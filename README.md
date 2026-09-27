@@ -35,6 +35,19 @@ Type-check the app with:
 npm run typecheck
 ```
 
+## Deploy the Expo web app
+
+The same Expo app exports a browser build without changing the native entry point:
+
+```bash
+npm install
+npm run build:web
+```
+
+The repository-root `vercel.json` builds the web app into `dist/`. In Vercel, import this repository with the **Root Directory** set to `.` and the `Other` framework preset. The intended app domain is `https://app.collos.sithunyein.com`; add it under **Project Settings → Domains** and create the DNS record Vercel provides. If the custom domain is not attached yet, use the exact Vercel deployment URL shown in the project dashboard instead.
+
+Web mode supports the onboarding and dashboard interaction flow with mock data. Native notifications and store purchases are not available in web mode; the Pro surface remains a preview shell until RevenueCat is wired for native builds. Supabase shared persistence is also not implemented yet.
+
 ## Project shape
 
 - `App.tsx` contains the first functional vertical slice: onboarding, dashboard, recipient switching, task state changes, loading/error/empty states, and the Pro paywall shell.

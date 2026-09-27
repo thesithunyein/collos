@@ -45,13 +45,20 @@ export default function App() {
   const [isPaywallOpen, setPaywallOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [activeNav, setActiveNav] = useState("Today");
+  const [notice, setNotice] = useState("");
 
   const recipient = useMemo(
     () => mockRecipients.find((item) => item.id === recipientId) ?? mockRecipients[0],
     [recipientId],
   );
   const completedCount = tasks.filter((task) => task.status === "confirmed").length;
-  const progress = Math.round((completedCount / tasks.length) * 100);
+  const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
+
+  const showNotice = (message: string) => {
+    setNotice(message);
+    setTimeout(() => setNotice(""), 2800);
+  };
 
   const enterDashboard = () => {
     setLoading(true);
@@ -184,6 +191,7 @@ export default function App() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Add a care recipient"
+              onPress={() => showNotice("Recipient invites will be available when shared care circles are connected.")}
               style={({ pressed }) => [styles.addRecipient, pressed && styles.pressed]}
             >
               <Ionicons name="add" size={20} color={colors.blue} />
@@ -230,7 +238,7 @@ export default function App() {
                 <Text style={styles.sectionTitle}>Today’s moments</Text>
                 <Text style={styles.sectionMeta}>{completedCount} of {tasks.length} confirmed</Text>
               </View>
-              <Pressable accessibilityRole="button" style={styles.viewAllButton}>
+              <Pressable accessibilityRole="button" onPress={() => showNotice("Plan editing is ready for the next build.")} style={styles.viewAllButton}>
                 <Text style={styles.viewAllText}>Edit plan</Text>
                 <Ionicons name="chevron-forward" size={16} color={colors.blue} />
               </Pressable>
@@ -241,7 +249,7 @@ export default function App() {
                 <Ionicons name="sparkles-outline" size={28} color={colors.blue} />
                 <Text style={styles.emptyTitle}>No moments planned yet</Text>
                 <Text style={styles.emptyText}>Add a small check-in so your care circle knows what matters today.</Text>
-                <Pressable accessibilityRole="button" style={styles.secondaryButton}>
+                <Pressable accessibilityRole="button" onPress={() => showNotice("Add a moment is ready for the next build.")} style={styles.secondaryButton}>
                   <Text style={styles.secondaryButtonText}>Add a moment</Text>
                 </Pressable>
               </View>
@@ -282,10 +290,11 @@ export default function App() {
         )}
       </ScrollView>
       <View style={styles.bottomNav}>
-        <NavItem icon="grid-outline" label="Today" active />
-        <NavItem icon="people-outline" label="Circle" />
-        <NavItem icon="settings-outline" label="Settings" />
+        <NavItem icon="grid-outline" label="Today" active={activeNav === "Today"} onPress={() => setActiveNav("Today")} />
+        <NavItem icon="people-outline" label="Circle" active={activeNav === "Circle"} onPress={() => showNotice("Your care circle will live here.")} />
+        <NavItem icon="settings-outline" label="Settings" active={activeNav === "Settings"} onPress={() => showNotice("Settings are coming in a future build.")} />
       </View>
+      {notice ? <View accessibilityLiveRegion="polite" style={styles.notice}><Ionicons name="information-circle-outline" size={17} color={colors.blue} /><Text style={styles.noticeText}>{notice}</Text></View> : null}
       <PaywallModal visible={isPaywallOpen} onClose={() => setPaywallOpen(false)} />
     </SafeAreaView>
   );
@@ -336,9 +345,9 @@ function TaskCard({ task, onUpdate }: { task: CareTask; onUpdate: (id: string, s
   );
 }
 
-function NavItem({ icon, label, active }: { icon: keyof typeof Ionicons.glyphMap; label: string; active?: boolean }) {
+function NavItem({ icon, label, active, onPress }: { icon: keyof typeof Ionicons.glyphMap; label: string; active?: boolean; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityState={{ selected: active }} style={styles.navItem}>
+    <Pressable accessibilityRole="button" accessibilityState={{ selected: active }} onPress={onPress} style={styles.navItem}>
       <Ionicons name={icon} size={21} color={active ? colors.blue : colors.muted} />
       <Text style={[styles.navLabel, active && styles.navLabelActive]}>{label}</Text>
     </Pressable>
@@ -367,10 +376,10 @@ function PaywallModal({ visible, onClose }: { visible: boolean; onClose: () => v
               </View>
             ))}
           </View>
-          <Pressable accessibilityRole="button" style={styles.modalPrimaryButton}>
+          <Pressable accessibilityRole="button" onPress={onClose} style={styles.modalPrimaryButton}>
             <Text style={styles.modalPrimaryText}>Continue with Pro</Text>
           </Pressable>
-          <Text style={styles.storeNote}>Ready for RevenueCat Test Store · No charge in this preview</Text>
+          <Text style={styles.storeNote}>Web preview only · Native store purchases are not available here</Text>
         </View>
       </View>
     </Modal>
@@ -461,6 +470,8 @@ const styles = StyleSheet.create({
   navItem: { minWidth: 70, minHeight: 52, alignItems: "center", justifyContent: "center", gap: 4 },
   navLabel: { color: colors.muted, fontSize: 11, fontWeight: "700" },
   navLabelActive: { color: colors.blue },
+  notice: { position: "absolute", left: 20, right: 20, bottom: 88, minHeight: 48, borderRadius: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 14, flexDirection: "row", alignItems: "center", gap: 8, shadowColor: colors.ink, shadowOpacity: 0.12, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
+  noticeText: { flex: 1, color: colors.ink, fontSize: 12, lineHeight: 17 },
   pressed: { opacity: 0.72 },
   skeletonStack: { gap: 12 },
   skeleton: { height: 112, borderRadius: 22, backgroundColor: "#E6EAF2" },
