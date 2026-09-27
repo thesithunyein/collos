@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Collos",
+    "slug": "collos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#2457F5",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.collos.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#2457F5"
+      },
+      "package": "com.collos.app"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
