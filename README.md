@@ -4,6 +4,14 @@ Collos is a mobile-first care coordination experience built with Expo and React 
 
 > **Safety note:** Collos is for care coordination only. It is not medical advice and does not replace a qualified care professional.
 
+## Project brief
+
+We built the first real Collos mobile experience: a calm onboarding flow and caregiver dashboard for coordinating everyday moments of support. The app is designed for a 375px mobile viewport, with accessible touch targets and clear safety copy.
+
+**Functional now:** onboarding, care-circle recipient switching, daily care-plan cards, confirmed/not-confirmed/skipped task states, loading/empty/error UI states, and a Pro paywall shell prepared for RevenueCat Test Store configuration. The public landing page is a separate static surface in `landing/`.
+
+**Still to build:** Supabase-backed shared persistence, real RevenueCat Test Store wiring and entitlements, push/local notifications, and signed production mobile builds.
+
 ## Run locally
 
 1. Install Node.js 18+ and Expo CLI prerequisites.
