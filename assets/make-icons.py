@@ -30,6 +30,9 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SOURCE = os.path.join(HERE, "logo-source.png")
+# Full-bleed square variant on the blue background — used where an opaque,
+# rounded-canvas favicon reads best (browser tabs, the app subdomain).
+FAVICON_SOURCE = os.path.join(HERE, "favicon-source.png")
 
 # Android adaptive icons: Google's published safe zone is a circle of 66dp
 # diameter on a 108dp canvas — ~61% of the width. Anything outside it risks
@@ -147,10 +150,13 @@ def make_adaptive_foreground(size: int = 1024) -> Image.Image:
 
 
 def make_favicon(size: int = 196) -> Image.Image:
-    """Browser-tab favicon: the logo on its own black, unmasked."""
-    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 255))
-    canvas.alpha_composite(fitted(load_source(), size, FAVICON_SAFE_ZONE))
-    return canvas
+    """Browser-tab favicon: resampled straight from `favicon-source.png`.
+
+    That source is the supplied full-bleed square variant (cat on blue), so the
+    favicon is the same artwork everywhere with no fitting decisions of its own.
+    """
+    source = Image.open(FAVICON_SOURCE).convert("RGBA")
+    return source.resize((size, size), Image.LANCZOS)
 
 
 def make_splash(size: int = 1024) -> Image.Image:
