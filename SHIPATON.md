@@ -167,6 +167,7 @@ summaries. Where the marketing page and the rules differ, the rules govern (thei
 | Requirement | Collos |
 | --- | --- |
 | Text description explaining features and functionality | ✅ §7, paste-ready |
+| Qualifying academic email (Next Gen gate) | ✅ Pre-checked 28 Sep: `my.uopeople.edu` is recognised on shipaton.com/next-gen. **Still required:** that same email must be on the Devpost account itself — check Devpost → Settings before submitting |
 | Demo video, <2 min, **publicly visible on YouTube or Vimeo**, showing the app functioning **on the device for which it was built** | ❌ Not recorded — the device clause matters: film it on a real phone via **Expo Go** or the iOS Simulator, not only the browser. Script in §6. Upload **public** (rules say "publicly visible"; RevenueCat's walkthrough accepts unlisted — treat public as the safe default). |
 | Public repo URL, open-source-licensed, **licence detectable and visible in the About section** | ✅ MIT `LICENSE` at the root — GitHub shows it in About automatically; confirm it says "MIT license" on the repo page before submitting |
 | 1024×1024 app icon | ✅ `assets/icon.png` (verified 1024×1024) |
