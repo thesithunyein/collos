@@ -15,10 +15,16 @@ import type { PlanOption } from "../purchases/revenuecat";
 import type { ProController } from "../purchases/usePro";
 import { colors } from "../theme";
 
+/**
+ * Only list what the entitlement actually unlocks. Reminders were advertised here
+ * long before any notification code existed, which is a store-review rejection
+ * (guideline 2.3.1) and the same drift that once put a "50%" dashboard on the
+ * landing page. Add the line back in the same change that ships delivery.
+ */
 const FEATURES = [
   "Invite more people to your care circle",
   "Save shared notes in one calm place",
-  "Get gentle reminders when you choose",
+  "Keep the whole circle on one plan",
 ];
 
 export function PaywallModal({
@@ -66,7 +72,7 @@ export function PaywallModal({
             </View>
             <Text style={styles.modalTitle}>More room for care</Text>
             <Text style={styles.modalText}>
-              Keep your circle in sync with shared notes, gentle reminders, and an unlimited care plan.
+              Keep your circle in sync with shared notes and room for everyone who helps.
             </Text>
 
             <View style={styles.featureList}>

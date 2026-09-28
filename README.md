@@ -10,7 +10,9 @@ Collos is for the person in a family who has quietly become the organiser. Care 
 
 **Functional now:** onboarding, care-circle recipient switching, daily care-plan cards, confirmed/not-confirmed/skipped task states, loading/empty/error UI states, a real RevenueCat purchase flow (offerings, purchase, restore, entitlement gating), and three working tabs — Today, Circle, and Settings.
 
-**Still to build:** Supabase-backed shared persistence, push/local notifications, and signed production builds for the App Store and Google Play.
+**Still to build:** Supabase-backed shared persistence and scheduled reminders. The release path is in place instead: `eas.json` defines the build profiles, and `RELEASE.md` is the runbook from an empty RevenueCat project to a submitted store listing.
+
+**Deliberately not advertised:** reminders. The paywall and three screens used to sell "gentle reminders" with no notification code behind it. Every mention was removed rather than left as a promise — a feature listed but absent is an App Store rejection, and it is the same drift that once left a stale dashboard mockup on the landing page. Re-add the copy in the same change that ships delivery.
 
 ## Run locally
 
@@ -113,9 +115,20 @@ The script launches a local Chrome or Edge headless, drives the web app over the
 npm run screenshots:devpost
 ```
 
-That writes six screenshots to `submission/screenshots/` at **1179×2556** — the exact size Devpost asks for, with no device frame. It captures at 393×852 CSS pixels with a 3× device scale factor, so the output needs no resampling. The `--set devpost` flow drives the real app through onboarding, the daily plan, the locked circle, the paywall, the unlocked circle, and Settings.
+That writes six screenshots to `submission/screenshots/` at **1179×2556** — the exact size Devpost asks for, with no device frame. It captures at 393×852 CSS pixels with a 3× device scale factor, so the output needs no resampling. The same flow drives the real app through onboarding, the daily plan, the locked circle, the paywall, the unlocked circle, and Settings.
+
+The store sizes are **not** interchangeable with that one, so they have their own presets:
+
+```bash
+npm run screenshots:appstore   # 1320x2868 -> store/screenshots/appstore/
+npm run screenshots:playstore  # 1080x1920 -> store/screenshots/playstore/
+```
+
+App Store Connect rejects a set that skips the largest supported display, which is why 1179×2556 is not accepted there, and Google Play refuses any screenshot whose longest side exceeds twice its shortest, which rules out both 1179×2556 and 1320×2868. See `store/listing.md` §5.
 
 `SHIPATON.md` holds the Shipaton 2026 submission pack: the eligibility gates, what is still missing, the two-minute demo video script, and paste-ready Devpost copy.
+
+The site also carries the `privacy` and `terms` pages that both app stores require; they are linked from the footer of every page. `landing/vercel.json` sets `cleanUrls`, so they resolve without the `.html` suffix.
 
 ### Deploy to Vercel
 
@@ -126,3 +139,26 @@ That writes six screenshots to `submission/screenshots/` at **1179×2556** — t
 5. Create the DNS record Vercel shows for that domain. Vercel will verify it and issue HTTPS automatically.
 
 The domain is not claimed to be live until Vercel reports the deployment as ready and the custom domain resolves.
+
+## Releasing to the App Store and Google Play
+
+`RELEASE.md` is the full runbook: creating the RevenueCat project, setting the environment variables in all three places they are needed, building, submitting, and the mistakes this project has already made once. `store/listing.md` holds the paste-ready listing copy and the privacy, data-safety, age-rating and content-rating answers.
+
+The pieces that live in the repository:
+
+| File | What it does |
+| --- | --- |
+| `eas.json` | A `preview` profile for internal distribution (Android APK, iOS simulator build) and a `production` profile for store builds that auto-increments the build numbers |
+| `app.json` | `ios.buildNumber`, `android.versionCode`, `scheme`, and the export-compliance answer, so the App Store encryption question is answered without a manual step |
+| `store/listing.md` | Store metadata, the pre-flight gates, and the questionnaires |
+| `RELEASE.md` | The runbook, including the two traps in §10 |
+
+```bash
+npm run release:preview     # internal build you can hand to someone
+npm run release:ios         # App Store build
+npm run release:android     # Google Play build
+npm run submit:ios          # upload to App Store Connect
+npm run submit:android      # upload to Google Play
+```
+
+EAS builds do **not** read the local `.env`. The `EXPO_PUBLIC_REVENUECAT_*` values have to be set as EAS environment variables per environment, or the build silently ships in preview mode.

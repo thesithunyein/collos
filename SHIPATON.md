@@ -42,7 +42,7 @@ Note that minors (and teams containing a minor) may only enter Next Gen.
 | 1 | iOS / iPadOS / macOS / Android app — web apps are **not** eligible | ⚠️ Expo project targets all three, but nothing is built or listed |
 | 2 | RevenueCat SDK powers ≥1 in-app or web purchase (or RevenueCat Ads) | ✅ **Done in this commit** — `react-native-purchases` 10.10.2, real offerings / purchase / restore / entitlement |
 | 3 | New app; first public release inside 1 Aug – 30 Sep 2026 | ✅ Nothing has ever been released anywhere |
-| 4 | Fully published on a supported store | ❌ Nothing in any store, no `eas.json` |
+| 4 | Fully published on a supported store | ❌ Nothing in any store yet. The build and submission path now exists — see `RELEASE.md` |
 | 5 | Available to download in the US | ❌ Follows from #4 |
 | 6 | RevenueCat project ID (required field on the form) | ❌ Dashboard still shows "Create a project" |
 | 7 | Public YouTube/Vimeo demo video, essential footage <2 min | ❌ Not recorded (script in §6) |
@@ -75,7 +75,16 @@ dashboard or a store, not a code change.
   *preview* mode: the flow is fully walkable and clearly labelled as not taking
   payment. The public web demo can never break because a key is missing.
 - **Screenshots at the exact size Devpost asks for.** `npm run screenshots:devpost`
-  captures 1179×2556 with no device frame.
+  captures 1179×2556 with no device frame. The same script also produces the sizes
+  App Store Connect and Google Play actually accept, which are *not* 1179×2556 — see
+  `store/listing.md` §5.
+- **A release path, not just a run instruction.** `eas.json` defines an internal
+  `preview` profile and a store-bound `production` profile, `app.json` carries the
+  build numbers and the export-compliance answer, and `RELEASE.md` is the runbook
+  from empty RevenueCat project to submitted listing.
+- **The store copy stopped promising things the app does not do.** "Gentle
+  reminders" was advertised in the paywall and on three screens with no notification
+  code behind it. That is an App Store 2.3.1 rejection, and it is removed.
 
 ## 4. Checklist: what only you can do
 
@@ -125,7 +134,7 @@ categories you are targeting — in that order.
 | 0:15–0:40 | Tap *Set up my care circle*, dashboard | "You set up who you're caring for, and each day gets a short care plan. Confirm what happened, skip what didn't." |
 | 0:40–1:00 | Tap *Confirm* on Water break, watch 25% become 50% | "Every confirmation updates the plan, so if a sibling opens the app, they can see what's already been done today." |
 | 1:00–1:20 | Circle tab, free state | "The Circle tab shows everyone involved. On the free plan you get one helper and one shared note a day — that's a deliberate limit, not a paywall on a core feature." |
-| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites, unlimited shared notes, and gentle reminders. This is a live RevenueCat purchase — the SDK fetches the offering, the StoreKit sheet is real, and the entitlement is checked on every launch and after every purchase." |
+| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites and unlimited shared notes. This is a live RevenueCat purchase — the SDK fetches the offering, the StoreKit sheet is real, and the entitlement is checked on every launch and after every purchase." |
 | 1:45–2:00 | Circle screen now unlocked, then Settings | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling." |
 
 Do not use copyrighted music or any third party's trademarks.
@@ -148,8 +157,8 @@ everyone. Recipients are switched with one tap when you are caring for more than
 person. The Circle screen shows who is involved and who has checked in today.
 
 **How it makes money.** A free tier covering one helper and one shared note a day, and
-Collos Pro — unlimited invites, unlimited shared notes, and gentle reminders — as a
-monthly or annual subscription through RevenueCat. The entitlement is enforced in the
+Collos Pro — unlimited invites and unlimited shared notes — as a monthly or annual
+subscription through RevenueCat. The entitlement is enforced in the
 UI, not just displayed.
 
 **RevenueCat integration.** `react-native-purchases` is initialised per platform, and

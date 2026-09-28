@@ -12,10 +12,18 @@
  *      for at least one 1179x2556 screenshot with NO device frame, so that preset
  *      captures at 393x852 CSS pixels with a 3x device scale factor, which is
  *      exactly 1179x2556 device pixels.
+ *   3. `--set appstore` produces the same six screens at 1320x2868, the 6.9-inch
+ *      iPhone size App Store Connect expects. App Store Connect rejects a set that
+ *      skips the largest supported display, so 1179x2556 alone is not enough.
+ *   4. `--set playstore` produces them at 1080x1920. Google Play refuses any
+ *      screenshot whose longest side is more than twice its shortest, which rules
+ *      out both 1179x2556 (1179 x 2 < 2556) and 1320x2868.
  *
  * Usage:
  *   node scripts/capture-app-screenshots.mjs
  *   node scripts/capture-app-screenshots.mjs --set devpost
+ *   node scripts/capture-app-screenshots.mjs --set appstore
+ *   node scripts/capture-app-screenshots.mjs --set playstore
  *   node scripts/capture-app-screenshots.mjs --base-url http://localhost:8081 --out-dir landing
  *
  * Requires a local Chrome or Edge. Override with CHROME_PATH if neither is found
@@ -37,8 +45,10 @@ const arg = (name, fallback) => {
 };
 
 const SET = arg("set", "landing");
-if (!["landing", "devpost"].includes(SET)) {
-  console.error(`Unknown --set "${SET}". Use "landing" or "devpost".`);
+if (!["landing", "devpost", "appstore", "playstore"].includes(SET)) {
+  console.error(
+    `Unknown --set "${SET}". Use "landing", "devpost", "appstore" or "playstore".`,
+  );
   process.exit(1);
 }
 
@@ -49,14 +59,25 @@ if (!["landing", "devpost"].includes(SET)) {
 const PRESETS = {
   landing: { width: 390, height: 844, scale: 2 },
   devpost: { width: 393, height: 852, scale: 3 },
+  // 440 x 956 CSS px at 3x is the 6.9-inch iPhone size, 1320 x 2868 exactly.
+  appstore: { width: 440, height: 956, scale: 3 },
+  // 360 x 640 CSS px at 3x is 1080 x 1920, a 9:16 phone capture. Play rejects
+  // anything longer than 2:1, so the taller sets above are not usable there.
+  playstore: { width: 360, height: 640, scale: 3 },
 };
 
 const VIEWPORT = PRESETS[SET];
 const BASE_URL = arg("base-url", "https://app.collos.sithunyein.com/");
-const OUT_DIR = path.resolve(
-  arg("out-dir", SET === "devpost" ? "submission/screenshots" : "landing"),
-);
-const PORT = Number(arg("port", SET === "devpost" ? "9334" : "9333"));
+const OUT_DIRS = {
+  landing: "landing",
+  devpost: "submission/screenshots",
+  appstore: "store/screenshots/appstore",
+  playstore: "store/screenshots/playstore",
+};
+const PORTS = { landing: 9333, devpost: 9334, appstore: 9335, playstore: 9336 };
+
+const OUT_DIR = path.resolve(arg("out-dir", OUT_DIRS[SET]));
+const PORT = Number(arg("port", String(PORTS[SET])));
 
 /**
  * Each step presses something, waits for the app to react, then captures.
@@ -72,41 +93,50 @@ const FLOWS = {
       expect: "Today.s moments",
     },
   ],
-  devpost: [
-    { file: "01-onboarding.png", label: "onboarding" },
-    {
-      file: "02-today.png",
-      label: "today",
-      press: "Set up my care circle",
-      expect: "Today.s moments",
-    },
-    {
-      file: "03-circle-free.png",
-      label: "care circle (free)",
-      press: "Circle",
-      expect: "Invite more people",
-    },
-    {
-      file: "04-paywall.png",
-      label: "paywall",
-      press: "Unlock with Pro",
-      expect: "More room for care",
-    },
-    {
-      file: "05-circle-pro.png",
-      label: "care circle (Pro unlocked)",
-      press: "Continue with Pro",
-      expect: "Invites are unlocked",
-      settleMs: 1400,
-    },
-    {
-      file: "06-settings.png",
-      label: "settings / store connection",
-      press: "Settings",
-      expect: "STORE CONNECTION",
-    },
-  ],
 };
+
+/**
+ * The six-screen tour. Shared by the Devpost set and the App Store set, which
+ * differ only in capture size and output directory.
+ */
+const APP_TOUR = [
+  { file: "01-onboarding.png", label: "onboarding" },
+  {
+    file: "02-today.png",
+    label: "today",
+    press: "Set up my care circle",
+    expect: "Today.s moments",
+  },
+  {
+    file: "03-circle-free.png",
+    label: "care circle (free)",
+    press: "Circle",
+    expect: "Invite more people",
+  },
+  {
+    file: "04-paywall.png",
+    label: "paywall",
+    press: "Unlock with Pro",
+    expect: "More room for care",
+  },
+  {
+    file: "05-circle-pro.png",
+    label: "care circle (Pro unlocked)",
+    press: "Continue with Pro",
+    expect: "Invites are unlocked",
+    settleMs: 1400,
+  },
+  {
+    file: "06-settings.png",
+    label: "settings / store connection",
+    press: "Settings",
+    expect: "STORE CONNECTION",
+  },
+];
+
+FLOWS.devpost = APP_TOUR;
+FLOWS.appstore = APP_TOUR;
+FLOWS.playstore = APP_TOUR;
 
 const BROWSERS = [
   process.env.CHROME_PATH,

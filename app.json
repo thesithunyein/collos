@@ -2,6 +2,7 @@
   "expo": {
     "name": "Collos",
     "slug": "collos",
+    "scheme": "collos",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -13,14 +14,17 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.collos.app"
+      "bundleIdentifier": "com.collos.app",
+      "buildNumber": "1",
+      "config": { "usesNonExemptEncryption": false }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2457F5"
       },
-      "package": "com.collos.app"
+      "package": "com.collos.app",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",

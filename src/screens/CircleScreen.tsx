@@ -141,8 +141,8 @@ export function CircleScreen({
             </View>
             <Text style={styles.lockedTitle}>Invite more people</Text>
             <Text style={styles.lockedText}>
-              Free includes one helper and one shared note a day. Collos Pro adds unlimited invites,
-              unlimited shared notes, and gentle reminders.
+              Inviting more than one helper is part of Collos Pro. Pro adds unlimited invites and
+              shared notes for everyone in your circle.
             </Text>
             <Pressable
               accessibilityRole="button"

@@ -11,7 +11,15 @@
     "build:web": "expo export --platform web",
     "typecheck": "tsc --noEmit",
     "screenshots": "node scripts/capture-app-screenshots.mjs",
-    "screenshots:devpost": "node scripts/capture-app-screenshots.mjs --set devpost"
+    "screenshots:devpost": "node scripts/capture-app-screenshots.mjs --set devpost",
+    "screenshots:appstore": "node scripts/capture-app-screenshots.mjs --set appstore",
+    "screenshots:playstore": "node scripts/capture-app-screenshots.mjs --set playstore",
+    "release:init": "npx eas-cli init",
+    "release:preview": "npx eas-cli build --profile preview",
+    "release:ios": "npx eas-cli build --platform ios --profile production",
+    "release:android": "npx eas-cli build --platform android --profile production",
+    "submit:ios": "npx eas-cli submit --platform ios --profile production",
+    "submit:android": "npx eas-cli submit --platform android --profile production"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",

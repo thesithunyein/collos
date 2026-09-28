@@ -210,8 +210,8 @@ export function TodayScreen({
                 </View>
                 <Text style={styles.proText}>
                   {pro
-                    ? "Shared notes, invites, and reminders are unlocked."
-                    : "Shared notes, reminders, and more space for your circle."}
+                    ? "Shared notes and unlimited invites are unlocked."
+                    : "Shared notes and more space for your circle."}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={colors.blue} />
