@@ -1,24 +1,31 @@
 #!/usr/bin/env node
 /**
- * Capture real screenshots of the running Collos app for the landing page.
+ * Capture real screenshots of the running Collos app.
  *
- * The landing page used to hand-build a CSS imitation of the dashboard, which
- * silently drifted from the app (it advertised "50%" and "2 of 4 confirmed"
- * long after the app showed "25%" and "1 of 4"). These PNGs are captured from
- * the app itself, so the landing page cannot contradict it.
+ * Two jobs:
+ *   1. `--set landing` feeds the landing page. That page used to hand-build a CSS
+ *      imitation of the dashboard, which silently drifted from the app (it
+ *      advertised "50%" and "2 of 4 confirmed" long after the app showed "25%"
+ *      and "1 of 4"). These PNGs come from the app itself, so the landing page
+ *      cannot contradict it.
+ *   2. `--set devpost` produces the Shipaton submission screenshots. Devpost asks
+ *      for at least one 1179x2556 screenshot with NO device frame, so that preset
+ *      captures at 393x852 CSS pixels with a 3x device scale factor, which is
+ *      exactly 1179x2556 device pixels.
  *
  * Usage:
  *   node scripts/capture-app-screenshots.mjs
+ *   node scripts/capture-app-screenshots.mjs --set devpost
  *   node scripts/capture-app-screenshots.mjs --base-url http://localhost:8081 --out-dir landing
  *
- * Requires a local Chrome or Edge. Override with CHROME_PATH if neither is
- * found in the usual places. No npm dependencies: it talks to the browser over
- * the DevTools protocol using Node's built-in WebSocket.
+ * Requires a local Chrome or Edge. Override with CHROME_PATH if neither is found
+ * in the usual places. No npm dependencies: it talks to the browser over the
+ * DevTools protocol using Node's built-in WebSocket.
  */
 
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -29,12 +36,77 @@ const arg = (name, fallback) => {
   return i !== -1 && argv[i + 1] ? argv[i + 1] : fallback;
 };
 
-const BASE_URL = arg("base-url", "https://app.collos.sithunyein.com/");
-const OUT_DIR = path.resolve(arg("out-dir", "landing"));
-const PORT = Number(arg("port", "9333"));
+const SET = arg("set", "landing");
+if (!["landing", "devpost"].includes(SET)) {
+  console.error(`Unknown --set "${SET}". Use "landing" or "devpost".`);
+  process.exit(1);
+}
 
-// Capture at a real phone viewport, at 2x for retina-crisp output.
-const VIEWPORT = { width: 390, height: 844, scale: 2 };
+/**
+ * 1179x2556 is the pixel size Shipaton asks for. 393 x 852 CSS px at a 3x device
+ * scale factor lands on it exactly, so the output needs no resampling.
+ */
+const PRESETS = {
+  landing: { width: 390, height: 844, scale: 2 },
+  devpost: { width: 393, height: 852, scale: 3 },
+};
+
+const VIEWPORT = PRESETS[SET];
+const BASE_URL = arg("base-url", "https://app.collos.sithunyein.com/");
+const OUT_DIR = path.resolve(
+  arg("out-dir", SET === "devpost" ? "submission/screenshots" : "landing"),
+);
+const PORT = Number(arg("port", SET === "devpost" ? "9334" : "9333"));
+
+/**
+ * Each step presses something, waits for the app to react, then captures.
+ * `expect` is matched against the document text to prove the app actually moved.
+ */
+const FLOWS = {
+  landing: [
+    { file: "app-onboarding.png", label: "onboarding" },
+    {
+      file: "app-dashboard.png",
+      label: "dashboard",
+      press: "Set up my care circle",
+      expect: "Today.s moments",
+    },
+  ],
+  devpost: [
+    { file: "01-onboarding.png", label: "onboarding" },
+    {
+      file: "02-today.png",
+      label: "today",
+      press: "Set up my care circle",
+      expect: "Today.s moments",
+    },
+    {
+      file: "03-circle-free.png",
+      label: "care circle (free)",
+      press: "Circle",
+      expect: "Invite more people",
+    },
+    {
+      file: "04-paywall.png",
+      label: "paywall",
+      press: "Unlock with Pro",
+      expect: "More room for care",
+    },
+    {
+      file: "05-circle-pro.png",
+      label: "care circle (Pro unlocked)",
+      press: "Continue with Pro",
+      expect: "Invites are unlocked",
+      settleMs: 1400,
+    },
+    {
+      file: "06-settings.png",
+      label: "settings / store connection",
+      press: "Settings",
+      expect: "STORE CONNECTION",
+    },
+  ],
+};
 
 const BROWSERS = [
   process.env.CHROME_PATH,
@@ -113,6 +185,49 @@ class Cdp {
   }
 
   /**
+   * The best interactive element matching `pattern`.
+   *
+   * Accessibility roles differ per control (nav items are `tab`, plan rows are
+   * `radio`), so query every interactive role and pick the *shortest* matching
+   * text: that is the innermost, most specific element rather than a container
+   * that happens to include the label.
+   */
+  _finder(pattern) {
+    return `(() => {
+      const re = new RegExp(${JSON.stringify(pattern)}, "i");
+      const nodes = [...document.querySelectorAll('[role="button"],[role="tab"],[role="radio"],[tabindex]')];
+      const hits = nodes
+        .filter((n) => re.test((n.innerText || n.getAttribute('aria-label') || '').trim()))
+        .sort((a, b) => (a.innerText || '').trim().length - (b.innerText || '').trim().length);
+      return hits[0] || null;
+    })()`;
+  }
+
+  /**
+   * Scrolls the target into view. Without this a press would be dispatched at a
+   * y coordinate below the viewport and silently hit nothing.
+   */
+  async scrollTo(pattern) {
+    const ok = await this.evaluate(
+      `(() => { const el = ${this._finder(pattern)}; if (!el) return false;` +
+        ` el.scrollIntoView({ block: 'center', inline: 'center' }); return true; })()`,
+    );
+    if (ok) await sleep(400);
+    return ok;
+  }
+
+  /** Viewport coordinates of the centre of the best match. */
+  async locate(pattern) {
+    return this.evaluate(`(() => {
+      const el = ${this._finder(pattern)};
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return null;
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    })()`);
+  }
+
+  /**
    * Press a point the way the running app expects it.
    *
    * React Native Web listens for touch/pointer events; a bare synthetic mouse
@@ -143,8 +258,15 @@ class Cdp {
         "click()",
         async () => {
           await this.evaluate(`(() => {
-            const el = [...document.querySelectorAll('[role="button"]')]
-              .find((n) => /Set up my care circle/.test(n.innerText || ''));
+            const el = document.elementFromPoint(${x}, ${y});
+            let node = el;
+            while (node && node !== document.body) {
+              if (node.getAttribute && (node.getAttribute('role') || node.onclick)) {
+                node.click();
+                return true;
+              }
+              node = node.parentElement;
+            }
             if (el) el.click();
             return true;
           })()`);
@@ -154,7 +276,7 @@ class Cdp {
 
     for (const [name, fire] of attempts) {
       await fire();
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 20; i++) {
         await sleep(150);
         if (await this.evaluate(isDone)) {
           console.log(`  reached ${label} via ${name}`);
@@ -173,9 +295,15 @@ if (!browserPath) {
   process.exit(1);
 }
 
+await mkdir(OUT_DIR, { recursive: true });
 const profile = await mkdtemp(path.join(tmpdir(), "collos-shots-"));
-console.log(`Capturing ${BASE_URL}`);
-console.log(`  browser ${browserPath}`);
+const flow = FLOWS[SET];
+const pixels = `${VIEWPORT.width * VIEWPORT.scale}x${VIEWPORT.height * VIEWPORT.scale}`;
+
+console.log(`Capturing "${SET}" set from ${BASE_URL}`);
+console.log(`  viewport ${VIEWPORT.width}x${VIEWPORT.height} @${VIEWPORT.scale}x -> ${pixels} px`);
+console.log(`  out      ${path.relative(process.cwd(), OUT_DIR)}`);
+console.log(`  browser  ${browserPath}`);
 
 const browser = spawn(
   browserPath,
@@ -236,33 +364,34 @@ try {
   await cdp.evaluate("document.fonts && document.fonts.ready");
   await sleep(900);
 
-  console.log("  onboarding screen");
-  await cdp.shoot("app-onboarding.png");
-
-  // Drive the real UI: press "Set up my care circle".
-  const button = await cdp.evaluate(`(() => {
-    const el = [...document.querySelectorAll('[role="button"]')]
-      .find((n) => /Set up my care circle/.test(n.innerText || ''));
-    if (!el) return null;
-    const r = el.getBoundingClientRect();
-    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-  })()`);
-  if (!button) throw new Error("Could not find the onboarding button");
-
-  // The app renders a curly apostrophe in "Today’s moments", so match loosely.
-  const onDashboard = `/Today.s moments/.test(document.body.innerText)`;
-
-  const reached = await cdp.press(button.x, button.y, onDashboard, "the dashboard");
-  if (!reached) {
-    const seen = await cdp.evaluate(
-      `document.getElementById('root').innerText.slice(0, 160)`,
-    );
-    throw new Error(`Never reached the dashboard. Screen read: ${JSON.stringify(seen)}`);
+  for (const step of flow) {
+    if (step.press) {
+      if (!(await cdp.scrollTo(step.press))) {
+        throw new Error(`Could not find a control matching ${JSON.stringify(step.press)}`);
+      }
+      const point = await cdp.locate(step.press);
+      if (!point) throw new Error(`Could not measure a control matching ${JSON.stringify(step.press)}`);
+      // The app renders a curly apostrophe in "Today’s moments", so expect
+      // patterns stay loose and are matched case-insensitively.
+      const reacted = await cdp.press(
+        point.x,
+        point.y,
+        `new RegExp(${JSON.stringify(step.expect)}, "i").test(document.body.innerText)`,
+        step.label,
+      );
+      if (!reacted) {
+        const seen = await cdp.evaluate(
+          `document.getElementById('root').innerText.slice(0, 200)`,
+        );
+        throw new Error(`Never reached ${step.label}. Screen read: ${JSON.stringify(seen)}`);
+      }
+      await sleep(step.settleMs ?? 900);
+    } else {
+      console.log(`  ${step.label}`);
+      await sleep(400);
+    }
+    await cdp.shoot(step.file);
   }
-  await sleep(900);
-
-  console.log("  dashboard screen");
-  await cdp.shoot("app-dashboard.png");
 
   console.log("Done.");
 } finally {
