@@ -205,8 +205,10 @@ function PlanRow({
   return (
     <Pressable
       accessibilityRole="radio"
-      // `checked` (not `selected`) is what maps onto aria-checked for role="radio".
-      accessibilityState={{ checked: selected, disabled }}
+      // `role="radio"` needs `aria-checked`, not `aria-selected`. React Native Web
+      // 0.19 only forwards the ARIA prop, so `accessibilityState.checked` alone left
+      // both plans reading as unchecked to assistive tech.
+      aria-checked={selected}
       accessibilityLabel={`${plan.label}, ${plan.priceString}`}
       disabled={disabled}
       onPress={onSelect}
