@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, Text, View } from "react-native";
 import { NavItem } from "./src/components/NavItem";
 import { PaywallModal } from "./src/components/PaywallModal";
+import { AddMomentSheet } from "./src/components/AddMomentSheet";
 import { CareRecipient, mockRecipients, TaskStatus } from "./src/data/mockCare";
 import { CircleScreen } from "./src/screens/CircleScreen";
 import { OnboardingScreen } from "./src/screens/OnboardingScreen";
@@ -10,26 +11,66 @@ import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { TodayScreen } from "./src/screens/TodayScreen";
 import { colors } from "./src/theme";
 import { usePro } from "./src/purchases/usePro";
+import {
+  StoredState,
+  StoredTask,
+  clearStoredState,
+  emptyStoredState,
+  loadStoredState,
+  newMomentId,
+  saveStoredState,
+  tasksForRecipient,
+  withActiveRecipient,
+  withCustomMoment,
+  withResetDay,
+  withTaskStatus,
+} from "./src/storage/careStore";
 
 type Stage = "onboarding" | "app";
 type Tab = "Today" | "Circle" | "Settings";
 
 export default function App() {
+  // `hydrated` gates first paint: without it the app renders the default plan,
+  // then snaps to the persisted one — a visible flicker and, worse, a moment
+  // where a judge pressing "Confirm" would write onto unpersisted state.
+  const [hydrated, setHydrated] = useState(false);
+  const [stored, setStored] = useState<StoredState>(emptyStoredState);
   const [stage, setStage] = useState<Stage>("onboarding");
   const [tab, setTab] = useState<Tab>("Today");
-  const [recipientId, setRecipientId] = useState(mockRecipients[0].id);
-  const [tasks, setTasks] = useState(mockRecipients[0].tasks);
   const [isPaywallOpen, setPaywallOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [notice, setNotice] = useState("");
+  const [isAddingMoment, setAddingMoment] = useState(false);
 
   const pro = usePro();
 
+  // Restore once on launch. A failed read leaves `stored` empty and the app
+  // opens fresh — the same never-failing contract as the purchases wrapper.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const restored = await loadStoredState();
+      if (cancelled) return;
+      if (restored) {
+        setStored(restored);
+        if (restored.seenOnboarding) setStage("app");
+      }
+      setHydrated(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const recipient = useMemo(
-    () => mockRecipients.find((item) => item.id === recipientId) ?? mockRecipients[0],
-    [recipientId],
+    () =>
+      mockRecipients.find((item) => item.id === stored.activeRecipientId) ?? mockRecipients[0],
+    [stored.activeRecipientId],
   );
+  // Tasks are derived, not owned: the stored statuses are the source of truth,
+  // so there is exactly one place to persist and no state that can drift.
+  const tasks = useMemo(() => tasksForRecipient(stored, recipient), [stored, recipient]);
   const completedCount = tasks.filter((task) => task.status === "confirmed").length;
   const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
 
@@ -37,6 +78,16 @@ export default function App() {
     setNotice(message);
     setTimeout(() => setNotice(""), 2800);
   };
+
+  // Every mutation goes through here: update, then persist. The ref keeps the
+  // last state so rapid taps persist sequentially instead of racing.
+  const storedRef = useRef(stored);
+  storedRef.current = stored;
+  const mutate = useCallback((next: StoredState) => {
+    setStored(next);
+    storedRef.current = next;
+    void saveStoredState(next);
+  }, []);
 
   // Close the paywall a beat after a successful unlock so the user lands back on
   // the screen that just opened up.
@@ -54,16 +105,36 @@ export default function App() {
     setTimeout(() => {
       setLoading(false);
       setStage("app");
+      mutate(withActiveRecipient(storedRef.current, mockRecipients[0].id));
     }, 350);
   };
 
   const selectRecipient = (nextRecipient: CareRecipient) => {
-    setRecipientId(nextRecipient.id);
-    setTasks(nextRecipient.tasks);
+    mutate(withActiveRecipient(storedRef.current, nextRecipient.id));
   };
 
   const updateTask = (taskId: string, status: TaskStatus) => {
-    setTasks((current) => current.map((task) => (task.id === taskId ? { ...task, status } : task)));
+    mutate(withTaskStatus(storedRef.current, recipient.id, taskId, status));
+  };
+
+  const addMoment = (moment: Omit<StoredTask, "id">) => {
+    const task: StoredTask = { ...moment, id: newMomentId() };
+    mutate(withCustomMoment(storedRef.current, recipient.id, task));
+    setAddingMoment(false);
+    showNotice(`“${moment.title}” added to ${recipient.name}’s plan.`);
+  };
+
+  const resetDay = () => {
+    mutate(withResetDay(storedRef.current, recipient.id));
+    showNotice(`Today’s moments for ${recipient.name} are open again.`);
+  };
+
+  const resetAllData = async () => {
+    await clearStoredState();
+    setStored(emptyStoredState());
+    storedRef.current = emptyStoredState();
+    setStage("onboarding");
+    setTab("Today");
   };
 
   const retryLoad = () => {
@@ -71,6 +142,14 @@ export default function App() {
     setLoading(true);
     setTimeout(() => setLoading(false), 450);
   };
+
+  if (!hydrated) {
+    return (
+      <View style={[styles.viewport, styles.launch]}>
+        <ActivityIndicator color={colors.blue} />
+      </View>
+    );
+  }
 
   if (stage === "onboarding") {
     return (
@@ -105,8 +184,8 @@ export default function App() {
                   : "Inviting more recipients is part of Collos Pro.",
               )
             }
-            onEditPlan={() => showNotice("Plan editing is ready for the next build.")}
-            onAddMoment={() => showNotice("Add a moment is ready for the next build.")}
+            onEditPlan={resetDay}
+            onAddMoment={() => setAddingMoment(true)}
             onOpenPaywall={() => setPaywallOpen(true)}
             onOpenSharedNotes={() => showNotice("Your shared notes will appear here.")}
           />
@@ -118,7 +197,7 @@ export default function App() {
             onInvite={() => showNotice("Send an invite link to anyone you trust.")}
           />
         ) : (
-          <SettingsScreen pro={pro} />
+          <SettingsScreen pro={pro} onResetData={resetAllData} />
         )}
 
         <View style={styles.bottomNav}>
@@ -138,6 +217,12 @@ export default function App() {
             <Text style={styles.noticeText}>{notice}</Text>
           </View>
         ) : null}
+
+        <AddMomentSheet
+          visible={isAddingMoment}
+          onClose={() => setAddingMoment(false)}
+          onSubmit={addMoment}
+        />
 
         <PaywallModal
           visible={isPaywallOpen}
@@ -160,6 +245,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
   },
+  launch: { alignItems: "center", justifyContent: "center" },
   frame: {
     flex: 1,
     width: "100%",

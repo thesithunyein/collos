@@ -52,8 +52,8 @@ export function TodayScreen({
       >
         <View style={styles.header}>
           <View>
-            <Text style={styles.eyebrow}>FRIDAY, 14 JUNE</Text>
-            <Text style={styles.greeting}>Good morning, Sithu</Text>
+            <Text style={styles.eyebrow}>{dateLine().toUpperCase()}</Text>
+            <Text style={styles.greeting}>{greeting()}, Sithu</Text>
           </View>
           <Pressable
             accessibilityRole="button"
@@ -159,11 +159,12 @@ export function TodayScreen({
               </View>
               <Pressable
                 accessibilityRole="button"
+                accessibilityLabel="Reset today's moments to not confirmed"
                 onPress={onEditPlan}
                 style={styles.viewAllButton}
               >
-                <Text style={styles.viewAllText}>Edit plan</Text>
-                <Ionicons name="chevron-forward" size={16} color={colors.blue} />
+                <Text style={styles.viewAllText}>Reset day</Text>
+                <Ionicons name="refresh" size={15} color={colors.blue} />
               </Pressable>
             </View>
 
@@ -231,6 +232,23 @@ export function TodayScreen({
   );
 }
 
+/** A real date line — the plan is about *today*, so the header must say today. */
+function dateLine(): string {
+  return new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+}
+
+/** Time-aware greeting; the fallback covers locales where the hour is unclear. */
+function greeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 /**
  * The surface that proves the entitlement does something: free users see a
  * locked preview, Pro users get the real thing.
@@ -261,7 +279,7 @@ function SharedNotesStrip({
         </View>
         <Text style={styles.notesText}>
           {pro
-            ? "“Mum loved the window flowers.” — added by Daniel, 2h ago"
+            ? "Leave a note for the next person who picks up the plan."
             : "Everyone in your circle can leave one calm note a day."}
         </Text>
       </View>

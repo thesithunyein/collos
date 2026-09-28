@@ -86,10 +86,10 @@ SET UP YOUR CIRCLE
 Add who you are caring for and the people who help. Switch between recipients with one tap when you look after more than one person.
 
 A SHORT PLAN FOR TODAY
-Each recipient has a few small care moments, not a wall of tasks. Confirm what happened, skip what did not, and leave the rest for later.
+Each recipient has a few small care moments, not a wall of tasks. Add your own moments, confirm what happened, skip what did not, and leave the rest for later.
 
-SEE WHAT IS ALREADY DONE
-Every moment has a clear state, and the plan shows today's progress at a glance - so whoever picks it up next is not starting from scratch.
+IT REMEMBERS
+Every confirmation is saved the moment you tap it. Close the app, come back tomorrow, and the plan still remembers - no account needed, nothing leaves your device.
 
 A SHARED NOTE
 Leave a short note for the next person: how the morning went, what to watch for, what was already handled.
@@ -228,7 +228,7 @@ become wrong the moment that changes.
 | Does your app collect or share required user data types? | Yes |
 | Data type: **Financial info → Purchase history** | Collected. Not shared. Processed ephemerally: no. Required: yes. Purpose: App functionality. |
 | Data type: **Device or other IDs** | Collected. Not shared. Purpose: App functionality. (RevenueCat provisions an anonymous app user ID for a device that has never signed in.) |
-| All other data types | Not collected |
+| All other data types | Not collected. Care-plan entries are stored on-device only and never transmitted to Collos or any third party. |
 | Is all user data encrypted in transit? | Yes |
 | Do you provide a way for users to request data deletion? | Yes — the RevenueCat app user ID is anonymous and uninstall-scoped; deletion requests go to the support email. State this in the privacy policy. |
 | Has your app been independently validated against a global security standard? | No |
@@ -254,11 +254,11 @@ These are in the listing copy above as things the app does **today**. Anything t
 cannot be demonstrated in the submitted binary does not belong in a store listing, so
 do not add the following until they exist:
 
-- **Sharing between phones.** The Circle screen shows who is involved and who has
-  checked in, but the data boundary (`src/data/mockCare.ts`) is still local, so two
-  phones do not see the same plan yet. The description in §3 is therefore worded as
-  *"whoever picks it up next"*. Do not add "shared", "in real time", or "everyone
-  sees the same plan" until persistence ships.
+- **Sharing between phones.** The care plan is device-local: every confirmation is
+  saved and survives a restart, but on one device only. Two phones do not see the same
+  plan yet, so the description says "the plan still remembers" (true per device) and
+  never "shared", "in real time", or "everyone sees the same plan". The §1 gate about
+  matching the shipped binary applies to this line exactly as to any other.
 - **Reminders.** This one was already wrong and is now fixed in code, not just here.
   The paywall was selling "gentle reminders" and the Circle, Today and Settings
   screens all repeated it, but no notification code existed anywhere. Every mention

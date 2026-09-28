@@ -179,7 +179,7 @@ categories you are targeting — in that order.
 | --- | --- | --- |
 | 0:00–0:15 | Onboarding screen | "This is Collos. When you help look after someone, the little things are the first to slip — did she drink water, did anyone actually check in, who is visiting on Sunday. Collos is one calm place for a care circle to keep track." |
 | 0:15–0:40 | Tap *Set up my care circle*, dashboard | "You set up who you're caring for, and each day gets a short care plan. Confirm what happened, skip what didn't." |
-| 0:40–1:00 | Tap *Confirm* on Water break, watch 25% become 50% | "Every confirmation updates the plan, so if a sibling opens the app, they can see what's already been done today." |
+| 0:40–1:00 | Tap *Confirm* on Water break, watch 25% become 50% | "Every confirmation is saved the moment you tap it — close the app, come back tomorrow, and the plan still remembers. Nothing you confirmed gets lost." |
 | 1:00–1:20 | Circle tab, free state | "The Circle tab shows everyone involved. On the free plan you get one helper and one shared note a day — that's a deliberate limit, not a paywall on a core feature." |
 | 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites and unlimited shared notes. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(If the RevenueCat project exists by recording day: "…and this is a live sandbox purchase through the Test Store." If not, keep the preview-mode wording — the category explicitly expects sandboxed monetization.)* |
 | 1:45–2:00 | Circle screen now unlocked, then Settings | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling." |
@@ -198,10 +198,11 @@ actually been done. Collos turns that into a short, shared daily plan.
 **Who it's for.** The person in a family who has quietly become the organiser — usually
 the one who lives closest, or the only one who remembers.
 
-**What it does.** Care recipients each get a daily plan of small check-ins. Anyone in
-the circle confirms or skips a moment, and the plan's completion is visible to
-everyone. Recipients are switched with one tap when you are caring for more than one
-person. The Circle screen shows who is involved and who has checked in today.
+**What it does.** Care recipients each get a daily plan of small check-ins. You confirm
+or skip a moment and the plan remembers it — on device, immediately, across restarts.
+Recipients are switched with one tap when you are caring for more than one person, and
+you can add your own moments to any plan. The Circle screen shows who is involved and
+who has checked in today.
 
 **How it makes money.** A free tier covering one helper and one shared note a day, and
 Collos Pro — unlimited invites and unlimited shared notes — as a monthly or annual
@@ -226,8 +227,12 @@ lesson was that `*` peer ranges are load-bearing in a pinned SDK tree. Adding
 `react-native-purchases` afterwards carried exactly that risk, so the dependency tree
 was fingerprinted before and after and verified unchanged.
 
-**What's next.** Real persistence so a care circle can actually be shared between
-phones, scheduled reminders, and store releases for iOS and Android.
+**What was built during the hackathon window.** The app went from two mock screens to
+a working product: device-local persistence (every confirmation survives a restart,
+with a settings reset), an add-a-moment flow, a real RevenueCat purchase path with
+sandboxable preview mode, and three full screens. **What's next.** A backend so a care
+circle can actually be shared between phones, scheduled reminders, and store releases
+for iOS and Android.
 
 **Categories targeted.** *(Tick only what you can evidence.)* Next Gen Award — student
 project, public repository, MIT licensed. RevenueCat Design Award — the interaction

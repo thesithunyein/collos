@@ -8,9 +8,11 @@ Collos is a mobile-first care coordination experience built with Expo and React 
 
 Collos is for the person in a family who has quietly become the organiser. Care work is invisible and easy to drop: one sibling does the morning call, another does the shopping, and nobody is sure what has actually been done. Collos turns that into a short, shared daily plan.
 
-**Functional now:** onboarding, care-circle recipient switching, daily care-plan cards, confirmed/not-confirmed/skipped task states, loading/empty/error UI states, a real RevenueCat purchase flow (offerings, purchase, restore, entitlement gating), and three working tabs — Today, Circle, and Settings.
+**Functional now:** onboarding, care-circle recipient switching, daily care-plan cards, confirmed/not-confirmed/skipped task states, loading/empty/error UI states, a real RevenueCat purchase flow (offerings, purchase, restore, entitlement gating), an add-a-moment flow, device-local persistence, and three working tabs — Today, Circle, and Settings.
 
-**Still to build:** Supabase-backed shared persistence and scheduled reminders. The release path is in place instead: `eas.json` defines the build profiles, and `RELEASE.md` is the runbook from an empty RevenueCat project to a submitted store listing.
+**Persistence:** the care plan survives restarts. Every confirmation, added moment, and recipient preference is written to device-local storage the moment it happens — `localStorage` on web, `expo-file-system` on native (`src/storage/`). No account, no backend, nothing leaves the device, which is exactly what the privacy policy and store listing claim. Settings has a reset that clears it.
+
+**Still to build:** a backend so a care circle is shared *between* phones (the current store is per-device), scheduled reminders. The release path is in place: `eas.json` defines the build profiles, and `RELEASE.md` is the runbook from an empty RevenueCat project to a submitted store listing.
 
 **Deliberately not advertised:** reminders. The paywall and three screens used to sell "gentle reminders" with no notification code behind it. Every mention was removed rather than left as a promise — a feature listed but absent is an App Store rejection, and it is the same drift that once left a stale dashboard mockup on the landing page. Re-add the copy in the same change that ships delivery.
 
@@ -70,17 +72,19 @@ The app targets Expo SDK 51, so every Expo package must stay on its SDK 51 versi
 ## Project shape
 
 ```
-App.tsx                        app shell: stage, tab routing, nav, paywall
+App.tsx                        app shell: stage, tab routing, nav, paywall, persistence wiring
 src/theme.ts                   colour palette (mirrors brand.md)
+src/storage/careStore.ts       device-local care-plan state: load, save, transitions
+src/storage/fileStore*.ts      storage primitive per platform (localStorage / expo-file-system)
 src/purchases/config.ts        platform key resolution, entitlement id, preview detection
 src/purchases/revenuecat.ts    SDK wrapper: init, offerings, purchase, restore, error mapping
 src/purchases/usePro.ts        the hook the UI consumes
-src/components/                NavItem, TaskCard, PaywallModal
+src/components/                NavItem, TaskCard, PaywallModal, AddMomentSheet
 src/screens/                   Onboarding, Today, Circle, Settings
-src/data/mockCare.ts           the temporary data boundary
+src/data/mockCare.ts           the built-in moment templates and recipients
 ```
 
-- `src/data/mockCare.ts` is the temporary data boundary. Replace this module with Supabase queries and mutations later without coupling the UI to a backend SDK.
+- `src/data/mockCare.ts` now provides the *built-in* moment templates. User-added moments and every status change live in `src/storage/careStore.ts`, on the device. A future backend replaces the storage module, not the UI.
 - `src/purchases/` is the only place that imports the RevenueCat SDK, so the rest of the UI only ever sees plans and a `pro` boolean.
 - The Pro entitlement gates real UI: care-circle invites and shared notes are locked until it is active. Settings exposes the app user ID, entitlement identifier, and project ID, which is what a reviewer needs to verify the integration.
 - `.env.example` documents every environment variable. No secrets are committed.

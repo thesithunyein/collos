@@ -1,7 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import {
   PRO_ENTITLEMENT,
   REVENUECAT_PROJECT_ID,
@@ -11,9 +20,36 @@ import {
 import type { ProController } from "../purchases/usePro";
 import { colors } from "../theme";
 
-export function SettingsScreen({ pro }: { pro: ProController }) {
+export function SettingsScreen({
+  pro,
+  onResetData,
+}: {
+  pro: ProController;
+  onResetData: () => void | Promise<void>;
+}) {
   const platform = activePlatform() ?? "unknown";
   const configured = isPaymentsConfigured();
+  const [confirmingReset, setConfirmingReset] = useState(false);
+
+  const confirmReset = () => {
+    // Alert is unavailable on web in RN 0.74, so the web gets an inline
+    // two-tap confirmation instead of a silent destructive action.
+    if (Alert?.alert) {
+      Alert.alert(
+        "Reset all data?",
+        "Every confirmed moment, added moment, and preference on this device will be deleted. This cannot be undone.",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Reset", style: "destructive", onPress: () => void onResetData() },
+        ],
+      );
+    } else if (!confirmingReset) {
+      setConfirmingReset(true);
+    } else {
+      setConfirmingReset(false);
+      void onResetData();
+    }
+  };
 
   return (
     <View style={styles.screen}>
@@ -115,6 +151,35 @@ export function SettingsScreen({ pro }: { pro: ProController }) {
         <Text style={styles.detailHint}>
           The project ID and entitlement identifier are what judges need to verify the RevenueCat
           integration for this app.
+        </Text>
+
+        <Text style={styles.sectionLabel}>YOUR DATA</Text>
+        <View style={styles.detailCard}>
+          <DetailRow label="Storage" value="On this device only" />
+          <DetailRow label="Accounts" value="None — no sign-up" />
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={confirmingReset ? "Tap again to confirm reset" : "Reset all app data"}
+          onPress={confirmReset}
+          style={({ pressed }) => [
+            styles.resetButton,
+            confirmingReset && styles.resetButtonArmed,
+            pressed && styles.pressed,
+          ]}
+        >
+          <Ionicons
+            name={confirmingReset ? "alert-circle" : "trash-outline"}
+            size={16}
+            color={confirmingReset ? colors.white : colors.danger}
+          />
+          <Text style={[styles.resetText, confirmingReset && styles.resetTextArmed]}>
+            {confirmingReset ? "Tap again to permanently reset" : "Reset all data on this device"}
+          </Text>
+        </Pressable>
+        <Text style={styles.detailHint}>
+          Resetting clears confirmed moments, added moments, and preferences from this device. Your
+          purchase is untouched — Restore purchases brings Pro back.
         </Text>
 
         <Text style={styles.sectionLabel}>ABOUT</Text>
@@ -244,5 +309,20 @@ const styles = StyleSheet.create({
   detailHint: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 9, paddingHorizontal: 2 },
   safetyNote: { flexDirection: "row", gap: 7, alignItems: "flex-start", marginTop: 22, paddingHorizontal: 2 },
   safetyText: { color: colors.muted, fontSize: 11, lineHeight: 17, flex: 1 },
+  resetButton: {
+    minHeight: 48,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#F3D7D7",
+    backgroundColor: "#FFF3F3",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 10,
+  },
+  resetButtonArmed: { backgroundColor: colors.danger, borderColor: colors.danger },
+  resetText: { color: colors.danger, fontSize: 13, fontWeight: "800" },
+  resetTextArmed: { color: colors.white },
   pressed: { opacity: 0.72 },
 });
