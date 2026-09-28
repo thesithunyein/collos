@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { colors } from "../theme";
 
 export function OnboardingScreen({
@@ -16,7 +16,12 @@ export function OnboardingScreen({
       <StatusBar style="light" />
       <View style={styles.onboardingTop}>
         <View style={styles.logoMark}>
-          <Ionicons name="heart" size={22} color={colors.blue} />
+          <Image
+            source={require("../../assets/logo-mark.png")}
+            style={styles.logoImage}
+            accessible
+            accessibilityLabel="The Collos logo: a white cat's face on a soft blue rounded square."
+          />
         </View>
         <Text style={styles.wordmark}>collos</Text>
       </View>
@@ -62,14 +67,8 @@ export function OnboardingScreen({
 const styles = StyleSheet.create({
   onboarding: { flex: 1, backgroundColor: colors.blue, paddingHorizontal: 24 },
   onboardingTop: { flexDirection: "row", alignItems: "center", gap: 10, paddingTop: 18 },
-  logoMark: {
-    width: 38,
-    height: 38,
-    borderRadius: 13,
-    backgroundColor: colors.white,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  logoMark: { width: 38, height: 38, borderRadius: 13, overflow: "hidden" },
+  logoImage: { width: "100%", height: "100%" },
   wordmark: { color: colors.white, fontSize: 22, fontWeight: "800", letterSpacing: -0.5 },
   onboardingArt: { flex: 1, justifyContent: "center", alignItems: "center", minHeight: 280 },
   sunHalo: {

@@ -159,6 +159,18 @@ def make_favicon(size: int = 196) -> Image.Image:
     return source.resize((size, size), Image.LANCZOS)
 
 
+def make_mark(size: int = 192) -> Image.Image:
+    """The brand mark shown inside the app and on the landing page.
+
+    Same artwork as the favicon, larger, because it is displayed at ~36 px next
+    to the wordmark rather than 16 px in a tab strip. Keeping it a resample of
+    `favicon-source.png` means the header mark, the tab icon and the app icon all
+    show one logo.
+    """
+    source = Image.open(FAVICON_SOURCE).convert("RGBA")
+    return source.resize((size, size), Image.LANCZOS)
+
+
 def make_splash(size: int = 1024) -> Image.Image:
     """Transparent splash mark sized to sit above a wordmark on #2457F5.
 
@@ -173,6 +185,7 @@ def main():
         ("icon.png", make_icon(1024)),
         ("adaptive-icon.png", make_adaptive_foreground(1024)),
         ("favicon.png", make_favicon(196)),
+        ("logo-mark.png", make_mark(192)),
         ("splash.png", make_splash(1024)),
     ]
     for name, img in jobs:
@@ -180,10 +193,12 @@ def main():
         img.save(path, "PNG", optimize=True)
         print(f"{name:20} {img.size[0]}x{img.size[1]}  mode={img.mode}")
 
-    # The landing page's tab icon is a copy: one logo everywhere.
-    landing_favicon = os.path.join(HERE, "..", "landing", "favicon.png")
-    jobs[2][1].save(landing_favicon, "PNG", optimize=True)
-    print(f"{'landing/favicon.png':20} {jobs[2][1].size[0]}x{jobs[2][1].size[1]}  mode={jobs[2][1].mode}")
+    # The landing page's tab icon and header mark are copies, not derivatives:
+    # one logo everywhere, so the site cannot drift from the app.
+    for out_name, image in (("favicon.png", jobs[2][1]), ("logo.png", jobs[3][1])):
+        target = os.path.join(HERE, "..", "landing", out_name)
+        image.save(target, "PNG", optimize=True)
+        print(f"{'landing/' + out_name:20} {image.size[0]}x{image.size[1]}  mode={image.mode}")
 
 
 if __name__ == "__main__":
