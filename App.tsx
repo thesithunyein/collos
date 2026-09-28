@@ -24,6 +24,7 @@ const colors = {
   ink: "#15243D",
   muted: "#66758F",
   soft: "#F5F7FB",
+  backdrop: "#E4E9F4",
   border: "#E8ECF3",
   blue: "#2457F5",
   blueDark: "#173DBA",
@@ -85,8 +86,7 @@ export default function App() {
     setTimeout(() => setLoading(false), 450);
   };
 
-  if (screen === "onboarding") {
-    return (
+  const screenContent = screen === "onboarding" ? (
       <SafeAreaView style={styles.onboarding}>
         <StatusBar style="light" />
         <View style={styles.onboardingTop}>
@@ -133,10 +133,7 @@ export default function App() {
           <Text style={styles.onboardingFooter}>Private by design · Built for everyday care</Text>
         </View>
       </SafeAreaView>
-    );
-  }
-
-  return (
+  ) : (
     <SafeAreaView style={styles.app}>
       <StatusBar style="dark" />
       <ScrollView
@@ -298,6 +295,12 @@ export default function App() {
       <PaywallModal visible={isPaywallOpen} onClose={() => setPaywallOpen(false)} />
     </SafeAreaView>
   );
+
+  return (
+    <View style={styles.viewport}>
+      <View style={styles.frame}>{screenContent}</View>
+    </View>
+  );
 }
 
 function TaskCard({ task, onUpdate }: { task: CareTask; onUpdate: (id: string, status: TaskStatus) => void }) {
@@ -387,6 +390,24 @@ function PaywallModal({ visible, onClose }: { visible: boolean; onClose: () => v
 }
 
 const styles = StyleSheet.create({
+  viewport: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: colors.backdrop,
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  frame: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 430,
+    overflow: "hidden",
+    backgroundColor: colors.soft,
+    shadowColor: colors.ink,
+    shadowOpacity: 0.12,
+    shadowRadius: 28,
+    shadowOffset: { width: 0, height: 12 },
+  },
   onboarding: { flex: 1, backgroundColor: colors.blue, paddingHorizontal: 24 },
   onboardingTop: { flexDirection: "row", alignItems: "center", gap: 10, paddingTop: 18 },
   logoMark: { width: 38, height: 38, borderRadius: 13, backgroundColor: colors.white, alignItems: "center", justifyContent: "center" },
@@ -487,8 +508,8 @@ const styles = StyleSheet.create({
   emptyText: { color: colors.muted, textAlign: "center", fontSize: 12, lineHeight: 18, marginTop: 6 },
   secondaryButton: { minHeight: 42, backgroundColor: colors.blueWash, borderRadius: 12, justifyContent: "center", paddingHorizontal: 15, marginTop: 15 },
   secondaryButtonText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
-  modalBackdrop: { flex: 1, backgroundColor: "rgba(21,36,61,0.42)", justifyContent: "flex-end" },
-  modalCard: { backgroundColor: colors.white, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24, paddingBottom: 31 },
+  modalBackdrop: { flex: 1, backgroundColor: "rgba(21,36,61,0.42)", justifyContent: "flex-end", alignItems: "center" },
+  modalCard: { width: "100%", maxWidth: 430, backgroundColor: colors.white, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24, paddingBottom: 31 },
   modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: "center", marginBottom: 12 },
   closeButton: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center", alignSelf: "flex-end" },
   modalIcon: { width: 55, height: 55, borderRadius: 18, backgroundColor: colors.blueWash, alignItems: "center", justifyContent: "center", marginTop: 3 },

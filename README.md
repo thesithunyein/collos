@@ -35,6 +35,10 @@ Type-check the app with:
 npm run typecheck
 ```
 
+## Dependency versions
+
+The app targets Expo SDK 51, so every Expo package must stay on its SDK 51 version. `expo-font` is pinned to `~12.0.10` and additionally guarded by an `overrides` entry in `package.json`, because `@expo/vector-icons` declares `expo-font` as a wildcard peer dependency: a floating range resolves it to the newest release, and a newer `expo-font` calls `registerWebModule`, which does not exist in SDK 51's `expo-modules-core`. The web bundle then builds successfully and throws at runtime, leaving a blank page. If you upgrade Expo, move `expo`, `expo-font`, and `@expo/vector-icons` together in one change.
+
 ## Deploy the Expo web app
 
 The same Expo app exports a browser build without changing the native entry point:

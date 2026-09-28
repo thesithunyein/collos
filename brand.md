@@ -12,6 +12,7 @@ Calm, trustworthy, and quietly optimistic. Collos should feel like a reliable sh
 - **Ink:** `#15243D` — headings and high-emphasis text
 - **Muted slate:** `#66758F` — supporting copy
 - **Soft cloud:** `#F5F7FB` — app background
+- **Backdrop:** `#E4E9F4` — surround behind the centred app frame on wide screens
 - **White:** `#FFFFFF` — cards and elevated surfaces
 - **Semantic green:** `#41A77A` — completed care moments
 - **Semantic orange:** `#F19B3B` — gentle attention state
