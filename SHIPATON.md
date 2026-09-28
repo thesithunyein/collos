@@ -5,8 +5,10 @@ only you can do. Verified against the official sources on **28 September 2026**
 (second pass: the Next Gen category page and RevenueCat's official walkthrough video,
 listed in §9).
 
-> **Deadline: 30 September 2026, 11:45 pm PDT.** Submissions go through Devpost.
-> You can keep editing after you submit, but an unsaved draft does not count.
+> **Deadline: 30 September 2026, 11:45 pm PDT** — both registration *and* submission
+> close then. After the Submission Period ends you may **not** change the submission
+> (Official Rules §5), so submit early and edit until the deadline, never after.
+> Judging runs 1–13 October; winners announced 21 October 2026.
 
 ---
 
@@ -50,9 +52,11 @@ in the app."* That is the rule this repo has been enforcing on itself all along 
 does not do.
 
 The full 1st-place prize stack: $20,000, an invitation to RevenueCat's App Growth
-Annual conference (New York, October), a Times Square billboard feature, the Times
-Square Demo Day on 22 October 2026, a Shippy trophy, a blog feature, and a media
-spotlight on 9to5Mac and 9to5Google. 2nd place $10,000; 3rd $5,000.
+Annual conference (New York, October — per the Official Rules this is **admission
+only; travel and accommodation are not included**, unlike the Grand Prize and
+#BuildInPublic 1st place), a Times Square billboard feature, the Times Square Demo
+Day on 22 October 2026, a Shippy trophy, a blog feature, and a media spotlight on
+9to5Mac and 9to5Google. 2nd place $10,000; 3rd $5,000.
 
 Student verification runs through the email checker on
 <https://www.shipaton.com/next-gen>. Most academic addresses validate automatically;
@@ -141,39 +145,75 @@ Setting the four environment variables is a one-line change in Vercel
 
 ## 5. The Next Gen path, step by step
 
-Already satisfied by the repository: public code, MIT `LICENSE` (the licence file the
-category page asks for), a working RevenueCat integration with sandboxable
-monetization, real screenshots, and a README a stranger can follow. What is left,
-in order:
+Verified against the **Official Rules** (Devpost, updated 31 August 2026) — §4
+Submission Requirements and the Next Gen judging criteria — not against marketing
+summaries. Where the marketing page and the rules differ, the rules govern (their
+§11 says so explicitly).
 
-1. **Verify your student status now**, before anything else — it is the one gate that
-   cannot be fixed in code. Go to <https://www.shipaton.com/next-gen> and enter your
-   academic email in the checker. If it validates, the path is fully open. If it does
-   not, use the contact on that page for a manual check; they flag you for judging
-   manually, so a rejection there is a delay, not a disqualification — but start it
-   today.
-2. **Record the demo video** (§6). The two requirements from the walkthrough: show the
-   app actually working, and show only what the app actually does. A device or
-   simulator is the strongest proof that "the app builds and runs"; the web build
-   (app.collos.sithunyein.com) is acceptable and easier to capture.
-3. **Create the RevenueCat project** (§4, steps 1–5). Not required to qualify, but it
-   upgrades the demo from preview mode to a real sandbox purchase, and the Devpost
-   form asks for the project ID.
-4. **Fill in the Devpost form** using §7, listing Next Gen as the category.
-5. If under the age of majority where you live: a parent or guardian's name, email,
-   and confirmation of consent on the form.
+### The four official judging criteria, mapped to Collos
 
-One more thing the video makes explicit: judges will compare the repo's state *before*
-the hackathon window with what the video shows, to see the progress made *during* it.
-Collos's first commit is dated 27 September 2026 — the entire build is inside the
-window, which is exactly the story the commit history tells. Push everything before
-submitting; a judge who opens the repo should see the same app the video shows.
+| Official criterion | Collos's evidence |
+| --- | --- |
+| "Is the app idea clear, useful, interesting, or original? Does it solve a real problem?" | Care coordination for the family organiser; the description (§7) names the person and the problem in one paragraph. |
+| "Does the project demonstrate meaningful progress toward a working app? Is the core functionality clear from the video and code repository?" | Two mock screens became three working tabs with a real purchase path and device-local persistence, all inside the window — the commit history is the progress log, and judges can build and run it from the README. |
+| "Does the project thoughtfully use RevenueCat?" | `react-native-purchases` wired per platform with offerings, purchase, restore, entitlement gating real UI, and a labelled preview mode when no key is present. Creating the project (§4) upgrades this from SDK-integrated to purchase-powering — do it before recording. |
+| "Thoughtful technical choices, product thinking, and care in how the app was built and presented?" | The pinned-dependency discipline that fixed a production blank page, the never-failing wrapper pattern, screenshots that assert the UI reacted, and docs that state what is *not* built. |
+
+### Submission requirements (rules §4), and where each stands
+
+| Requirement | Collos |
+| --- | --- |
+| Text description explaining features and functionality | ✅ §7, paste-ready |
+| Demo video, <2 min, **publicly visible on YouTube or Vimeo**, showing the app functioning **on the device for which it was built** | ❌ Not recorded — the device clause matters: film it on a real phone via **Expo Go** or the iOS Simulator, not only the browser. Script in §6. |
+| Public repo URL, open-source-licensed, **licence detectable and visible in the About section** | ✅ MIT `LICENSE` at the root — GitHub shows it in About automatically; confirm it says "MIT license" on the repo page before submitting |
+| 1024×1024 app icon | ✅ `assets/icon.png` (verified 1024×1024) |
+| ≥1 screenshot at 1179×2556, no device frame | ✅ `submission/screenshots/` |
+| Free trial / promo code | ➖ Explicitly waived for Next Gen: "Next Gen Award Projects will be evaluated using the demonstration video and code repository" |
+| Store listing | ➖ Explicitly waived for Next Gen |
+| All materials in English | ✅ |
+
+Two rules-side facts that are easy to miss:
+
+- **The qualifying academic email must be on the Devpost account itself** — "use a
+  qualifying student or academic email address on Devpost. Email-domain eligibility
+  may be verified using JetBrains/swot." The checker on shipaton.com/next-gen is a
+  pre-check, not the verification. Update the Devpost account email first if needed.
+- **Minors:** an entrant under the age of majority may enter Next Gen only, and the
+  parent/guardian consent form (<https://forms.gle/Gx2Cr4X8WPk9V1q77>) must be
+  completed **before the Submission Period ends** — the rules removed the
+  "upon request" flexibility for new entries on 31 August 2026.
+
+### Order of operations
+
+1. **Put the academic email on the Devpost account and check it** at
+   <https://www.shipaton.com/next-gen>. The one gate no code can clear. If the checker
+   rejects a real academic domain, use the contact there for a manual check today —
+   the rules point to JetBrains/swot for domain verification, and unlisted domains are
+   resolved manually.
+2. **If under the age of majority: complete the guardian consent form now** (link
+   above) — it is a deadline, not a formality.
+3. **Create the RevenueCat project** (§4, steps 1–5). The rules' Project Requirements
+   say the app "uses the RevenueCat SDK to power at least one in-app or web purchase";
+   the Next Gen walkthrough confirms sandboxed purchases are acceptable. Preview mode
+   satisfies "SDK integrated"; a Test Store purchase satisfies "SDK powers a purchase"
+   beyond doubt — and the Ship Kit milestones (perks) track exactly this. Have the
+   project ID ready for the Devpost form.
+4. **Record the video on a real device** — Expo Go on a phone, or the iOS Simulator.
+   Show only what the app does; no copyrighted music, no third-party trademarks or
+   logos (rules §4 makes this a submission requirement, not a style tip).
+5. **Fill in the Devpost form** using §7, list Next Gen, submit, then keep editing
+   until the deadline if needed — but never after it.
 
 ## 6. Demo video script (two minutes)
 
-Judges are only required to watch the first two minutes, and screeners score from the
-video plus the description. Cover the pitch, the app in use, the purchase, and the
-categories you are targeting — in that order.
+Judges are not required to watch beyond two minutes, and screeners score from the
+video plus the description. **Film on the device the app is built for** — a real phone
+running the app in Expo Go (`npm start`, scan the QR code), or the iOS Simulator. The
+browser build (app.collos.sithunyein.com) is a fine closing shot but not the main
+evidence: the rules ask for "footage that shows the Project functioning on the device
+for which it was built." No copyrighted music, no third-party trademarks or logos
+anywhere in the frame — this is a submission requirement in the Official Rules, and
+violating it risks the whole entry.
 
 | Time | On screen | Say |
 | --- | --- | --- |
@@ -181,7 +221,7 @@ categories you are targeting — in that order.
 | 0:15–0:40 | Tap *Set up my care circle*, dashboard | "You set up who you're caring for, and each day gets a short care plan. Confirm what happened, skip what didn't." |
 | 0:40–1:00 | Tap *Confirm* on Water break, watch 25% become 50% | "Every confirmation is saved the moment you tap it — close the app, come back tomorrow, and the plan still remembers. Nothing you confirmed gets lost." |
 | 1:00–1:20 | Circle tab, free state | "The Circle tab shows everyone involved. On the free plan you get one helper and one shared note a day — that's a deliberate limit, not a paywall on a core feature." |
-| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites and unlimited shared notes. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(If the RevenueCat project exists by recording day: "…and this is a live sandbox purchase through the Test Store." If not, keep the preview-mode wording — the category explicitly expects sandboxed monetization.)* |
+| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites and unlimited shared notes. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(With the RevenueCat project + Test Store key set: "…and this is a live sandbox purchase." Without: keep the preview-mode wording — the Next Gen walkthrough confirms sandboxed monetization is what this category expects.)* |
 | 1:45–2:00 | Circle screen now unlocked, then Settings | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling." |
 
 Do not use copyrighted music or any third party's trademarks.
@@ -258,6 +298,7 @@ required, and the walkthrough confirms sandboxed monetization is acceptable.
 
 ## 9. Sources
 
+- <https://revenuecat-shipaton-2026.devpost.com/rules> — **Official Rules** (authoritative; §4 submission requirements, Next Gen criteria in §6, §5 no-changes-after-deadline)
 - <https://revenuecat-shipaton-2026.devpost.com/> — official rules and prizes
 - <https://www.revenuecat.com/blog/engineering/how-to-submit-your-app-for-shipaton> — the submission walkthrough, eligibility gates, required assets
 - <https://www.shipaton.com/blog/how-we-judge-shipaton> — intake filtering, prescreening, 1–5 scoring, final selection
