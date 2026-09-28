@@ -185,6 +185,12 @@ Two rules-side facts that are easy to miss:
   parent/guardian consent form (<https://forms.gle/Gx2Cr4X8WPk9V1q77>) must be
   completed **before the Submission Period ends** — the rules removed the
   "upon request" flexibility for new entries on 31 August 2026.
+- **The evaluation surfaces are exactly two: the video and the repo.** The waived-
+  requirements clause says Next Gen projects "will be evaluated using the
+  demonstration video and code repository." A live web preview is a worthwhile extra
+  (§7's "Try it" paragraph), but it is not a review step — nothing in the rules
+  obliges a judge to click it, so never let the video lean on it, and keep making
+  sure whatever it shows matches the app.
 
 ### Order of operations
 
