@@ -8,14 +8,23 @@ Calm, trustworthy, and quietly optimistic. Collos should feel like a reliable sh
 
 ## Palette
 
-- **Collos blue:** `#2457F5` — primary action and moments of reassurance
-- **Ink:** `#15243D` — headings and high-emphasis text
-- **Muted slate:** `#66758F` — supporting copy
-- **Soft cloud:** `#F5F7FB` — app background
-- **Backdrop:** `#E4E9F4` — surround behind the centred app frame on wide screens
+Every value below is read off the logo, and the app and the landing site use the
+same ones so the phone frames on the site match the app they show.
+
+- **Collos blue:** `#2F63D6` — primary action and moments of reassurance
+- **Ink navy:** `#183468` — headings and high-emphasis text (the cat's outline)
+- **Periwinkle:** `#9ABFF3` — the logo's own square, for fills on brand blue
+- **Blush:** `#DD6B6B` — the coral of the heart on the cat's tag
+- **Muted slate:** `#5D7099` — supporting copy
+- **Soft cloud:** `#F3F7FE` — app background
+- **Backdrop:** `#E4ECFA` — surround behind the centred app frame on wide screens
 - **White:** `#FFFFFF` — cards and elevated surfaces
-- **Semantic green:** `#41A77A` — completed care moments
-- **Semantic orange:** `#F19B3B` — gentle attention state
+- **Semantic mint:** `#4FA98A` — completed care moments
+- **Lilac:** `#7B76DE` — the fourth moment tone, kept distinct from the blues
+- **Semantic red:** `#C75353` — recoverable errors only
+
+`src/theme.ts` is the single source for the app; `landing/styles.css` repeats the
+same values as CSS variables. Keep both files, and this list, in step.
 - **Semantic red:** `#C75353` — recoverable errors only
 
 ## Logo
@@ -35,11 +44,10 @@ header) agrees.
 
 ## Landing page skin
 
-The site's action blue (`#2F63D6`) is a lighter sibling of the app's `#2457F5`,
-and the rest of its supporting palette is read straight off the logo: navy
-`#183468` for headings, periwinkle `#9ABFF3` / `#D5E3FB` for washes, and coral
-`#DD6B6B` for accents. A few pastel sparkle dots in the hero echo the confetti
-scattered around the cat, and they are hidden on small screens.
+The site runs on the same palette as the app, so the two phone frames shown in the
+hero carry the exact colours of the app they display. Its layout adds one flourish
+the mark suggests: a few pastel sparkle dots in the hero that echo the confetti
+scattered around the cat, hidden on small screens.
 
 ## Typography
 

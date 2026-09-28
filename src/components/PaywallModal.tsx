@@ -78,7 +78,7 @@ export function PaywallModal({
             <View style={styles.featureList}>
               {FEATURES.map((feature) => (
                 <View key={feature} style={styles.featureRow}>
-                  <Ionicons name="checkmark-circle" size={19} color={colors.green} />
+                  <Ionicons name="checkmark-circle" size={19} color={colors.mint} />
                   <Text style={styles.featureText}>{feature}</Text>
                 </View>
               ))}
@@ -86,7 +86,7 @@ export function PaywallModal({
 
             {pro.pro ? (
               <View style={styles.activeCard}>
-                <Ionicons name="checkmark-circle" size={22} color={colors.green} />
+                <Ionicons name="checkmark-circle" size={22} color={colors.mint} />
                 <View style={styles.activeCopy}>
                   <Text style={styles.activeTitle}>Collos Pro is active</Text>
                   <Text style={styles.activeText}>
@@ -255,7 +255,7 @@ function formatDate(iso: string): string {
 const styles = StyleSheet.create({
   modalBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(21,36,61,0.42)",
+    backgroundColor: colors.scrim,
     justifyContent: "flex-end",
     alignItems: "center",
   },
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     height: 21,
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: "#C9D3E6",
+    borderColor: colors.borderSoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   planCopy: { flex: 1 },
   planTitleRow: { flexDirection: "row", alignItems: "center", gap: 7 },
   planLabel: { color: colors.ink, fontSize: 14, fontWeight: "800" },
-  saveBadge: { backgroundColor: colors.green, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
+  saveBadge: { backgroundColor: colors.mint, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   saveBadgeText: { color: colors.white, fontSize: 9, fontWeight: "900", letterSpacing: 0.4 },
   planDescription: { color: colors.muted, fontSize: 11, marginTop: 3 },
   planPriceColumn: { alignItems: "flex-end" },
@@ -345,8 +345,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: colors.blueWash,
   },
-  messageRowError: { backgroundColor: "#FFF3F3" },
-  messageRowSuccess: { backgroundColor: colors.greenWash },
+  messageRowError: { backgroundColor: colors.errorWash },
+  messageRowSuccess: { backgroundColor: colors.mintWash },
   messageText: { flex: 1, color: colors.ink, fontSize: 12, lineHeight: 17 },
   modalPrimaryButton: {
     minHeight: 52,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 22,
   },
-  modalPrimaryButtonDisabled: { backgroundColor: "#9FB4E8" },
+  modalPrimaryButtonDisabled: { backgroundColor: colors.blueDisabled },
   modalPrimaryText: { color: colors.white, fontSize: 15, fontWeight: "800" },
   activeCard: {
     flexDirection: "row",
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
     padding: 14,
     borderRadius: 16,
-    backgroundColor: colors.greenWash,
+    backgroundColor: colors.mintWash,
   },
   activeCopy: { flex: 1 },
   activeTitle: { color: colors.ink, fontSize: 14, fontWeight: "800" },

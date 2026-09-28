@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  spark: { position: "absolute", width: 12, height: 12, borderRadius: 6, backgroundColor: "#90B4FF" },
+  spark: { position: "absolute", width: 12, height: 12, borderRadius: 6, backgroundColor: colors.periwinkle },
   sparkOne: { top: "30%", left: "22%" },
   sparkTwo: { top: "21%", right: "23%", width: 8, height: 8 },
   sparkThree: { bottom: "28%", right: "20%", width: 16, height: 16, borderRadius: 8 },

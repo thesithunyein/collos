@@ -172,7 +172,7 @@ def make_mark(size: int = 192) -> Image.Image:
 
 
 def make_splash(size: int = 1024) -> Image.Image:
-    """Transparent splash mark sized to sit above a wordmark on #2457F5.
+    """Transparent splash mark sized to sit above a wordmark on #2F63D6.
 
     The source art already has a transparent background and line-art styling,
     so it reads as a sticker on the brand blue with no recolouring.

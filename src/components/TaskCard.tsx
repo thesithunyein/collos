@@ -4,11 +4,13 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { CareTask, TaskStatus } from "../data/mockCare";
 import { colors } from "../theme";
 
+// Tone keys are stored with each saved moment, so they keep their old names even
+// though the colours behind them now come from the logo's palette.
 const TONES = {
   blue: { background: colors.blueWash, icon: colors.blue },
-  orange: { background: colors.orangeWash, icon: colors.orange },
-  green: { background: colors.greenWash, icon: colors.green },
-  purple: { background: colors.purpleWash, icon: colors.purple },
+  orange: { background: colors.blushWash, icon: colors.blush },
+  green: { background: colors.mintWash, icon: colors.mint },
+  purple: { background: colors.lilacWash, icon: colors.lilac },
 } as const;
 
 export function TaskCard({
@@ -101,7 +103,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#C9D7FF",
+    borderColor: colors.borderSoft,
     flexDirection: "row",
     alignItems: "center",
     gap: 4,

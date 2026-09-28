@@ -100,7 +100,7 @@ export function CircleScreen({
               </View>
               {member.confirmedToday ? (
                 <View style={styles.donePill}>
-                  <Ionicons name="checkmark" size={12} color={colors.green} />
+                  <Ionicons name="checkmark" size={12} color={colors.mint} />
                   <Text style={styles.donePillText}>Today</Text>
                 </View>
               ) : (
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   memberAvatarYou: { backgroundColor: colors.blue },
-  memberAvatarHelper: { backgroundColor: colors.purpleWash },
+  memberAvatarHelper: { backgroundColor: colors.lilacWash },
   memberInitials: { color: colors.blue, fontSize: 15, fontWeight: "800" },
   memberInitialsInverted: { color: colors.white },
   memberCopy: { flex: 1 },
@@ -215,12 +215,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    backgroundColor: colors.greenWash,
+    backgroundColor: colors.mintWash,
     borderRadius: 9,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  donePillText: { color: colors.green, fontSize: 10, fontWeight: "800" },
+  donePillText: { color: colors.mint, fontSize: 10, fontWeight: "800" },
   pendingPill: { backgroundColor: colors.soft, borderRadius: 9, paddingHorizontal: 8, paddingVertical: 4 },
   pendingPillText: { color: colors.muted, fontSize: 10, fontWeight: "800" },
   unlockedCard: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blueWash,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#CBD9FF",
+    borderColor: colors.borderSoft,
     padding: 16,
     marginTop: 22,
   },

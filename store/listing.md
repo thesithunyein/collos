@@ -196,7 +196,8 @@ the entitlement actually change the UI.
 
 Apple also requires a **1024×1024** icon with no alpha and no rounded corners:
 `assets/icon.png`, committed. Play takes the same file, and reads the adaptive icon
-from `assets/adaptive-icon.png` with a `#2457F5` background.
+from `assets/adaptive-icon.png` with a `#000000` background — the same canvas the
+logo is drawn on.
 
 There is no App Preview video on either store. Both are optional; if one is added it
 must be captured from the shipped build, not from the web export.

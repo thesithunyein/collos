@@ -122,7 +122,7 @@ export function AddMomentSheet({
             value={title}
             onChangeText={setTitle}
             placeholder="e.g. Evening tea together"
-            placeholderTextColor="#9AA7BB"
+            placeholderTextColor={colors.placeholder}
             maxLength={60}
             accessibilityLabel="Moment title"
             style={styles.input}
@@ -133,7 +133,7 @@ export function AddMomentSheet({
             value={detail}
             onChangeText={setDetail}
             placeholder={kind.detailPlaceholder}
-            placeholderTextColor="#9AA7BB"
+            placeholderTextColor={colors.placeholder}
             maxLength={120}
             accessibilityLabel="Moment note"
             style={[styles.input, styles.inputMultiline]}
@@ -218,7 +218,7 @@ export function AddMomentSheet({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(21,36,61,0.42)",
+    backgroundColor: colors.scrim,
     justifyContent: "flex-end",
     alignItems: "center",
   },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 24,
   },
-  primaryButtonDisabled: { backgroundColor: "#9FB4E8" },
+  primaryButtonDisabled: { backgroundColor: colors.blueDisabled },
   primaryButtonText: { color: colors.white, fontSize: 15, fontWeight: "800" },
   hint: { color: colors.muted, fontSize: 11, lineHeight: 16, textAlign: "center", marginTop: 12 },
   pressed: { opacity: 0.72 },
