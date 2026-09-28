@@ -14,12 +14,12 @@
     "screenshots:devpost": "node scripts/capture-app-screenshots.mjs --set devpost",
     "screenshots:appstore": "node scripts/capture-app-screenshots.mjs --set appstore",
     "screenshots:playstore": "node scripts/capture-app-screenshots.mjs --set playstore",
-    "release:init": "npx eas-cli init",
-    "release:preview": "npx eas-cli build --profile preview",
-    "release:ios": "npx eas-cli build --platform ios --profile production",
-    "release:android": "npx eas-cli build --platform android --profile production",
-    "submit:ios": "npx eas-cli submit --platform ios --profile production",
-    "submit:android": "npx eas-cli submit --platform android --profile production"
+    "release:init": "npx --yes eas-cli@24.8.0 init",
+    "release:preview": "npx --yes eas-cli@24.8.0 build --profile preview",
+    "release:ios": "npx --yes eas-cli@24.8.0 build --platform ios --profile production",
+    "release:android": "npx --yes eas-cli@24.8.0 build --platform android --profile production",
+    "submit:ios": "npx --yes eas-cli@24.8.0 submit --platform ios --profile production",
+    "submit:android": "npx --yes eas-cli@24.8.0 submit --platform android --profile production"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",

@@ -31,6 +31,31 @@ An Expo **free** plan can build, but EAS free builds queue behind paid ones. The
 not a total blocker: it targets the iOS **simulator**, which needs no provisioning
 profile and no paid membership. Android internal distribution is unaffected.
 
+### Give the build machine room
+
+The EAS CLI is a large dependency tree of its own — `oclif`, `keychain`, `gradle-to-js`,
+`jks-js` and several hundred packages. This project's `node_modules` is about 400 MB and
+the CLI adds several hundred more on top, and `eas build` also needs to read
+`package-lock.json` to compute the dependency hash it uploads.
+
+With less than roughly 2 GB free, the install fails partway with `ENOSPC`. Two things
+make that worth knowing before you hit it. The error surfaces as a wall of
+`npm warn tar TAR_ENTRY_ERROR ENOSPC` lines rather than a plain "out of disk", so it is
+easy to mistake for a network problem. And a half-finished `npm install` leaves
+half-extracted packages in `node_modules` — including corrupt copies of shared
+dependencies, which is far worse than a clean failure.
+
+To recover, without losing the locked tree:
+
+```bash
+npm ls --all          # exits non-zero and lists the survivors as "extraneous"
+npm prune             # removes exactly those, leaving the locked tree alone
+npm run typecheck
+```
+
+If `npm ls --all` reports `invalid` or `missing` rather than only `extraneous`, the
+shared tree was touched and you need `rm -rf node_modules && npm ci` once there is room.
+
 ## 1. Create the RevenueCat project
 
 In <https://app.revenuecat.com>, with no project yet, the first screen offers *Create a
@@ -122,6 +147,11 @@ npx eas-cli login
 npm run release:init        # npx eas-cli init — writes extra.eas.projectId into app.json
 git add app.json && git commit -m "Link the EAS project"
 ```
+
+The npm scripts pin the CLI — `npx --yes eas-cli@24.8.0` — so they never stop on npm's
+"Ok to proceed?" prompt and never build with a version other than the one this runbook
+was written against. `eas.json` declares the same floor with `cli.version`. This project
+has already been bitten twice by floating version ranges; the build tool is not exempt.
 
 `eas init` must add `expo.extra.eas.projectId` to `app.json`. If it reports a slug
 conflict, another Expo account already owns the slug `collos`; change `expo.slug` and
