@@ -1,10 +1,14 @@
 # Collos
 
 <p align="center">
-  <img src="assets/logo-source.png" alt="The Collos logo: a hand-drawn white cat's face with sparkling blue eyes and a heart tag, on a black rounded square." width="180" />
+  <img src="assets/logo-mark.png" alt="The Collos logo: a hand-drawn white cat's face with sparkling blue eyes and a heart tag, on a soft periwinkle rounded square." width="120" />
 </p>
 
 Collos is a mobile-first care coordination experience built with Expo and React Native. It helps a care circle share small, everyday moments of support without making medical claims.
+
+<p align="center">
+  <a href="https://app.collos.sithunyein.com"><strong>Open the live app</strong></a> · <a href="https://collos.sithunyein.com">Project site</a>
+</p>
 
 > **Safety note:** Collos is for care coordination only. It is not medical advice and does not replace a qualified care professional.
 

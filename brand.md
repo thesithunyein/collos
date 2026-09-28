@@ -33,7 +33,8 @@ The mark is a hand-drawn white cat's face with sparkly eyes, blush, and a heart
 tag, on a soft periwinkle rounded square. Two source files, both committed
 exactly as supplied:
 
-- `assets/logo-source.png` — transparent background (README, splash mark)
+- `assets/logo-source.png` — transparent background (splash mark)
+- `assets/logo-mark.png` — the periwinkle square, resampled (`README`, the app header, the landing header)
 - `assets/favicon-source.png` — the periwinkle square (app header, browser tab, app icon)
 
 `assets/make-icons.py` only ever *resamples* those two files; it never draws the
