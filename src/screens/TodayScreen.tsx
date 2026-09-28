@@ -157,15 +157,26 @@ export function TodayScreen({
                   {completedCount} of {tasks.length} confirmed
                 </Text>
               </View>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Reset today's moments to not confirmed"
-                onPress={onEditPlan}
-                style={styles.viewAllButton}
-              >
-                <Text style={styles.viewAllText}>Reset day</Text>
-                <Ionicons name="refresh" size={15} color={colors.blue} />
-              </Pressable>
+              <View style={styles.sectionActions}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Add a moment to today's plan"
+                  onPress={onAddMoment}
+                  style={styles.viewAllButton}
+                >
+                  <Text style={styles.viewAllText}>Add</Text>
+                  <Ionicons name="add" size={17} color={colors.blue} />
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Reset today's moments to not confirmed"
+                  onPress={onEditPlan}
+                  style={styles.viewAllButton}
+                >
+                  <Text style={styles.viewAllText}>Reset day</Text>
+                  <Ionicons name="refresh" size={15} color={colors.blue} />
+                </Pressable>
+              </View>
             </View>
 
             {tasks.length === 0 ? (
@@ -418,6 +429,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { color: colors.ink, fontSize: 20, fontWeight: "800", letterSpacing: -0.4 },
   sectionMeta: { color: colors.muted, fontSize: 12, marginTop: 3 },
+  sectionActions: { flexDirection: "row", alignItems: "center", gap: 14 },
   viewAllButton: { minHeight: 40, flexDirection: "row", alignItems: "center", gap: 2 },
   viewAllText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
   taskList: { gap: 10 },
