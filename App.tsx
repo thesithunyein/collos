@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { NavItem } from "./src/components/NavItem";
 import { PaywallModal } from "./src/components/PaywallModal";
@@ -44,6 +44,12 @@ export default function App() {
   const [isAddingMoment, setAddingMoment] = useState(false);
 
   const pro = usePro();
+
+  // On a wide screen the app is a phone-width column, so it gets a device frame:
+  // without one it read as a bare slab of brand colour floating in the window.
+  // Narrow viewports stay edge to edge, as a phone should.
+  const { width: windowWidth } = useWindowDimensions();
+  const isWide = windowWidth >= 560;
 
   // Restore once on launch. A failed read leaves `stored` empty and the app
   // opens fresh — the same never-failing contract as the purchases wrapper.
@@ -145,7 +151,7 @@ export default function App() {
 
   if (!hydrated) {
     return (
-      <View style={[styles.viewport, styles.launch]}>
+      <View style={[styles.viewport, styles.launch, isWide && styles.viewportWide]}>
         <ActivityIndicator color={colors.blue} />
       </View>
     );
@@ -153,8 +159,8 @@ export default function App() {
 
   if (stage === "onboarding") {
     return (
-      <View style={styles.viewport}>
-        <View style={styles.frame}>
+      <View style={[styles.viewport, isWide && styles.viewportWide]}>
+        <View style={[styles.frame, isWide && styles.frameWide]}>
           <OnboardingScreen isLoading={isLoading} onStart={enterApp} />
         </View>
       </View>
@@ -162,8 +168,8 @@ export default function App() {
   }
 
   return (
-    <View style={styles.viewport}>
-      <View style={styles.frame}>
+    <View style={[styles.viewport, isWide && styles.viewportWide]}>
+      <View style={[styles.frame, isWide && styles.frameWide]}>
         {tab === "Today" ? (
           <TodayScreen
             recipients={mockRecipients}
@@ -245,17 +251,30 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
   },
+  viewportWide: { paddingVertical: 34, paddingHorizontal: 24, justifyContent: "center" },
   launch: { alignItems: "center", justifyContent: "center" },
   frame: {
     flex: 1,
     width: "100%",
-    maxWidth: 430,
     overflow: "hidden",
     backgroundColor: colors.soft,
     shadowColor: colors.ink,
     shadowOpacity: 0.12,
     shadowRadius: 28,
     shadowOffset: { width: 0, height: 12 },
+  },
+  /** The same navy bezel the landing page draws around its phone mockups. */
+  frameWide: {
+    // Capped here rather than in `frame` so the app fills wider phones: a 440pt
+    // device was showing a 430pt frame with a strip of backdrop down each side.
+    maxWidth: 430,
+    maxHeight: 932,
+    borderRadius: 46,
+    borderWidth: 10,
+    borderColor: colors.ink,
+    shadowOpacity: 0.2,
+    shadowRadius: 40,
+    shadowOffset: { width: 0, height: 20 },
   },
   bottomNav: {
     position: "absolute",

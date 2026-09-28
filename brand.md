@@ -17,7 +17,7 @@ same ones so the phone frames on the site match the app they show.
 - **Blush:** `#DD6B6B` — the coral of the heart on the cat's tag
 - **Muted slate:** `#5D7099` — supporting copy
 - **Soft cloud:** `#F3F7FE` — app background
-- **Backdrop:** `#E4ECFA` — surround behind the centred app frame on wide screens
+- **Backdrop:** `#EDF3FE` — surround behind the device frame on wide screens
 - **White:** `#FFFFFF` — cards and elevated surfaces
 - **Semantic mint:** `#4FA98A` — completed care moments
 - **Lilac:** `#7B76DE` — the fourth moment tone, kept distinct from the blues

@@ -1,7 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { ActivityIndicator, Image, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { colors } from "../theme";
 
 export function OnboardingScreen({
@@ -14,6 +23,13 @@ export function OnboardingScreen({
   return (
     <SafeAreaView style={styles.onboarding}>
       <StatusBar style="light" />
+      {/* The only screen with a fixed height, so it is also the only one that
+          could clip: on a short window the button fell off the bottom with no
+          way to reach it. `flexGrow: 1` keeps it filling a tall frame. */}
+      <ScrollView
+        contentContainerStyle={styles.onboardingContent}
+        showsVerticalScrollIndicator={false}
+      >
       <View style={styles.onboardingTop}>
         <View style={styles.logoMark}>
           <Image
@@ -60,12 +76,14 @@ export function OnboardingScreen({
         </Pressable>
         <Text style={styles.onboardingFooter}>Private by design · Built for everyday care</Text>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  onboarding: { flex: 1, backgroundColor: colors.blue, paddingHorizontal: 24 },
+  onboarding: { flex: 1, backgroundColor: colors.blue },
+  onboardingContent: { flexGrow: 1, paddingHorizontal: 24 },
   onboardingTop: { flexDirection: "row", alignItems: "center", gap: 10, paddingTop: 18 },
   logoMark: { width: 38, height: 38, borderRadius: 13, overflow: "hidden" },
   logoImage: { width: "100%", height: "100%" },

@@ -11,7 +11,7 @@ export const colors = {
   ink: "#183468",
   muted: "#5D7099",
   soft: "#F3F7FE",
-  backdrop: "#E4ECFA",
+  backdrop: "#EDF3FE",
   border: "#E3EAF8",
   /** A border that sits on a wash, where `border` would disappear. */
   borderSoft: "#CFDDF4",
