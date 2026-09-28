@@ -62,7 +62,14 @@ The paywall copy and action are intentionally shell-only. RevenueCat initializat
 
 ## Public landing page
 
-The static marketing site lives in `landing/` so it can deploy independently without changing the Expo app. It uses the existing Collos brand direction, includes CSS-rendered app preview placeholders, and has no runtime dependencies.
+The static marketing site lives in `landing/` so it can deploy independently without changing the Expo app. It uses the existing Collos brand direction and has no runtime dependencies.
+The two phone previews are real captures of the running app (`landing/app-onboarding.png` and `landing/app-dashboard.png`), not hand-built CSS mockups. The site therefore cannot advertise a dashboard the app does not render: an earlier mockup kept claiming "50%" and "2 of 4 confirmed" months after the app showed 25% and 1 of 4. Re-capture them after any UI change so the two stay in sync:
+
+```bash
+npm run screenshots
+```
+
+The script launches a local Chrome or Edge headless, drives the web app over the DevTools protocol, and rewrites both PNGs in `landing/`. It has no npm dependencies and needs no secrets. Point it at a local build with `--base-url http://localhost:8081`, or set `CHROME_PATH` if Chrome is not installed in the usual location.
 
 ### Deploy to Vercel
 
