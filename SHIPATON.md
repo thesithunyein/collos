@@ -135,7 +135,10 @@ Ordered by what unblocks the most.
 5. **Copy the project ID** (`prj_…`) into `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` so it
    shows up in Settings.
 6. **Decide the path**: Next Gen (student, this week) or a proper store launch later.
-7. **Record the demo video** (§6) and upload it to YouTube as *unlisted*, not private.
+7. **Record the demo video** (§6) and upload it to YouTube **public**. The Official
+   Rules say the video must be "publicly visible" on YouTube or Vimeo; RevenueCat's
+   submission walkthrough says unlisted is fine and private is not, so unlisted is
+   the fallback — but public costs nothing and removes the argument.
 8. **Fill in the Devpost form** using §7.
 9. Add a **7-day free trial** or a promo code to the default offering so judges can
    reach premium features.
@@ -164,7 +167,7 @@ summaries. Where the marketing page and the rules differ, the rules govern (thei
 | Requirement | Collos |
 | --- | --- |
 | Text description explaining features and functionality | ✅ §7, paste-ready |
-| Demo video, <2 min, **publicly visible on YouTube or Vimeo**, showing the app functioning **on the device for which it was built** | ❌ Not recorded — the device clause matters: film it on a real phone via **Expo Go** or the iOS Simulator, not only the browser. Script in §6. |
+| Demo video, <2 min, **publicly visible on YouTube or Vimeo**, showing the app functioning **on the device for which it was built** | ❌ Not recorded — the device clause matters: film it on a real phone via **Expo Go** or the iOS Simulator, not only the browser. Script in §6. Upload **public** (rules say "publicly visible"; RevenueCat's walkthrough accepts unlisted — treat public as the safe default). |
 | Public repo URL, open-source-licensed, **licence detectable and visible in the About section** | ✅ MIT `LICENSE` at the root — GitHub shows it in About automatically; confirm it says "MIT license" on the repo page before submitting |
 | 1024×1024 app icon | ✅ `assets/icon.png` (verified 1024×1024) |
 | ≥1 screenshot at 1179×2556, no device frame | ✅ `submission/screenshots/` |
@@ -234,6 +237,12 @@ Do not use copyrighted music or any third party's trademarks.
 parent or a relative who needs a hand. Care work is invisible and easily dropped: one
 sibling does the morning call, another does the shopping, and nobody knows what has
 actually been done. Collos turns that into a short, shared daily plan.
+
+**Try it.** The video shows the app running on a phone. You can also open the same
+codebase in a browser — <https://app.collos.sithunyein.com> is a live, interactive
+preview of the mobile UI (web is an Expo export of this React Native app, not a
+separate build). Without a store key configured it runs in a clearly-labelled
+preview mode and takes no payment; project site: <https://collos.sithunyein.com>.
 
 **Who it's for.** The person in a family who has quietly become the organiser — usually
 the one who lives closest, or the only one who remembers.
