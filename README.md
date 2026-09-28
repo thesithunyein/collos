@@ -1,5 +1,9 @@
 # Collos
 
+<p align="center">
+  <img src="assets/logo-source.png" alt="The Collos logo: a hand-drawn white cat's face with sparkling blue eyes and a heart tag, on a black rounded square." width="180" />
+</p>
+
 Collos is a mobile-first care coordination experience built with Expo and React Native. It helps a care circle share small, everyday moments of support without making medical claims.
 
 > **Safety note:** Collos is for care coordination only. It is not medical advice and does not replace a qualified care professional.
@@ -105,7 +109,7 @@ Web mode runs the full interaction flow. Web purchases bill through RevenueCat B
 ## Public landing page
 
 The static marketing site lives in `landing/` so it can deploy independently without changing the Expo app. It uses the existing Collos brand direction and has no runtime dependencies.
-The two phone previews are real captures of the running app (`landing/app-onboarding.png` and `landing/app-dashboard.png`), not hand-built CSS mockups. The site therefore cannot advertise a dashboard the app does not render: an earlier mockup kept claiming "50%" and "2 of 4 confirmed" months after the app showed 25% and 1 of 4. Re-capture them after any UI change so the two stay in sync:
+The two phone previews are real captures of the running app (`landing/app-onboarding.png` and `landing/app-dashboard.png`), not hand-built CSS mockups. The cat logo at the top of this README is the source of truth for every icon: `python assets/make-icons.py` regenerates the App Store icon, the Android adaptive foreground, both favicons, and the splash mark from it. The site therefore cannot advertise a dashboard the app does not render: an earlier mockup kept claiming "50%" and "2 of 4 confirmed" months after the app showed 25% and 1 of 4. Re-capture them after any UI change so the two stay in sync:
 
 ```bash
 npm run screenshots
