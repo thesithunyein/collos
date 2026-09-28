@@ -146,6 +146,15 @@ Ordered by what unblocks the most.
 Setting the four environment variables is a one-line change in Vercel
 (*Project → Settings → Environment Variables*), followed by a redeploy.
 
+**Status, 29 Sep: done.** Project `Collos` exists (Test Store / RevenueCat
+Billing app), entitlement `collos_pro` attached to `monthly_499` ($4.99) and
+`yearly_3999` ($39.99) in the default offering, and the web key, project ID
+and entitlement are set in Vercel production. Verified live: the paywall at
+app.collos.sithunyein.com loads the real offering ($4.99 / $39.99 / $3.33 per
+month) with no preview notice. On a phone in Expo Go purchases stay in
+labelled preview mode — iOS/Android store products are what native keys would
+buy, and Next Gen explicitly does not require them.
+
 ## 5. The Next Gen path, step by step
 
 Verified against the **Official Rules** (Devpost, updated 31 August 2026) — §4
@@ -159,7 +168,7 @@ summaries. Where the marketing page and the rules differ, the rules govern (thei
 | --- | --- |
 | "Is the app idea clear, useful, interesting, or original? Does it solve a real problem?" | Care coordination for the family organiser; the description (§7) names the person and the problem in one paragraph. |
 | "Does the project demonstrate meaningful progress toward a working app? Is the core functionality clear from the video and code repository?" | Two mock screens became three working tabs with a real purchase path and device-local persistence, all inside the window — the commit history is the progress log, and judges can build and run it from the README. |
-| "Does the project thoughtfully use RevenueCat?" | `react-native-purchases` wired per platform with offerings, purchase, restore, entitlement gating real UI, and a labelled preview mode when no key is present. Creating the project (§4) upgrades this from SDK-integrated to purchase-powering — do it before recording. |
+| "Does the project thoughtfully use RevenueCat?" | `react-native-purchases` wired per platform with offerings, purchase, restore, entitlement gating real UI, and a labelled preview mode when no key is present. Project created 29 Sep (§4 status): the web build takes a live sandbox purchase through RevenueCat Billing. |
 | "Thoughtful technical choices, product thinking, and care in how the app was built and presented?" | The pinned-dependency discipline that fixed a production blank page, the never-failing wrapper pattern, screenshots that assert the UI reacted, and docs that state what is *not* built. |
 
 ### Submission requirements (rules §4), and where each stands
@@ -231,7 +240,7 @@ violating it risks the whole entry.
 | 0:15–0:40 | Tap *Set up my care circle*, dashboard | "You set up who you're caring for, and each day gets a short care plan. Confirm what happened, skip what didn't." |
 | 0:40–1:00 | Tap *Confirm* on Water break, watch 25% become 50% | "Every confirmation is saved the moment you tap it — close the app, come back tomorrow, and the plan still remembers. Nothing you confirmed gets lost." |
 | 1:00–1:20 | Circle tab, free state | "The Circle tab shows everyone involved. On the free plan you get one helper and one shared note a day — that's a deliberate limit, not a paywall on a core feature." |
-| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites and unlimited shared notes. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(With the RevenueCat project + Test Store key set: "…and this is a live sandbox purchase." Without: keep the preview-mode wording — the Next Gen walkthrough confirms sandboxed monetization is what this category expects.)* |
+| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites and unlimited shared notes. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
 | 1:45–2:00 | Circle screen now unlocked, then Settings | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling." |
 
 Do not use copyrighted music or any third party's trademarks.
