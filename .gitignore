@@ -5,3 +5,5 @@ web-build/
 .env
 .DS_Store
 *.log
+.vercel
+.env*
