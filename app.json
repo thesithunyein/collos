@@ -5,7 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
     "splash": {
+      "image": "./assets/splash.png",
       "backgroundColor": "#2457F5",
       "resizeMode": "contain"
     },
@@ -15,12 +17,14 @@
     },
     "android": {
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2457F5"
       },
       "package": "com.collos.app"
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
     }
   }
 }
