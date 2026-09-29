@@ -150,8 +150,8 @@ export function SettingsScreen({
           />
         </View>
         <Text style={styles.detailHint}>
-          The project ID and entitlement identifier are what judges need to verify the RevenueCat
-          integration for this app.
+          The project ID and entitlement identifier identify the store connection for this app. If
+          you contact support, include the app user ID so your purchase record can be found.
         </Text>
 
         <Text style={styles.sectionLabel}>YOUR DATA</Text>
