@@ -14,6 +14,21 @@ const TONES = {
 } as const;
 
 /**
+ * Both controls on a row are drawn 36px tall, which is short of Apple's 44pt
+ * and Material's 48dp minimum for a touch target. The chrome itself stays that
+ * size — taking chrome off this list was the point of the last pass — and the
+ * *touching* area grows around it instead. A control nobody can hit reliably is
+ * not a smaller button, it is a broken one.
+ *
+ * Two shapes, because the two controls are 9px apart: padding both of them out
+ * sideways by 6 would overlap by 3px and hand a strip of taps to the wrong one,
+ * which on this row means skipping instead of confirming. Confirm is already
+ * wide, so it only needs height; Skip is a 36px circle, so it needs both.
+ */
+const TOUCH_SLOP_ROW = { top: 6, bottom: 6 };
+const TOUCH_SLOP_ICON = { top: 6, bottom: 6, left: 6, right: 6 };
+
+/**
  * One moment on today's plan.
  *
  * The card physically answers every tap: a quick press shrinks it a few percent
@@ -95,6 +110,7 @@ export function TaskCard({
             accessibilityRole="button"
             accessibilityState={{ checked: isConfirmed }}
             accessibilityLabel={`${isConfirmed ? "Unconfirm" : "Confirm"} ${task.title}`}
+            hitSlop={TOUCH_SLOP_ROW}
             onPressIn={() => {
               setPressed(true);
               press.setValue(0.975);
@@ -129,6 +145,7 @@ export function TaskCard({
             accessibilityRole="button"
             accessibilityState={{ selected: isSkipped }}
             accessibilityLabel={`${isSkipped ? "Unskip" : "Skip"} ${task.title}`}
+            hitSlop={TOUCH_SLOP_ICON}
             onPress={() => onUpdate(task.id, isSkipped ? "not-confirmed" : "skipped")}
             style={({ pressed: isPressed }) => [
               styles.skipButton,
