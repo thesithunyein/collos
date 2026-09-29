@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#2F63D6" />
-    <meta name="description" content="Collos makes everyday care coordination feel lighter." />
+    <meta name="description" content="Collos turns check-ins, water breaks and shared notes into one calm daily plan for everyone who helps." />
     <title>Collos | Care, together.</title>
     <link rel="canonical" href="https://collos.sithunyein.com/" />
     <meta property="og:type" content="website" />
@@ -20,60 +20,113 @@
     <meta name="twitter:title" content="Collos | Care, together." />
     <meta name="twitter:description" content="Keep the small things that matter in one shared place." />
     <meta name="twitter:image" content="https://collos.sithunyein.com/app-dashboard.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
-<link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="icon" type="image/png" href="favicon.png" />
   </head>
   <body>
-    <header class="site-header shell">
-      <a class="brand" href="#top" aria-label="Collos home">
-        <img class="brand-mark" src="logo.png" width="36" height="36" alt="" />
-        <span>collos</span>
-      </a>
-      <nav class="desktop-nav" aria-label="Main navigation">
-        <a href="#how-it-works">How it works</a>
-        <a href="#care-circle">Care circle</a>
-        <a href="#faq">FAQ</a>
-      </nav>
-      <a class="header-link" href="https://github.com/thesithunyein/collos" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">&#8599;</span></a>
-    </header>
+    <div class="nav-wrap">
+      <header class="glass-nav">
+        <a class="brand" href="#top" aria-label="Collos home">
+          <img class="brand-mark" src="logo.png" width="34" height="34" alt="" />
+          <span>collos</span>
+        </a>
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#how-it-works">How it works</a>
+          <a href="#care-circle">Care circle</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+        <a class="nav-cta" href="https://app.collos.sithunyein.com" target="_blank" rel="noreferrer">
+          Open the app
+          <span class="nav-cta-arrow" aria-hidden="true">&#8599;</span>
+        </a>
+      </header>
+    </div>
 
     <main id="top">
-      <section class="hero shell">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> A calmer way to show up</p>
-          <h1>Care, <em>together.</em></h1>
-          <p class="hero-lede">Keep the small things that matter in one shared place. Collos helps families coordinate everyday care with less noise and more confidence.</p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="https://app.collos.sithunyein.com" target="_blank" rel="noreferrer">Open the app <span aria-hidden="true">&#8599;</span></a>
-            <a class="text-link" href="https://github.com/thesithunyein/collos" target="_blank" rel="noreferrer">View source <span aria-hidden="true">&#8599;</span></a>
-          </div>
-          <p class="mobile-note"><span aria-hidden="true">&#9679;</span> Collos is a mobile app. Use the repository setup to preview it with Expo.</p>
-          <div class="trust-line"><span aria-hidden="true">&#10003;</span> Private by design <span class="line-separator"></span> Built for everyday care</div>
+      <!-- HERO — poster structure, glass material. The floating cards are the
+           product: every row on them mirrors a real screen in the app. -->
+      <section class="hero">
+        <div class="hero-glow" aria-hidden="true">
+          <span class="glow glow-a"></span>
+          <span class="glow glow-b"></span>
+          <span class="glow glow-c"></span>
         </div>
-        <div class="hero-visual" aria-label="Preview of the Collos mobile app">
-          <div class="orbit orbit-one"></div>
-          <div class="orbit orbit-two"></div>
-          <div class="sparklets" aria-hidden="true">
-            <span class="sparklet sparklet-one"></span>
-            <span class="sparklet sparklet-two"></span>
-            <span class="sparklet sparklet-three"></span>
-            <span class="sparklet sparklet-four"></span>
-          </div>
-          <div class="phone phone-hero">
-            <div class="phone-speaker"></div>
-            <div class="phone-screen">
-              <img src="app-onboarding.png" width="390" height="844" alt="The Collos onboarding screen: a sun illustration above the headline Care, together, a safety note, and a Set up my care circle button." />
-            </div>
-          </div>
-          <div class="float-note note-top"><span class="note-icon sky">&#10003;</span><span><strong>One shared plan</strong><small>for your whole circle</small></span></div>
-          <div class="float-note note-bottom"><span class="note-icon blush">&#9829;</span><span><strong>A little goes a long way</strong><small>small moments, shared</small></span></div>
-        </div>
-      </section>
 
-      <section class="proof-strip">
-        <div class="shell proof-inner">
-          <p>For the people who help care feel less lonely.</p>
-          <div class="proof-pills"><span>Family</span><span>Friends</span><span>Care circles</span></div>
+        <div class="hero-inner shell">
+          <div class="hero-copy">
+            <p class="hero-badge"><span aria-hidden="true">&#10022;</span> Built for RevenueCat Shipaton 2026 &middot; MIT open source</p>
+            <h1>Care, together<br /><span class="tone">for the small things that matter.</span></h1>
+            <p class="hero-lede">Collos turns check-ins, water breaks and shared notes into one calm daily plan for everyone who helps.</p>
+            <div class="hero-actions">
+              <a class="button-glass" href="https://app.collos.sithunyein.com" target="_blank" rel="noreferrer">
+                Open the app
+                <span class="button-glass-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+              <a class="text-link" href="https://github.com/thesithunyein/collos" target="_blank" rel="noreferrer">View source <span aria-hidden="true">&#8599;</span></a>
+            </div>
+            <p class="mobile-note"><span aria-hidden="true">&#9679;</span> <span class="mobile-note-text">A native iOS &amp; Android app &mdash; the browser build is the same codebase exported to web.</span></p>
+          </div>
+
+          <div class="hero-stage" aria-label="Preview of the Collos care plan">
+            <div class="orb" aria-hidden="true"><span class="orb-highlight"></span></div>
+
+            <article class="glass-card card-plan">
+              <header class="card-head">
+                <span class="card-avatar">M</span>
+                <div class="card-head-copy">
+                  <strong>Margaret &middot; Mum</strong>
+                  <small>Today&rsquo;s plan</small>
+                </div>
+                <span class="card-chip">50%</span>
+              </header>
+              <div class="plan-row">
+                <span class="plan-dot plan-dot-blush" aria-hidden="true"></span>
+                <span class="plan-row-copy">Water break <small>10:30 AM</small></span>
+                <span class="plan-check" aria-hidden="true">&#10003;</span>
+              </div>
+              <div class="plan-row">
+                <span class="plan-dot plan-dot-mint" aria-hidden="true"></span>
+                <span class="plan-row-copy">Fresh air <small>2:00 PM</small></span>
+                <span class="plan-check plan-check-open" aria-hidden="true">&mdash;</span>
+              </div>
+              <div class="plan-bar" role="img" aria-label="Half of today's moments confirmed">
+                <span class="plan-bar-fill"></span>
+              </div>
+              <div class="avatar-stack" aria-hidden="true">
+                <span>M</span><span>A</span><span>D</span>
+              </div>
+            </article>
+
+            <article class="glass-card card-note">
+              <span class="note-icon" aria-hidden="true">&#9829;</span>
+              <div>
+                <strong>Evening note</strong>
+                <small>&ldquo;Share one good thing from today&rdquo;</small>
+              </div>
+            </article>
+
+            <article class="glass-card card-circle">
+              <img class="circle-logo" src="logo.png" width="40" height="40" alt="" />
+              <div>
+                <strong>Care circle</strong>
+                <small>3 helpers checked in today</small>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="stack-strip shell" aria-label="Built with">
+          <p>Built in the open with</p>
+          <ul>
+            <li>Expo</li>
+            <li>React Native</li>
+            <li>TypeScript</li>
+            <li>RevenueCat</li>
+            <li>Vercel</li>
+          </ul>
         </div>
       </section>
 
@@ -84,21 +137,21 @@
           <p>Care is already full of decisions. Collos takes one small thing off your plate: remembering who is doing what, and when.</p>
         </div>
         <div class="feature-grid">
-          <article class="feature-card">
+          <article class="glass-card feature-card">
             <span class="feature-number">01</span>
-            <div class="feature-icon feature-sky">&#9829;</div>
+            <div class="feature-icon feature-sky" aria-hidden="true">&#9829;</div>
             <h3>Choose your circle</h3>
             <p>Set up the people and recipients who make up your everyday care rhythm.</p>
           </article>
-          <article class="feature-card feature-card-lift">
+          <article class="glass-card feature-card feature-card-lift">
             <span class="feature-number">02</span>
-            <div class="feature-icon feature-blush">&#10024;</div>
+            <div class="feature-icon feature-blush" aria-hidden="true">&#10024;</div>
             <h3>Plan small moments</h3>
             <p>Turn check-ins and shared notes into one plan everyone can see.</p>
           </article>
-          <article class="feature-card">
+          <article class="glass-card feature-card">
             <span class="feature-number">03</span>
-            <div class="feature-icon feature-mint">&#10003;</div>
+            <div class="feature-icon feature-mint" aria-hidden="true">&#10003;</div>
             <h3>Show up, together</h3>
             <p>Confirm what is done, skip what is not, and leave the next person a clear handoff.</p>
           </article>
@@ -111,13 +164,13 @@
           <h2>More clarity.<br /><em>Less carrying it alone.</em></h2>
           <p>From a morning hello to an evening note, the dashboard makes care visible without turning it into a chore.</p>
           <ul class="check-list">
-            <li><span>&#10003;</span><span><strong>See today's moments</strong><small>Know what is planned at a glance.</small></span></li>
-            <li><span>&#10003;</span><span><strong>Keep context close</strong><small>Give every handoff a little more care.</small></span></li>
-            <li><span>&#10003;</span><span><strong>Make room for people</strong><small>Coordination should support connection, not replace it.</small></span></li>
+            <li><span aria-hidden="true">&#10003;</span><span><strong>See today's moments</strong><small>Know what is planned at a glance.</small></span></li>
+            <li><span aria-hidden="true">&#10003;</span><span><strong>Keep context close</strong><small>Give every handoff a little more care.</small></span></li>
+            <li><span aria-hidden="true">&#10003;</span><span><strong>Make room for people</strong><small>Coordination should support connection, not replace it.</small></span></li>
           </ul>
         </div>
         <div class="dashboard-frame">
-          <img src="app-dashboard.png" width="390" height="844" alt="The Collos care dashboard showing Margaret's care plan at 25 percent, with one of four today's moments confirmed." />
+          <img src="app-dashboard.png" width="390" height="844" alt="The Collos care dashboard showing Margaret's care plan, with one of four today's moments confirmed." />
         </div>
       </section>
 
@@ -126,17 +179,17 @@
           <div class="video-copy">
             <p class="eyebrow">SEE IT IN A MOMENT</p>
             <h2>Care that fits<br /><em>real life.</em></h2>
-            <p>We are preparing a short walkthrough of the Collos experience. Until then, take a look at the flow we are building for families and friends.</p>
+            <p>A two-minute walkthrough of the Collos experience, filmed on a phone for the Shipaton submission.</p>
           </div>
           <div class="video-placeholder" role="img" aria-label="Demo video placeholder">
-            <div class="play-button">&#9654;</div>
-            <span>DEMO VIDEO<br /><small>Coming soon</small></span>
+            <div class="play-button" aria-hidden="true">&#9654;</div>
+            <span>TWO-MINUTE TOUR<br /><small>Filmed for Shipaton 2026</small></span>
           </div>
         </div>
       </section>
 
       <section class="cta shell">
-        <div class="cta-card">
+        <div class="glass-card cta-card">
           <div><p class="eyebrow">START WITH ONE SMALL THING</p><h2>Make care feel<br /><em>lighter.</em></h2></div>
           <div><p>Collos is being shaped with care, one useful moment at a time.</p><a class="button button-light" href="https://github.com/thesithunyein/collos" target="_blank" rel="noreferrer">Follow along on GitHub <span aria-hidden="true">&#8599;</span></a></div>
         </div>

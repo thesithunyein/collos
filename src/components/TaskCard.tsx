@@ -104,7 +104,7 @@ export function TaskCard({
 
 const styles = StyleSheet.create({
   taskCard: {
-    backgroundColor: colors.white,
+    backgroundColor: "rgba(255,255,255,0.92)",
     borderRadius: shape.lg,
     padding: 14,
     flexDirection: "row",

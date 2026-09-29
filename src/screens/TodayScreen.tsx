@@ -182,6 +182,12 @@ export function TodayScreen({
           </View>
         ) : (
           <>
+            <View style={styles.heroGlowWrap}>
+              {/* Soft glow ellipses behind the hero — the landing page's
+                  gradient-glow material, emulated with layered translucent
+                  circles because RN has no blur without expo-blur. */}
+              <View style={styles.heroGlowLarge} aria-hidden />
+              <View style={styles.heroGlowSmall} aria-hidden />
             <View style={styles.heroCard}>
               <View style={styles.heroContent}>
                 <Text style={styles.heroKicker}>TODAY’S CARE PLAN</Text>
@@ -191,6 +197,7 @@ export function TodayScreen({
                 </Text>
               </View>
               <ProgressRing progress={progress} />
+            </View>
             </View>
 
             <View style={styles.sectionHeader}>
@@ -432,10 +439,35 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   addRecipientText: { color: colors.blue, fontSize: 11, fontWeight: "700" },
+  heroGlowWrap: { position: "relative" },
+  heroGlowLarge: {
+    position: "absolute",
+    top: -34,
+    left: -30,
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    backgroundColor: "rgba(154,191,243,0.45)",
+  },
+  heroGlowSmall: {
+    position: "absolute",
+    bottom: -40,
+    right: -22,
+    width: 170,
+    height: 170,
+    borderRadius: 85,
+    backgroundColor: "rgba(96,177,255,0.32)",
+  },
   heroCard: {
     backgroundColor: colors.blue,
     borderRadius: shape.xl,
     padding: 21,
+    // Floats above the glow ellipses behind it.
+    shadowColor: colors.ink,
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
     flexDirection: "row",
     justifyContent: "space-between",
     overflow: "hidden",
