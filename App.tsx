@@ -32,6 +32,7 @@ import {
   withAddedRecipient,
   withMoment,
   withResetDay,
+  withOrganiserName,
   withStarterMoments,
   withTaskStatus,
 } from "./src/storage/careStore";
@@ -197,7 +198,11 @@ export default function App() {
     setTimeout(() => {
       setLoading(false);
       setStage("app");
-      mutate(withAddedRecipient(storedRef.current, person));
+      let next = withAddedRecipient(storedRef.current, person);
+      // The organiser's name rides along with the first save, so the greeting
+      // and the circle card speak from the person holding the phone.
+      if (person.organiserName) next = withOrganiserName(next, person.organiserName);
+      mutate(next);
     }, 350);
   };
 
@@ -291,6 +296,7 @@ export default function App() {
             isLoading={isLoading}
             pro={pro.pro}
             noteCount={recipientNotes.length}
+            organiserName={stored.organiserName}
             onSelectRecipient={selectRecipient}
             onUpdateTask={updateTask}
             onAddMoment={() => setAddingMoment(true)}
@@ -306,6 +312,7 @@ export default function App() {
             notesToday={notesToday}
             notesTotal={stored.notes.length}
             pro={pro.pro}
+            organiserName={stored.organiserName}
             onAddPerson={() => setAddingPerson(true)}
             onOpenNotes={openNotes}
             onUnlock={() => setPaywallOpen(true)}

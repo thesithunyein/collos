@@ -14,7 +14,7 @@ import {
 import { Avatar } from "../components/Avatar";
 import { TaskCard } from "../components/TaskCard";
 import type { CareRecipient, CareTask, TaskStatus } from "../data/mockCare";
-import { currentUser } from "../data/mockCare";
+
 import { colors, elevation, insets, shape } from "../theme";
 
 /**
@@ -171,6 +171,8 @@ export type TodayScreenProps = {
   pro: boolean;
   /** Notes kept for this recipient on this device. */
   noteCount: number;
+  /** The person holding the phone, from stored state — empty when unsaid. */
+  organiserName: string;
   onSelectRecipient: (recipient: CareRecipient) => void;
   onUpdateTask: (taskId: string, status: TaskStatus) => void;
   onAddMoment: () => void;
@@ -191,6 +193,7 @@ export function TodayScreen({
   isLoading,
   pro,
   noteCount,
+  organiserName,
   onSelectRecipient,
   onUpdateTask,
   onAddMoment,
@@ -209,9 +212,7 @@ export function TodayScreen({
         <View style={styles.header}>
           <View>
             <Text style={styles.eyebrow}>{dateLine()}</Text>
-            <Text style={styles.greeting}>
-              {greeting()}, {currentUser.name}
-            </Text>
+            <Text style={styles.greeting}>{organiserGreeting(organiserName)}</Text>
           </View>
           <Pressable
             accessibilityRole="button"
@@ -219,7 +220,7 @@ export function TodayScreen({
             onPress={onOpenAccount}
             style={({ pressed }) => [styles.avatarWrap, pressed && styles.pressed]}
           >
-            <Avatar source={currentUser.avatar} initials={currentUser.initials} size={44} />
+            <Avatar initials={organiserInitials(organiserName)} size={44} />
             {pro ? (
               <View style={styles.proDot}>
                 <Ionicons name="sparkles" size={9} color={colors.white} />
@@ -418,12 +419,28 @@ function dateLine(): string {
   });
 }
 
-/** Time-aware greeting; the fallback covers locales where the hour is unclear. */
-function greeting(): string {
+/**
+ * Time-aware greeting, built from the stored organiser's name.
+ *
+ * With a name it reads "Good morning, Ama"; without one — an existing install
+ * whose payload predates the field, or someone who never said — it falls back to
+ * who the plan is *for*, so the line never invents a person.
+ */
+function organiserGreeting(organiserName: string): string {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
+  const part = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  return organiserName ? `${part}, ${organiserName}` : `${part} 👋`;
+}
+
+/** The organiser's initials for the header avatar, same rule the store uses. */
+function organiserInitials(organiserName: string): string {
+  const words = organiserName.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "You";
+  return words
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
 }
 
 /**

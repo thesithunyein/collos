@@ -9,6 +9,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { PersonFields } from "../components/PersonFields";
@@ -18,6 +19,8 @@ export type NewPerson = {
   name: string;
   relationship: string;
   portraitId?: string;
+  /** The person holding the phone. Optional — the app speaks neutrally without it. */
+  organiserName?: string;
 };
 
 /**
@@ -45,12 +48,13 @@ export function OnboardingScreen({
   const [name, setName] = useState("");
   const [relationship, setRelationship] = useState("");
   const [portraitId, setPortraitId] = useState<string | undefined>(undefined);
+  const [organiserName, setOrganiserName] = useState("");
 
   const canStart = name.trim().length > 0 && relationship.length > 0;
 
   const submit = () => {
     if (!canStart || isLoading) return;
-    onStart({ name: name.trim(), relationship, portraitId });
+    onStart({ name: name.trim(), relationship, portraitId, organiserName: organiserName.trim() });
   };
 
   return (
@@ -149,6 +153,19 @@ export function OnboardingScreen({
                 onSubmitEditing={submit}
               />
             </View>
+
+            <Text style={styles.fieldLabelDark}>And you are?</Text>
+            <TextInput
+              accessibilityLabel="Your name, optional"
+              placeholder="e.g. Sithu (optional)"
+              placeholderTextColor={colors.placeholder}
+              value={organiserName}
+              onChangeText={setOrganiserName}
+              returnKeyType="done"
+              onSubmitEditing={submit}
+              maxLength={40}
+              style={styles.inputDark}
+            />
 
             <Pressable
               accessibilityRole="button"
@@ -277,4 +294,18 @@ const styles = StyleSheet.create({
   },
   primaryButtonSpaced: { marginTop: 16 },
   primaryButtonOff: { opacity: 0.55 },
+  /** The organiser field sits on the navy hero, so it inverts the card's inputs. */
+  fieldLabelDark: { color: colors.blueTint, fontSize: 13, fontWeight: "600", marginTop: 20 },
+  inputDark: {
+    marginTop: 8,
+    minHeight: 50,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.28)",
+    backgroundColor: "rgba(255,255,255,0.1)",
+    paddingHorizontal: 14,
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "500",
+  },
 });

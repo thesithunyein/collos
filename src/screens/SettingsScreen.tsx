@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -61,23 +62,29 @@ export function SettingsScreen({
   const [showSupport, setShowSupport] = useState(false);
 
   const confirmReset = () => {
-    // Alert is unavailable on web in RN 0.74, so the web gets an inline
-    // two-tap confirmation instead of a silent destructive action.
-    if (Alert?.alert) {
-      Alert.alert(
-        "Reset all data?",
-        "Every confirmed moment, added moment, and preference on this device will be deleted. This cannot be undone.",
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Reset", style: "destructive", onPress: () => void onResetData() },
-        ],
-      );
-    } else if (!confirmingReset) {
-      setConfirmingReset(true);
-    } else {
-      setConfirmingReset(false);
-      void onResetData();
+    // A native Alert dialog on iOS/Android; an inline two-tap arm-and-confirm
+    // on web. The branch is on `Platform.OS` rather than on `Alert?.alert`
+    // truthiness: react-native-web ships `Alert` as a no-op stub whose `alert`
+    // *exists*, so the old guard passed on web and the reset button did
+    // nothing at all — a silent no-op on the most destructive control in the
+    // app, found in an end-to-end audit of the production build.
+    if (Platform.OS === "web") {
+      if (!confirmingReset) {
+        setConfirmingReset(true);
+      } else {
+        setConfirmingReset(false);
+        void onResetData();
+      }
+      return;
     }
+    Alert.alert(
+      "Reset all data?",
+      "Every confirmed moment, added moment, and preference on this device will be deleted. This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Reset", style: "destructive", onPress: () => void onResetData() },
+      ],
+    );
   };
 
   return (

@@ -4,7 +4,6 @@ import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Avatar } from "../components/Avatar";
 import type { CareRecipient } from "../data/mockCare";
-import { currentUser } from "../data/mockCare";
 import { colors, elevation, insets, shape } from "../theme";
 
 /**
@@ -26,17 +25,29 @@ type Member = {
   confirmedToday: boolean;
 };
 
+/**
+ * Builds the circle's member cards.
+ *
+ * The organiser's card is built from the stored name rather than a compiled-in
+ * one, and its avatar falls back to initials — the same fallback every person
+ * without a portrait gets, rather than a bundled picture of a specific human.
+ */
 function buildMembers(
   recipients: CareRecipient[],
   confirmedTodayByRecipientId: Record<string, boolean>,
+  organiserName: string,
 ): Member[] {
+  const words = organiserName.trim().split(/\s+/).filter(Boolean);
+  const initials = words.length
+    ? words.slice(0, 2).map((w) => w[0]).join("").toUpperCase()
+    : "You";
   return [
     {
       id: "you",
-      name: "You",
+      name: organiserName || "You",
       role: "Care organiser",
-      initials: currentUser.initials,
-      avatar: currentUser.avatar,
+      initials,
+      avatar: undefined,
       kind: "you",
       confirmedToday: true,
     },
@@ -58,6 +69,7 @@ export function CircleScreen({
   notesToday,
   notesTotal,
   pro,
+  organiserName,
   onAddPerson,
   onOpenNotes,
   onUnlock,
@@ -69,12 +81,14 @@ export function CircleScreen({
   /** Every note kept on this device. */
   notesTotal: number;
   pro: boolean;
+  /** The person holding the phone, from stored state — empty when unsaid. */
+  organiserName: string;
   /** Opens the sheet that adds another person to the plan. */
   onAddPerson: () => void;
   onOpenNotes: () => void;
   onUnlock: () => void;
 }) {
-  const members = buildMembers(recipients, confirmedTodayByRecipientId);
+  const members = buildMembers(recipients, confirmedTodayByRecipientId, organiserName);
   const checkedIn = members.filter((member) => member.confirmedToday).length;
 
   return (

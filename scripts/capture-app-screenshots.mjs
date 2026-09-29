@@ -104,6 +104,10 @@ const SETUP_PRESSES = [
   "Set up my care circle",
   { type: { label: "Their name", value: "Margaret" } },
   "Mum",
+  // The organiser is whoever runs the tour; the field is optional in the app
+  // but the greeting and circle card read from it, so the screenshots name the
+  // person holding the phone rather than falling back to a neutral greeting.
+  { type: { label: "Your name, optional", value: "Sithu" } },
   "Start my plan",
 ];
 

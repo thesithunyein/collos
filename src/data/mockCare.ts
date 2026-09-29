@@ -40,27 +40,18 @@ export type CareRecipient = {
 };
 
 /**
- * The person holding the phone.
- *
- * Portraits are hand-drawn line art (Notionists by Zoish, CC0 1.0) rather than
- * photographs, which keeps them consistent with the hand-drawn cat in the logo
- * and avoids putting a real stranger's face on someone in a public repository.
- * Bundled as files rather than fetched, so the app has no runtime network
- * dependency and still works offline.
- */
-export const currentUser = {
-  name: "Sithu",
-  initials: "S",
-  avatar: require("../../assets/avatars/sithu.png") as ImageSourcePropType,
-};
-
-/**
  * Portraits a user can pick for someone they care for.
  *
  * Offered during setup rather than assigned, because the alternative for a
  * person the app has never met is initials — and a screen of letters is exactly
  * what this app used to look like before it had faces. Picking is optional; the
  * initials fallback is a designed state, not a placeholder.
+ *
+ * Portraits are hand-drawn line art (Notionists by Zoish, CC0 1.0) rather than
+ * photographs, which keeps them consistent with the hand-drawn cat in the logo
+ * and avoids putting a real stranger's face on someone in a public repository.
+ * Bundled as files rather than fetched, so the app has no runtime network
+ * dependency and still works offline.
  */
 export const PORTRAITS: { id: string; source: ImageSourcePropType }[] = [
   { id: "margaret", source: require("../../assets/avatars/margaret.png") },

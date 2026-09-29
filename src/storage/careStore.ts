@@ -71,6 +71,13 @@ export type StoredState = {
   version: 2;
   /** The people the user cares for, in the order they were added. */
   recipients: StoredRecipient[];
+  /**
+   * The person holding the phone. Collos is used by someone *about* someone
+   * else, and every screen speaks from that person — the greeting, the circle
+   * card, the "checked in" count — so it has to be stored like any other fact
+   * rather than compiled in. Empty until setup asks for it.
+   */
+  organiserName: string;
   /** Per recipient, per moment: the last status the user chose for it. */
   statuses: Record<string, Record<string, TaskStatus>>;
   /**
@@ -99,6 +106,7 @@ export function emptyStoredState(): StoredState {
   return {
     version: VERSION,
     recipients: [],
+    organiserName: "",
     statuses: {},
     moments: {},
     notes: [],
@@ -124,6 +132,10 @@ function parse(raw: string | null): StoredState | null {
       statuses: parsed.statuses ?? {},
       // Notes arrived after v1 shipped, so an older payload must still load.
       notes: Array.isArray(parsed.notes) ? parsed.notes : [],
+      // `organiserName` also postdates v1: the greeting used to be compiled
+      // from a constant. Existing payloads keep working with an empty name,
+      // which the UI renders as a neutral greeting rather than a wrong one.
+      organiserName: typeof parsed.organiserName === "string" ? parsed.organiserName : "",
       moments: parsed.moments ?? {},
       activeRecipientId: parsed.activeRecipientId ?? null,
       seenOnboarding: Boolean(parsed.seenOnboarding),
@@ -201,6 +213,11 @@ export function newRecipientId(): string {
  * description of a day that is right for someone the app has never been told
  * anything about — so the first thing the user sees is their own empty screen
  * with one obvious way out of it, not somebody else's finished one.
+ *
+ * The first person a user defines is the care *recipient*; the organiser is the
+ * person holding the phone, captured separately. Setup asks for the recipient
+ * because a plan without a subject is unrenderable, while the organiser's own
+ * name only changes how the app speaks — the empty-string fallback covers it.
  */
 export function withAddedRecipient(
   state: StoredState,
@@ -218,6 +235,11 @@ export function withAddedRecipient(
     activeRecipientId: recipient.id,
     recipients: [...state.recipients, recipient],
   };
+}
+
+/** Records who is holding the phone, so the app speaks from them. */
+export function withOrganiserName(state: StoredState, name: string): StoredState {
+  return { ...state, organiserName: name.trim() };
 }
 
 /**
