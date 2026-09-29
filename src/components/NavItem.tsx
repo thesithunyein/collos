@@ -28,9 +28,9 @@ export function NavItem({
   // 0 = resting, 1 = active. Starts at the right value so a tab that mounts
   // already active doesn't play a spurious pop.
   const lift = useRef(new Animated.Value(active ? 1 : 0)).current;
-  // The icon GROWS when active; it never shrinks below full size, so every
-  // tab stays visible at rest.
-  const iconScale = lift.interpolate({ inputRange: [0, 1], outputRange: [1, 1.16] });
+  // The icon grows slightly when active; it never shrinks below full size, so
+  // every tab stays visible at rest.
+  const iconScale = lift.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] });
 
   useEffect(() => {
     Animated.spring(lift, {
@@ -51,8 +51,11 @@ export function NavItem({
       onPress={onPress}
       style={({ pressed }) => [styles.navItem, pressed && styles.navItemPressed]}
     >
-      <Animated.View style={{ transform: [{ scale: iconScale }] }}>
-        <Ionicons name={icon} size={21} color={active ? colors.blue : colors.muted} />
+      {/* The luma-style wash capsule behind the active tab's icon: it fills in
+          with the same spring that lifts the icon, so the selection reads as
+          held rather than merely tinted, and there is exactly one icon per tab. */}
+      <Animated.View style={[styles.iconWell, { opacity: lift, transform: [{ scale: iconScale }] }]}>
+        <Ionicons name={icon} size={22} color={active ? colors.blue : colors.muted} />
       </Animated.View>
       <Text style={[styles.navLabel, active && styles.navLabelActive]}>{label}</Text>
     </Pressable>
@@ -60,8 +63,20 @@ export function NavItem({
 }
 
 const styles = StyleSheet.create({
-  navItem: { minWidth: 70, minHeight: 52, alignItems: "center", justifyContent: "center", gap: 4 },
+  navItem: { minWidth: 84, minHeight: 52, alignItems: "center", justifyContent: "center", gap: 4 },
   navItemPressed: { opacity: 0.72 },
-  navLabel: { color: colors.muted, fontSize: 11, fontWeight: "700" },
-  navLabelActive: { color: colors.blue },
+  /** The luma-style wash capsule that appears behind the active tab's icon. */
+  iconWell: {
+    width: 62,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.blueWash,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  // Luma's tab bar separates its states by weight as well as tint: an inactive
+  // label sits back, the active one is genuinely bold. Weight alone would be too
+  // subtle at 11pt, so tint and weight move together.
+  navLabel: { color: colors.muted, fontSize: 11, fontWeight: "600" },
+  navLabelActive: { color: colors.blue, fontWeight: "800" },
 });

@@ -184,7 +184,7 @@ export function CircleScreen({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
-  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 110 },
+  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 130 },
   eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1.1 },
   title: { color: colors.ink, fontSize: 27, fontWeight: "800", letterSpacing: -0.7, marginTop: 6 },
   subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },

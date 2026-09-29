@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Animated, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Animated, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { LaunchScreen } from "./src/components/LaunchScreen";
 import { NavItem } from "./src/components/NavItem";
 import { PaywallModal } from "./src/components/PaywallModal";
 import { AddMomentSheet } from "./src/components/AddMomentSheet";
@@ -204,8 +205,10 @@ export default function App() {
 
   if (!hydrated) {
     return (
-      <View style={[styles.viewport, styles.launch, isWide && styles.viewportWide]}>
-        <ActivityIndicator color={colors.blue} />
+      <View style={[styles.viewport, isWide && styles.viewportWide]}>
+        <View style={[styles.frame, isWide && styles.frameWide]}>
+          <LaunchScreen />
+        </View>
       </View>
     );
   }
@@ -342,7 +345,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   viewportWide: { paddingVertical: 34, paddingHorizontal: 24, justifyContent: "center" },
-  launch: { alignItems: "center", justifyContent: "center" },
   frame: {
     flex: 1,
     width: "100%",
@@ -366,26 +368,41 @@ const styles = StyleSheet.create({
     shadowRadius: 40,
     shadowOffset: { width: 0, height: 20 },
   },
+  /**
+   * The Luma pattern: nav floats free of the edges as a capsule, not a bar.
+   *
+   * Opaque, not frosted. Luma's bar is genuinely translucent, but it can afford
+   * to be because the platform gives it a backdrop blur; `expo-blur` is a native
+   * module this project deliberately does not carry, and without a blur 3%
+   * translucency does not read as glass — it reads as text bleeding through the
+   * bar. A solid capsule plus the shadow keeps the float without the ghosting.
+   */
   bottomNav: {
     position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    minHeight: 76,
-    paddingTop: 10,
-    paddingBottom: 10 + insets.bottom,
-    backgroundColor: "rgba(255,255,255,0.98)",
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
+    left: 18,
+    right: 18,
+    bottom: 10 + insets.bottom,
+    minHeight: 68,
+    paddingTop: 8,
+    paddingBottom: 8,
+    borderRadius: 34,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    shadowColor: colors.ink,
+    shadowOpacity: 0.12,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
   },
   notice: {
     position: "absolute",
     left: 20,
     right: 20,
-    bottom: 88 + insets.bottom,
+    bottom: 96 + insets.bottom,
     minHeight: 48,
     borderRadius: shape.md,
     backgroundColor: colors.white,
@@ -412,7 +429,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 18,
     backgroundColor: colors.ink,
-    zIndex: 40,
+    zIndex: 60,
   },
   /** Decorative home indicator inside the desktop device frame. */
   homeIndicator: {
@@ -424,6 +441,6 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 3,
     backgroundColor: "rgba(24,52,104,0.9)",
-    zIndex: 40,
+    zIndex: 60,
   },
 });

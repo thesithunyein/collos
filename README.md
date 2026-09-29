@@ -136,13 +136,27 @@ npm run screenshots
 
 The script launches a local Chrome or Edge headless, drives the web app over the DevTools protocol, and rewrites both PNGs in `landing/`. It has no npm dependencies and needs no secrets. Point it at a local build with `--base-url http://localhost:8081`, or set `CHROME_PATH` if Chrome is not installed in the usual location. `--only 04-paywall` runs the tour as far as the screenshots you name and writes only those, which is how the paywall shot is taken against the deployed app — the real RevenueCat offering loads there, and stopping before *Continue with Pro* keeps the tour out of a live checkout.
 
+Two switches exist to keep a run against production from failing. `--skip-pro` drops the paywall *and* the Pro steps, because against the deployed app *Continue with Pro* hands off to the real RevenueCat Billing checkout, which a headless browser cannot finish; the tour would abort there and leave the Settings screenshot at whatever the previous build wrote. The paywall shot has to go with it: that step leaves the modal open, so the next step's *Settings* press would land on the scrim instead of the tab bar. Run it on its own with `--only 04-paywall`.
+
 ## Submission assets
 
 ```bash
 npm run screenshots:devpost
 ```
 
-That writes six screenshots to `submission/screenshots/` at **1179×2556** — the exact size Devpost asks for, with no device frame. It captures at 393×852 CSS pixels with a 3× device scale factor, so the output needs no resampling. The same flow drives the real app through onboarding, the daily plan, the locked circle, the paywall, the unlocked circle, and Settings.
+That writes six screenshots to `submission/screenshots/` at **1179×2556** — the exact size Devpost asks for, with no device frame. It captures at 393×852 CSS pixels with a 3× device scale factor, so the output needs no resampling. The flow drives the real app through onboarding, the daily plan, the locked circle, the paywall, the unlocked circle, and Settings.
+
+Those six frames do not all come from the same build, and the split is deliberate rather than incidental:
+
+```bash
+node scripts/capture-app-screenshots.mjs --set devpost --skip-pro   # 01, 02, 03, 06 from production
+node scripts/capture-app-screenshots.mjs --set devpost --only 04-paywall
+node scripts/capture-app-screenshots.mjs --set devpost --base-url http://localhost:8081 --only 05-circle-pro
+```
+
+Five of the six are captured from `app.collos.sithunyein.com`, which is the only place the Settings screen can show a real store row: a locally built web bundle carries no `EXPO_PUBLIC_REVENUECAT_*` values, so it renders `Status: Preview mode`, `Entitlement: collos_pro` and `RevenueCat project: Not set in this build` — no evidence at all for the RevenueCat criterion. From production the same rows read `Connected`, `collos_pro` and `projaa1359ce`. The paywall is the second production frame, for the same reason: it loads the live offering and says *Billed by RevenueCat Billing* instead of the preview notice.
+
+The Pro-state frame is the exception. Unlocking Pro against production means completing a real card checkout, so `05-circle-pro.png` is captured from a preview-mode build where the unlock is simulated. The rules explicitly allow sandboxed purchases for the Next Gen Award, and the app labels that state on screen rather than hiding it.
 
 The store sizes are **not** interchangeable with that one, so they have their own presets:
 

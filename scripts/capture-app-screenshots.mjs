@@ -49,6 +49,8 @@ const arg = (name, fallback) => {
   const i = argv.indexOf(`--${name}`);
   return i !== -1 && argv[i + 1] ? argv[i + 1] : fallback;
 };
+/** Boolean switches take no value, so `--skip-pro` on its own means true. */
+const flag = (name) => argv.includes(`--${name}`);
 
 const SET = arg("set", "landing");
 const ONLY = arg("only", "");
@@ -131,7 +133,11 @@ const APP_TOUR = [
     label: "care circle (Pro unlocked)",
     press: "Continue with Pro",
     expect: "Unlimited notes are on",
-    settleMs: 1400,
+    // The app raises a "Collos Pro unlocked" toast for 2800ms and it sits
+    // directly over the card this screenshot exists to show. Waiting it out
+    // keeps the toast out of both this frame and the next one; the previous
+    // 1400ms landed the toast right across the middle of the image.
+    settleMs: 3050,
   },
   {
     file: "06-settings.png",
@@ -141,9 +147,32 @@ const APP_TOUR = [
   },
 ];
 
-FLOWS.devpost = APP_TOUR;
-FLOWS.appstore = APP_TOUR;
-FLOWS.playstore = APP_TOUR;
+/**
+ * `--skip-pro` drops the one step that cannot complete against the live app.
+ *
+ * Against a preview-mode build "Continue with Pro" is simulated and unlocks
+ * instantly, so the tour runs end to end. Against app.collos.sithunyein.com it
+ * hands off to the real RevenueCat Billing / Stripe checkout, which a headless
+ * browser cannot finish — so the run would abort at step 5 and silently leave
+ * the Settings screenshot at whatever the previous build captured.
+ *
+ * Skipping that step lets the other five be captured from production, which is
+ * the only way the Settings shot can show a real `Connected` store row and the
+ * live `collos_pro` entitlement instead of the preview placeholders. The Pro
+ * screenshot is then captured separately from the preview build.
+ */
+const SKIP_PRO = flag("skip-pro");
+// The paywall step has to go with it: it leaves the modal open, and the next
+// step's "Settings" press would land on the scrim instead of the tab bar. Run
+// the paywall on its own with `--only 04-paywall`, where stopping the tour on
+// the open modal is the point.
+const TOUR = SKIP_PRO
+  ? APP_TOUR.filter((step) => !step.file.startsWith("04") && !step.file.startsWith("05"))
+  : APP_TOUR;
+
+FLOWS.devpost = TOUR;
+FLOWS.appstore = TOUR;
+FLOWS.playstore = TOUR;
 
 const BROWSERS = [
   process.env.CHROME_PATH,

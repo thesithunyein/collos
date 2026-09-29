@@ -41,23 +41,62 @@ function useCountUp(target: number, duration = 400): Animated.Value {
   return value;
 }
 
+/**
+ * How many arcs the ring is divided into.
+ *
+ * Four is not arbitrary: the authored plan is four moments, and each moment is
+ * a quarter of the day, so one lit arc means exactly one confirmed moment and
+ * the ring agrees with the "1 of 4 confirmed" line underneath it. Luma's
+ * equivalent is a clean piece of state rather than ornament, and a ring that
+ * cannot be trusted is worse than no ring.
+ *
+ * The count is fixed rather than following the moment count, because a single
+ * coloured border is a 90° arc: five arcs at 72° spacing would overlap, and
+ * two or three arcs at their natural spacing would leave visible gaps in a
+ * ring that is supposed to read as continuous. The cost is quantisation — a
+ * plan with five moments shows 20% beside one lit quarter. The exact figure is
+ * the number; the arcs are the glanceable shape, and a stepped gauge that
+ * always looks intact beats an exact one that looks broken at two moments.
+ */
+const RING_SEGMENTS = 4;
+
+/**
+ * Four separate 90° arcs, lit from the top clockwise.
+ *
+ * The previous version laid one translucent disc over the whole track, so 25%
+ * and 100% rendered identically — the number was the only thing carrying the
+ * value. A real arc needs SVG or a mask, neither of which this project has, but
+ * a single coloured border on a circle *is* a 90° arc, so four rotated copies
+ * tile the ring exactly with no geometry to get wrong.
+ */
 function ProgressRing({ progress }: { progress: number }) {
   const animated = useCountUp(progress);
+  const [shown, setShown] = useState(progress);
+
+  useEffect(() => {
+    const id = animated.addListener(({ value }) => setShown(value));
+    return () => animated.removeListener(id);
+  }, [animated]);
+
+  const lit = Math.round((shown / 100) * RING_SEGMENTS);
+
   return (
-    <View style={styles.progressRing}>
-      <CountedProgress value={animated} initial={progress} />
+    <View style={styles.progressRing} accessibilityLabel={`${Math.round(shown)}% of today's plan done`}>
+      {Array.from({ length: RING_SEGMENTS }, (_, index) => (
+        <View
+          key={index}
+          pointerEvents="none"
+          style={[
+            styles.progressSegment,
+            { transform: [{ rotate: `${index * (360 / RING_SEGMENTS)}deg` }] },
+            { borderTopColor: index < lit ? colors.white : "rgba(255,255,255,0.30)" },
+          ]}
+        />
+      ))}
+      <Text style={styles.progressValue}>{Math.round(shown)}%</Text>
       <Text style={styles.progressLabel}>done</Text>
     </View>
   );
-}
-
-function CountedProgress({ value, initial }: { value: Animated.Value; initial: number }) {
-  const [label, setLabel] = useState(initial);
-  useEffect(() => {
-    const id = value.addListener(({ value: shown }) => setLabel(Math.round(shown)));
-    return () => value.removeListener(id);
-  }, [value]);
-  return <Text style={styles.progressValue}>{label}%</Text>;
 }
 
 export type TodayScreenProps = {
@@ -172,11 +211,19 @@ export function TodayScreen({
         ) : (
           <>
             <View style={styles.heroGlowWrap}>
-              {/* Soft glow ellipses behind the hero — the landing page's
-                  gradient-glow material, emulated with layered translucent
-                  circles because RN has no blur without expo-blur. */}
-              <View style={styles.heroGlowLarge} aria-hidden />
-              <View style={styles.heroGlowSmall} aria-hidden />
+              {/* The glow behind the hero, as nested translucent discs.
+                  A single flat circle read as a sticker pasted behind the card
+                  because its edge was a hard arc; stacking three concentric
+                  discs of the same low alpha gives a stepped falloff that reads
+                  as light. RN has no blur without `expo-blur`, and adding an
+                  unpinned native module this late is the risk we already
+                  decided against — the launch screen and onboarding halo use
+                  the identical trick, so the lighting language matches. */}
+              <View style={styles.heroGlowLargeOuter} aria-hidden />
+              <View style={styles.heroGlowLargeMid} aria-hidden />
+              <View style={styles.heroGlowLargeCore} aria-hidden />
+              <View style={styles.heroGlowSmallOuter} aria-hidden />
+              <View style={styles.heroGlowSmallCore} aria-hidden />
             <View style={styles.heroCard}>
               <View style={styles.heroContent}>
                 <Text style={styles.heroKicker}>TODAY’S CARE PLAN</Text>
@@ -201,19 +248,19 @@ export function TodayScreen({
                   accessibilityRole="button"
                   accessibilityLabel="Add a moment to today's plan"
                   onPress={onAddMoment}
-                  style={styles.viewAllButton}
+                  style={({ pressed }) => [styles.pillButton, pressed && styles.pillButtonPressed]}
                 >
-                  <Text style={styles.viewAllText}>Add</Text>
-                  <Ionicons name="add" size={17} color={colors.blue} />
+                  <Ionicons name="add" size={16} color={colors.blue} />
+                  <Text style={styles.pillButtonText}>Add</Text>
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Reset today's moments to not confirmed"
                   onPress={onEditPlan}
-                  style={styles.viewAllButton}
+                  style={({ pressed }) => [styles.pillButton, styles.pillButtonQuiet, pressed && styles.pillButtonPressed]}
                 >
-                  <Text style={styles.viewAllText}>Reset day</Text>
-                  <Ionicons name="refresh" size={15} color={colors.blue} />
+                  <Ionicons name="refresh" size={14} color={colors.muted} />
+                  <Text style={styles.pillButtonTextQuiet}>Reset day</Text>
                 </Pressable>
               </View>
             </View>
@@ -336,13 +383,16 @@ function SharedNotesStrip({
     >
       <View style={styles.notesIcon}>
         <Ionicons name="chatbubble-ellipses" size={17} color={colors.blue} />
+        {noteCount > 0 ? <View style={styles.notesCountDot} /> : null}
       </View>
       <View style={styles.notesCopy}>
         <View style={styles.notesTitleRow}>
           <Text style={styles.notesTitle}>Shared notes</Text>
           {!pro ? <Text style={styles.notesLockBadge}>1 / DAY</Text> : null}
         </View>
-        <Text style={styles.notesText}>{pro ? kept : "The free plan keeps one note a day. Pro keeps as many as you like."}</Text>
+        <Text style={styles.notesText}>
+          {pro ? kept : noteCount === 0 ? "Leave the first note for whoever picks up the plan next." : `${noteCount} of today's notes kept — one a day on the free plan.`}
+        </Text>
       </View>
       <Ionicons name="chevron-forward" size={18} color={colors.muted} />
     </Pressable>
@@ -351,7 +401,7 @@ function SharedNotesStrip({
 
 const styles = StyleSheet.create({
   app: { flex: 1, backgroundColor: colors.soft },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 105 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 130 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -389,7 +439,18 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.soft,
   },
-  recipientSwitcher: { marginBottom: 20 },
+  /**
+   * Sits above the hero on purpose.
+   *
+   * The hero block comes later in the tree and carries both an absolutely
+   * positioned glow that bleeds ~34px upward and a 24px shadow, so without this
+   * the bottom half of every recipient chip got washed blue — the chips read as
+   * half-selected, which is precisely the "something is subtly wrong" feeling
+   * the polish pass is trying to remove. Sibling `zIndex` is the fix that keeps
+   * the glow's upward spill, which is what makes the hero look lit.
+   */
+  recipientSwitcher: { marginBottom: 20, zIndex: 2 },
+  heroGlowWrap: { position: "relative", zIndex: 0 },
   sectionLabel: {
     color: colors.muted,
     fontSize: 11,
@@ -426,24 +487,52 @@ const styles = StyleSheet.create({
   chipNameSelected: { color: colors.white },
   chipRelationship: { color: colors.muted, fontSize: 11, marginTop: 2 },
   chipRelationshipSelected: { color: colors.blueTint },
-  heroGlowWrap: { position: "relative" },
-  heroGlowLarge: {
+  /* Concentric with one another by construction: each pair below shares the
+     centre of the 210px / 170px disc, so the falloff stays round. */
+  heroGlowLargeOuter: {
     position: "absolute",
     top: -34,
     left: -30,
     width: 210,
     height: 210,
     borderRadius: 105,
-    backgroundColor: "rgba(154,191,243,0.45)",
+    backgroundColor: "rgba(154,191,243,0.15)",
   },
-  heroGlowSmall: {
+  heroGlowLargeMid: {
+    position: "absolute",
+    top: -16,
+    left: -12,
+    width: 174,
+    height: 174,
+    borderRadius: 87,
+    backgroundColor: "rgba(154,191,243,0.15)",
+  },
+  heroGlowLargeCore: {
+    position: "absolute",
+    top: 1,
+    left: 5,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: "rgba(154,191,243,0.15)",
+  },
+  heroGlowSmallOuter: {
     position: "absolute",
     bottom: -40,
     right: -22,
     width: 170,
     height: 170,
     borderRadius: 85,
-    backgroundColor: "rgba(96,177,255,0.32)",
+    backgroundColor: "rgba(96,177,255,0.17)",
+  },
+  heroGlowSmallCore: {
+    position: "absolute",
+    bottom: -18,
+    right: 0,
+    width: 126,
+    height: 126,
+    borderRadius: 63,
+    backgroundColor: "rgba(96,177,255,0.17)",
   },
   heroCard: {
     backgroundColor: colors.blue,
@@ -476,10 +565,25 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 36,
     borderWidth: 5,
-    borderColor: colors.periwinkle,
+    // The unlit track only. It used to be full periwinkle, which sat *under*
+    // the arcs and made an unconfirmed quarter look half-lit anyway.
+    borderColor: "rgba(255,255,255,0.16)",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 4,
+    backgroundColor: "rgba(255,255,255,0.14)",
+    overflow: "hidden",
+  },
+  /**
+   * One 90° arc: a circle that shows only its top border. `borderColor` has to
+   * be transparent first or the remaining three borders would square the shape
+   * off. Four of these, rotated 0/90/180/270, tile the ring exactly.
+   */
+  progressSegment: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 5,
+    borderRadius: 36,
+    borderColor: "transparent",
   },
   progressValue: { color: colors.white, fontSize: 16, fontWeight: "800" },
   progressLabel: { color: colors.blueTint, fontSize: 10, marginTop: 1 },
@@ -491,9 +595,22 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { color: colors.ink, fontSize: 20, fontWeight: "800", letterSpacing: -0.4 },
   sectionMeta: { color: colors.muted, fontSize: 12, marginTop: 3 },
-  sectionActions: { flexDirection: "row", alignItems: "center", gap: 14 },
-  viewAllButton: { minHeight: 40, flexDirection: "row", alignItems: "center", gap: 2 },
-  viewAllText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
+  sectionActions: { flexDirection: "row", alignItems: "center", gap: 8 },
+  pillButton: {
+    minHeight: 34,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 12,
+    borderRadius: 99,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  pillButtonQuiet: { backgroundColor: "transparent", borderWidth: 0 },
+  pillButtonPressed: { opacity: 0.6 },
+  pillButtonText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
+  pillButtonTextQuiet: { color: colors.muted, fontSize: 12, fontWeight: "700" },
   taskList: { gap: 10 },
   notesCard: {
     flexDirection: "row",
@@ -513,6 +630,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blueWash,
     alignItems: "center",
     justifyContent: "center",
+  },
+  /** A quiet activity dot — notes exist on this device. */
+  notesCountDot: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: colors.mint,
+    borderWidth: 2,
+    borderColor: colors.white,
   },
   notesCopy: { flex: 1 },
   notesTitleRow: { flexDirection: "row", alignItems: "center", gap: 7 },

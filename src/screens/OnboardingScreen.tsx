@@ -42,6 +42,11 @@ export function OnboardingScreen({
         <Text style={styles.wordmark}>collos</Text>
       </View>
       <View style={styles.onboardingArt} accessible accessibilityLabel="A calm blue sun illustration">
+        {/* Two stacked halos rather than one flat disc: a single circle read as a
+            sticker, whereas overlapping falloffs read as light behind the sun.
+            Same layered-translucency trick the hero and the launch screen use,
+            since RN has no blur without a native module. */}
+        <View style={styles.sunHaloOuter} />
         <View style={styles.sunHalo} />
         <View style={styles.sun}>
           <Ionicons name="sunny" size={52} color={colors.blue} />
@@ -51,7 +56,12 @@ export function OnboardingScreen({
         <View style={[styles.spark, styles.sparkThree]} />
       </View>
       <View style={styles.onboardingCopy}>
-        <Text style={styles.onboardingTitle}>Care, together.</Text>
+        {/* Two-tone headline: the promise in white, the warm half of it in the
+            logo's own periwinkle — the landing page does the same thing. */}
+        <Text style={styles.onboardingTitle}>
+          Care,{"\n"}
+          <Text style={styles.onboardingTitleAccent}>together.</Text>
+        </Text>
         <Text style={styles.onboardingSubtitle}>
           A simple place to share the small moments that help someone feel supported.
         </Text>
@@ -89,6 +99,13 @@ const styles = StyleSheet.create({
   logoImage: { width: "100%", height: "100%" },
   wordmark: { color: colors.white, fontSize: 22, fontWeight: "800", letterSpacing: -0.5 },
   onboardingArt: { flex: 1, justifyContent: "center", alignItems: "center", minHeight: 280 },
+  sunHaloOuter: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: "rgba(255,255,255,0.055)",
+  },
   sunHalo: {
     position: "absolute",
     width: 220,
@@ -116,21 +133,23 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: -1.4,
   },
+  onboardingTitleAccent: { color: colors.periwinkle },
   onboardingSubtitle: {
     color: colors.blueTint,
-    fontSize: 17,
-    lineHeight: 25,
+    fontSize: 16,
+    lineHeight: 24,
     marginTop: 14,
     maxWidth: 330,
   },
-  trustNote: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 25 },
+  trustNote: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 24 },
   trustText: { color: colors.blueTint, fontSize: 12, lineHeight: 18, flex: 1 },
+  /** Luma's primary action is a full-width pill, not a rounded rectangle. */
   primaryButton: {
     backgroundColor: colors.white,
-    minHeight: 54,
-    borderRadius: 17,
+    minHeight: 58,
+    borderRadius: 999,
     marginTop: 22,
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

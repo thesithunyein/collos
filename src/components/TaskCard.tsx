@@ -14,10 +14,14 @@ const TONES = {
 } as const;
 
 /**
- * One moment on today's plan. The check button now *moves*: a quick press
- * shrinks the card a few percent and springs it back on release, so a confirm
- * reads as a physical action rather than a repaint. It is the tap people
- * repeat most often, so it is the one that has to feel best.
+ * One moment on today's plan.
+ *
+ * The card physically answers every tap: a quick press shrinks it a few percent
+ * and a spring returns it on release, so a confirm reads as an action rather
+ * than a repaint. The three states are shaped so they can be told apart at a
+ * glance without reading — confirmed gets the filled button and a quieted title,
+ * skipped gets an outlined pill with a strike through the word, and everything
+ * else stays inviting.
  */
 export function TaskCard({
   task,
@@ -27,6 +31,7 @@ export function TaskCard({
   onUpdate: (id: string, status: TaskStatus) => void;
 }) {
   const isConfirmed = task.status === "confirmed";
+  const isSkipped = task.status === "skipped";
   const tone = TONES[task.tone];
 
   const press = useRef(new Animated.Value(1)).current;
@@ -50,16 +55,39 @@ export function TaskCard({
       style={[
         styles.taskCard,
         isConfirmed && styles.taskCardConfirmed,
+        isSkipped && styles.taskCardSkipped,
         { transform: [{ scale: press }] },
       ]}
     >
       <View style={[styles.taskIcon, { backgroundColor: tone.background }]}>
         <Ionicons name={task.icon} size={20} color={tone.icon} />
+        {/* State rides on the leading tile, the way Luma tags a row's state on
+            its thumbnail: a glance down the column tells you what is done
+            without reading a single word of copy. */}
+        {isConfirmed || isSkipped ? (
+          <View style={[styles.statusBadge, isSkipped && styles.statusBadgeSkipped]}>
+            <Ionicons
+              name={isConfirmed ? "checkmark" : "arrow-forward"}
+              size={9}
+              color={colors.white}
+            />
+          </View>
+        ) : null}
       </View>
       <View style={styles.taskCopy}>
         <View style={styles.taskTitleRow}>
-          <Text style={[styles.taskTitle, isConfirmed && styles.taskTitleDone]}>{task.title}</Text>
-          <Text style={styles.taskTime}>{task.time}</Text>
+          <Text
+            style={[
+              styles.taskTitle,
+              (isConfirmed || isSkipped) && styles.taskTitleDone,
+            ]}
+          >
+            {task.title}
+          </Text>
+          <View style={styles.taskTimeRow}>
+            <Ionicons name="time-outline" size={12} color={colors.muted} />
+            <Text style={styles.taskTime}>{task.time}</Text>
+          </View>
         </View>
         <Text style={styles.taskDetail}>{task.detail}</Text>
         <View style={styles.taskActions}>
@@ -81,7 +109,7 @@ export function TaskCard({
           >
             <Ionicons
               name={isConfirmed ? "checkmark" : "checkmark-outline"}
-              size={15}
+              size={14}
               color={isConfirmed ? colors.white : colors.blue}
             />
             <Text style={[styles.confirmButtonText, isConfirmed && styles.confirmedButtonText]}>
@@ -90,11 +118,19 @@ export function TaskCard({
           </Pressable>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Skip ${task.title}`}
-            onPress={() => onUpdate(task.id, "skipped")}
-            style={({ pressed: isPressed }) => [styles.skipButton, isPressed && styles.pressed]}
+            accessibilityState={{ selected: isSkipped }}
+            accessibilityLabel={`${isSkipped ? "Unskip" : "Skip"} ${task.title}`}
+            onPress={() => onUpdate(task.id, isSkipped ? "not-confirmed" : "skipped")}
+            style={({ pressed: isPressed }) => [styles.skipButton, isSkipped && styles.skippedButton, isPressed && styles.pressed]}
           >
-            <Text style={styles.skipButtonText}>{task.status === "skipped" ? "Skipped" : "Skip"}</Text>
+            <Ionicons
+              name={isSkipped ? "arrow-undo" : "arrow-forward"}
+              size={13}
+              color={isSkipped ? colors.blush : colors.muted}
+            />
+            <Text style={[styles.skipButtonText, isSkipped && styles.skippedButtonText]}>
+              {isSkipped ? "Skipped" : "Skip"}
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -104,14 +140,15 @@ export function TaskCard({
 
 const styles = StyleSheet.create({
   taskCard: {
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: colors.white,
     borderRadius: shape.lg,
-    padding: 14,
+    padding: 15,
     flexDirection: "row",
     borderWidth: 1,
     borderColor: colors.border,
   },
-  taskCardConfirmed: { borderColor: colors.borderSoft },
+  taskCardConfirmed: { borderColor: colors.borderSoft, backgroundColor: colors.soft },
+  taskCardSkipped: { borderColor: colors.border, backgroundColor: colors.soft },
   taskIcon: {
     width: 43,
     height: 43,
@@ -120,6 +157,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 12,
   },
+  /** A small mark on the tile: confirmed reads blue, skipped reads blush. */
+  statusBadge: {
+    position: "absolute",
+    right: -4,
+    bottom: -4,
+    width: 19,
+    height: 19,
+    borderRadius: 10,
+    backgroundColor: colors.blue,
+    alignItems: "center",
+    justifyContent: "center",
+    // Rings the badge in the settled card's own fill so it reads as punched
+    // out of the tile rather than pasted on top of it.
+    borderWidth: 2,
+    borderColor: colors.soft,
+  },
+  statusBadgeSkipped: { backgroundColor: colors.blush },
   taskCopy: { flex: 1 },
   taskTitleRow: {
     flexDirection: "row",
@@ -127,25 +181,38 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 8,
   },
-  taskTitle: { color: colors.ink, fontSize: 14, fontWeight: "800", flex: 1 },
+  taskTitle: { color: colors.ink, fontSize: 15, fontWeight: "800", flex: 1, letterSpacing: -0.2 },
   taskTitleDone: { color: colors.muted, textDecorationLine: "line-through" },
+  taskTimeRow: { flexDirection: "row", alignItems: "center", gap: 3 },
   taskTime: { color: colors.muted, fontSize: 11, fontWeight: "700" },
   taskDetail: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 4 },
-  taskActions: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 10 },
+  taskActions: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: 12 },
   confirmButton: {
-    minHeight: 35,
-    paddingHorizontal: 10,
-    borderRadius: 10,
+    minHeight: 36,
+    paddingHorizontal: 12,
+    borderRadius: 11,
     borderWidth: 1,
     borderColor: colors.borderSoft,
+    backgroundColor: colors.blueWash,
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 5,
   },
   confirmedButton: { backgroundColor: colors.blue, borderColor: colors.blue },
-  confirmButtonText: { color: colors.blue, fontSize: 11, fontWeight: "800" },
+  confirmButtonText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
   confirmedButtonText: { color: colors.white },
-  skipButton: { minHeight: 35, paddingHorizontal: 8, justifyContent: "center" },
-  skipButtonText: { color: colors.muted, fontSize: 11, fontWeight: "700" },
+  skipButton: {
+    minHeight: 36,
+    paddingHorizontal: 11,
+    borderRadius: 11,
+    borderWidth: 1,
+    borderColor: "transparent",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  skippedButton: { borderColor: colors.borderSoft, backgroundColor: colors.white },
+  skipButtonText: { color: colors.muted, fontSize: 12, fontWeight: "700" },
+  skippedButtonText: { color: colors.blush },
   pressed: { opacity: 0.72 },
 });

@@ -236,7 +236,7 @@ function formatDate(iso: string): string {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
-  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 110 },
+  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 130 },
   eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1.1 },
   title: { color: colors.ink, fontSize: 27, fontWeight: "800", letterSpacing: -0.7, marginTop: 6 },
   subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },
@@ -315,9 +315,27 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  detailLabel: { color: colors.muted, fontSize: 12, fontWeight: "700" },
-  detailValue: { color: colors.ink, fontSize: 12, fontWeight: "700", flexShrink: 1, textAlign: "right" },
-  detailValueMono: { letterSpacing: -0.2 },
+  /**
+   * `flexShrink: 0` keeps the label on one line.
+   *
+   * The store table is the one place with a genuinely long value — the
+   * RevenueCat anonymous app user ID runs past 60 characters — and without a
+   * fixed label the row split it as "App user" / "ID" while the value ran into
+   * the card edge. Now the label holds its width and the value takes what is
+   * left, so `numberOfLines={1}` has a real width to ellipsize against instead
+   * of overflowing.
+   */
+  detailLabel: { color: colors.muted, fontSize: 12, fontWeight: "700", flexShrink: 0 },
+  detailValue: {
+    color: colors.ink,
+    fontSize: 12,
+    fontWeight: "700",
+    flex: 1,
+    flexShrink: 1,
+    textAlign: "right",
+  },
+  /** Slightly tighter so more of an identifier survives the truncation. */
+  detailValueMono: { letterSpacing: -0.3, fontSize: 11 },
   detailHint: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 9, paddingHorizontal: 2 },
   safetyNote: { flexDirection: "row", gap: 7, alignItems: "flex-start", marginTop: 22, paddingHorizontal: 2 },
   safetyText: { color: colors.muted, fontSize: 11, lineHeight: 17, flex: 1 },
