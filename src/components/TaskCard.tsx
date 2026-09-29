@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import type { CareTask, TaskStatus } from "../data/mockCare";
-import { colors } from "../theme";
+import { colors, nativeAnimDriver, shape } from "../theme";
 
 // Tone keys are stored with each saved moment, so they keep their old names even
 // though the colours behind them now come from the logo's palette.
@@ -13,6 +13,12 @@ const TONES = {
   purple: { background: colors.lilacWash, icon: colors.lilac },
 } as const;
 
+/**
+ * One moment on today's plan. The check button now *moves*: a quick press
+ * shrinks the card a few percent and springs it back on release, so a confirm
+ * reads as a physical action rather than a repaint — this is the tap a demo
+ * video leans on, so it should feel the best in the app.
+ */
 export function TaskCard({
   task,
   onUpdate,
@@ -23,8 +29,30 @@ export function TaskCard({
   const isConfirmed = task.status === "confirmed";
   const tone = TONES[task.tone];
 
+  const press = useRef(new Animated.Value(1)).current;
+  const [pressed, setPressed] = useState(false);
+
+  // The spring fires only when the press actually ends, so a user who slides
+  // off the button cancels cleanly instead of getting a ghost bounce.
+  useEffect(() => {
+    if (!pressed) {
+      Animated.spring(press, {
+        toValue: 1,
+        friction: 5,
+        tension: 220,
+        useNativeDriver: nativeAnimDriver,
+      }).start();
+    }
+  }, [pressed, press]);
+
   return (
-    <View style={styles.taskCard}>
+    <Animated.View
+      style={[
+        styles.taskCard,
+        isConfirmed && styles.taskCardConfirmed,
+        { transform: [{ scale: press }] },
+      ]}
+    >
       <View style={[styles.taskIcon, { backgroundColor: tone.background }]}>
         <Ionicons name={task.icon} size={20} color={tone.icon} />
       </View>
@@ -39,11 +67,16 @@ export function TaskCard({
             accessibilityRole="button"
             accessibilityState={{ checked: isConfirmed }}
             accessibilityLabel={`${isConfirmed ? "Unconfirm" : "Confirm"} ${task.title}`}
+            onPressIn={() => {
+              setPressed(true);
+              press.setValue(0.975);
+            }}
+            onPressOut={() => setPressed(false)}
             onPress={() => onUpdate(task.id, isConfirmed ? "not-confirmed" : "confirmed")}
-            style={({ pressed }) => [
+            style={({ pressed: isPressed }) => [
               styles.confirmButton,
               isConfirmed && styles.confirmedButton,
-              pressed && styles.pressed,
+              isPressed && styles.pressed,
             ]}
           >
             <Ionicons
@@ -59,29 +92,30 @@ export function TaskCard({
             accessibilityRole="button"
             accessibilityLabel={`Skip ${task.title}`}
             onPress={() => onUpdate(task.id, "skipped")}
-            style={({ pressed }) => [styles.skipButton, pressed && styles.pressed]}
+            style={({ pressed: isPressed }) => [styles.skipButton, isPressed && styles.pressed]}
           >
             <Text style={styles.skipButtonText}>{task.status === "skipped" ? "Skipped" : "Skip"}</Text>
           </Pressable>
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   taskCard: {
     backgroundColor: colors.white,
-    borderRadius: 20,
+    borderRadius: shape.lg,
     padding: 14,
     flexDirection: "row",
     borderWidth: 1,
     borderColor: colors.border,
   },
+  taskCardConfirmed: { borderColor: colors.borderSoft },
   taskIcon: {
     width: 43,
     height: 43,
-    borderRadius: 14,
+    borderRadius: shape.sm,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,

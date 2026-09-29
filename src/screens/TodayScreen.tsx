@@ -1,10 +1,56 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TaskCard } from "../components/TaskCard";
 import type { CareRecipient, CareTask, TaskStatus } from "../data/mockCare";
-import { colors } from "../theme";
+import { colors, insets, nativeAnimDriver, shape } from "../theme";
+
+/**
+ * The hero's progress number counts up on mount and eases to each new value,
+ * so the signature demo beat — confirming a moment and watching the plan
+ * respond — reads as motion, not a repaint. Capped-duration tween: with the
+ * default 400ms cap the ring visibly ticks 0→100 rather than snapping.
+ */
+function useCountUp(target: number, duration = 400): Animated.Value {
+  const value = useRef(new Animated.Value(0)).current;
+  const current = useRef(0);
+
+  useEffect(() => {
+    const from = current.current;
+    const listenerId = value.addListener(({ value: shown }) => {
+      current.current = shown;
+    });
+    Animated.timing(value, {
+      toValue: target,
+      duration: Math.min(duration, 260 + Math.abs(target - from) * 3),
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: nativeAnimDriver,
+    }).start();
+    return () => value.removeListener(listenerId);
+  }, [target, duration, value]);
+
+  return value;
+}
+
+function ProgressRing({ progress }: { progress: number }) {
+  const animated = useCountUp(progress);
+  return (
+    <View style={styles.progressRing}>
+      <CountedProgress value={animated} />
+      <Text style={styles.progressLabel}>done</Text>
+    </View>
+  );
+}
+
+function CountedProgress({ value }: { value: Animated.Value }) {
+  const [label, setLabel] = useState(0);
+  useEffect(() => {
+    const id = value.addListener(({ value: shown }) => setLabel(Math.round(shown)));
+    return () => value.removeListener(id);
+  }, [value]);
+  return <Text style={styles.progressValue}>{label}%</Text>;
+}
 
 export type TodayScreenProps = {
   recipients: CareRecipient[];
@@ -144,10 +190,7 @@ export function TodayScreen({
                   You’re helping {recipient.name} feel remembered and supported.
                 </Text>
               </View>
-              <View style={styles.progressRing}>
-                <Text style={styles.progressValue}>{progress}%</Text>
-                <Text style={styles.progressLabel}>done</Text>
-              </View>
+              <ProgressRing progress={progress} />
             </View>
 
             <View style={styles.sectionHeader}>
@@ -306,7 +349,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: 20,
+    paddingTop: 20 + insets.top,
     paddingBottom: 24,
   },
   eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1.1 },
@@ -391,7 +434,7 @@ const styles = StyleSheet.create({
   addRecipientText: { color: colors.blue, fontSize: 11, fontWeight: "700" },
   heroCard: {
     backgroundColor: colors.blue,
-    borderRadius: 24,
+    borderRadius: shape.xl,
     padding: 21,
     flexDirection: "row",
     justifyContent: "space-between",

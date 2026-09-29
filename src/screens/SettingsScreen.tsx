@@ -11,6 +11,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { deviceRows } from "../platform/device";
 import {
   PRO_ENTITLEMENT,
   REVENUECAT_PROJECT_ID,
@@ -18,7 +19,7 @@ import {
   isPaymentsConfigured,
 } from "../purchases/config";
 import type { ProController } from "../purchases/usePro";
-import { colors } from "../theme";
+import { colors, insets, shape } from "../theme";
 
 export function SettingsScreen({
   pro,
@@ -182,9 +183,20 @@ export function SettingsScreen({
           purchase is untouched — Restore purchases brings Pro back.
         </Text>
 
+        <Text style={styles.sectionLabel}>THIS DEVICE</Text>
+        <View style={styles.detailCard}>
+          {deviceRows().map((row) => (
+            <DetailRow key={row.label} label={row.label} value={row.value} mono={row.mono} />
+          ))}
+        </View>
+        <Text style={styles.detailHint}>
+          Platform, OS version and runtime are read from the app you are holding, not written into
+          the copy. On a phone this card reads iOS or Android and “Native”; in a browser it reads
+          Web export — same codebase, second target.
+        </Text>
+
         <Text style={styles.sectionLabel}>ABOUT</Text>
         <View style={styles.detailCard}>
-          <DetailRow label="Version" value="1.0.0" />
           <DetailRow label="Payments" value="RevenueCat" />
           <DetailRow label="Privacy" value="Care data stays in your circle" />
         </View>
@@ -224,13 +236,13 @@ function formatDate(iso: string): string {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
-  content: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 110 },
+  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 110 },
   eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1.1 },
   title: { color: colors.ink, fontSize: 27, fontWeight: "800", letterSpacing: -0.7, marginTop: 6 },
   subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },
   statusCard: {
     backgroundColor: colors.white,
-    borderRadius: 20,
+    borderRadius: shape.xl,
     borderWidth: 1,
     borderColor: colors.border,
     padding: 16,
@@ -289,7 +301,7 @@ const styles = StyleSheet.create({
   },
   detailCard: {
     backgroundColor: colors.white,
-    borderRadius: 18,
+    borderRadius: shape.lg,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: 14,

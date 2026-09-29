@@ -1,15 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Animated, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { NavItem } from "./src/components/NavItem";
 import { PaywallModal } from "./src/components/PaywallModal";
 import { AddMomentSheet } from "./src/components/AddMomentSheet";
-import { CareRecipient, mockRecipients, TaskStatus } from "./src/data/mockCare";
+import type { CareRecipient } from "./src/data/mockCare";
+import { mockRecipients } from "./src/data/mockCare";
+import type { TaskStatus } from "./src/data/mockCare";
 import { CircleScreen } from "./src/screens/CircleScreen";
 import { OnboardingScreen } from "./src/screens/OnboardingScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { TodayScreen } from "./src/screens/TodayScreen";
-import { colors } from "./src/theme";
+import { colors, insets, nativeAnimDriver, shape } from "./src/theme";
 import { usePro } from "./src/purchases/usePro";
 import {
   StoredState,
@@ -27,7 +29,10 @@ import {
 } from "./src/storage/careStore";
 
 type Stage = "onboarding" | "app";
-type Tab = "Today" | "Circle" | "Settings";
+type Tab = "today" | "circle" | "settings";
+
+/** Duration of the cross-fade when switching tabs, kept subtle on purpose. */
+const TAB_FADE_MS = 150;
 
 export default function App() {
   // `hydrated` gates first paint: without it the app renders the default plan,
@@ -36,12 +41,54 @@ export default function App() {
   const [hydrated, setHydrated] = useState(false);
   const [stored, setStored] = useState<StoredState>(emptyStoredState);
   const [stage, setStage] = useState<Stage>("onboarding");
-  const [tab, setTab] = useState<Tab>("Today");
+  const [tab, setTab] = useState<Tab>("today");
   const [isPaywallOpen, setPaywallOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [notice, setNotice] = useState("");
   const [isAddingMoment, setAddingMoment] = useState(false);
+
+  // Tab cross-fade: the screen content fades and lifts a few pixels on every
+  // tab change, so navigation reads as motion instead of a hard repaint.
+  const contentFade = useRef(new Animated.Value(1)).current;
+  // Mirrors `tab` so the rapid-tap guard can read the latest value without
+  // being rebuilt on every render (same pattern as `storedRef` below).
+  const tabRef = useRef<Tab>("today");
+  const changeTab = useCallback((nextTab: Tab) => {
+    if (nextTab === tabRef.current) return;
+    tabRef.current = nextTab;
+    setTab(nextTab);
+    Animated.sequence([
+        Animated.timing(contentFade, {
+          toValue: 0,
+          duration: TAB_FADE_MS / 2,
+          useNativeDriver: nativeAnimDriver,
+        }),
+        Animated.timing(contentFade, {
+          toValue: 1,
+          duration: TAB_FADE_MS,
+          useNativeDriver: nativeAnimDriver,
+        }),
+      ]).start();
+  }, [contentFade]);
+
+  // The notice toast rises into place on the native driver when it appears;
+  // exit stays instant because it is only 2.8s and a slow exit reads as lag.
+  const noticeRise = useRef(new Animated.Value(0)).current;
+  const [noticeShown, setNoticeShown] = useState(false);
+  useEffect(() => {
+    if (notice) {
+      setNoticeShown(true);
+      Animated.timing(noticeRise, {
+        toValue: 1,
+        duration: 240,
+        useNativeDriver: nativeAnimDriver,
+      }).start();
+    } else {
+      setNoticeShown(false);
+      noticeRise.setValue(0);
+    }
+  }, [notice, noticeRise]);
 
   const pro = usePro();
 
@@ -134,13 +181,13 @@ export default function App() {
     mutate(withResetDay(storedRef.current, recipient.id));
     showNotice(`Today’s moments for ${recipient.name} are open again.`);
   };
-
   const resetAllData = async () => {
     await clearStoredState();
     setStored(emptyStoredState());
     storedRef.current = emptyStoredState();
     setStage("onboarding");
-    setTab("Today");
+    tabRef.current = "today";
+    setTab("today");
   };
 
   const retryLoad = () => {
@@ -156,7 +203,6 @@ export default function App() {
       </View>
     );
   }
-
   if (stage === "onboarding") {
     return (
       <View style={[styles.viewport, isWide && styles.viewportWide]}>
@@ -170,7 +216,7 @@ export default function App() {
   return (
     <View style={[styles.viewport, isWide && styles.viewportWide]}>
       <View style={[styles.frame, isWide && styles.frameWide]}>
-        {tab === "Today" ? (
+        {tab === "today" ? (
           <TodayScreen
             recipients={mockRecipients}
             recipient={recipient}
@@ -195,7 +241,7 @@ export default function App() {
             onOpenPaywall={() => setPaywallOpen(true)}
             onOpenSharedNotes={() => showNotice("Your shared notes will appear here.")}
           />
-        ) : tab === "Circle" ? (
+        ) : tab === "circle" ? (
           <CircleScreen
             recipients={mockRecipients}
             pro={pro.pro}
@@ -206,22 +252,43 @@ export default function App() {
           <SettingsScreen pro={pro} onResetData={resetAllData} />
         )}
 
-        <View style={styles.bottomNav}>
-          <NavItem icon="grid-outline" label="Today" active={tab === "Today"} onPress={() => setTab("Today")} />
-          <NavItem icon="people-outline" label="Circle" active={tab === "Circle"} onPress={() => setTab("Circle")} />
-          <NavItem
-            icon="settings-outline"
-            label="Settings"
-            active={tab === "Settings"}
-            onPress={() => setTab("Settings")}
-          />
-        </View>
+        <Animated.View
+          pointerEvents="box-none"
+          style={[styles.tabLayer, { opacity: contentFade }]}
+        >
+          <View style={styles.bottomNav}>
+            <NavItem icon="grid-outline" label="Today" active={tab === "today"} onPress={() => changeTab("today")} />
+            <NavItem icon="people-outline" label="Circle" active={tab === "circle"} onPress={() => changeTab("circle")} />
+            <NavItem
+              icon="settings-outline"
+              label="Settings"
+              active={tab === "settings"}
+              onPress={() => changeTab("settings")}
+            />
+          </View>
+        </Animated.View>
 
-        {notice ? (
-          <View accessibilityLiveRegion="polite" style={styles.notice}>
+        {noticeShown ? (
+          <Animated.View
+            accessibilityLiveRegion="polite"
+            style={[
+              styles.notice,
+              {
+                opacity: noticeRise,
+                transform: [
+                  {
+                    translateY: noticeRise.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [14, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
             <Ionicons name="information-circle-outline" size={17} color={colors.blue} />
             <Text style={styles.noticeText}>{notice}</Text>
-          </View>
+          </Animated.View>
         ) : null}
 
         <AddMomentSheet
@@ -282,7 +349,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     minHeight: 76,
-    paddingBottom: 10,
+    paddingTop: 10,
+    paddingBottom: 10 + insets.bottom,
     backgroundColor: "rgba(255,255,255,0.98)",
     borderTopWidth: 1,
     borderTopColor: colors.border,
@@ -290,13 +358,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
   },
+  tabLayer: { position: "absolute", left: 0, right: 0, bottom: 0 },
   notice: {
     position: "absolute",
     left: 20,
     right: 20,
-    bottom: 88,
+    bottom: 88 + insets.bottom,
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: shape.md,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,

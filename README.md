@@ -6,6 +6,8 @@
 
 Collos is a mobile-first care coordination experience built with Expo and React Native. It helps a care circle share small, everyday moments of support without making medical claims.
 
+**Platforms.** Collos is a native iOS and Android app — one identifier, `com.collos.app`, on both, built through EAS (`eas.json`), with native-storage code paths in `src/storage/`. The browser build at [app.collos.sithunyein.com](https://app.collos.sithunyein.com) is a second target of the **same** React Native codebase via `react-native-web`, not a separate web app. Settings → **This device** prints the platform, OS version, device, React Native runtime and app identifier read from whichever build is running, so the two are easy to tell apart.
+
 <p align="center">
   <a href="https://app.collos.sithunyein.com"><strong>Open the live app</strong></a> · <a href="https://collos.sithunyein.com">Project site</a>
 </p>
@@ -58,7 +60,7 @@ Copy `.env.example` to `.env` and fill in the public SDK keys from your RevenueC
 | `EXPO_PUBLIC_REVENUECAT_IOS_KEY` | App Store purchases |
 | `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` | Google Play purchases |
 | `EXPO_PUBLIC_REVENUECAT_WEB_KEY` | Web purchases, billed through RevenueCat Billing (Stripe). Separate from the native keys. |
-| `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT` | Entitlement identifier that unlocks Pro. Defaults to `pro`. |
+| `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT` | Entitlement identifier that unlocks Pro. Must match the dashboard; the Collos project uses `collos_pro`, which is also the built-in fallback. |
 | `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` | `prj_…` from the dashboard. Shown in the app's Settings screen. |
 
 In the dashboard you need: a project, a product per store, an entitlement named to match `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT`, and a **default** offering holding a monthly and an annual package.

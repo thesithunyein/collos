@@ -3,7 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { CareRecipient } from "../data/mockCare";
-import { colors } from "../theme";
+import { colors, insets, shape } from "../theme";
 
 type Member = {
   id: string;
@@ -161,7 +161,7 @@ export function CircleScreen({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
-  content: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 110 },
+  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 110 },
   eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1.1 },
   title: { color: colors.ink, fontSize: 27, fontWeight: "800", letterSpacing: -0.7, marginTop: 6 },
   subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     backgroundColor: colors.white,
-    borderRadius: 17,
+    borderRadius: shape.md,
     borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: 14,
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 11,
     backgroundColor: colors.white,
-    borderRadius: 18,
+    borderRadius: shape.md,
     borderWidth: 1,
     borderColor: colors.border,
     padding: 12,

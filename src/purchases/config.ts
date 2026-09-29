@@ -32,9 +32,14 @@ export const revenueCatKeys = {
 } as const;
 
 
-/** Entitlement that unlocks Collos Pro. Must match the RevenueCat dashboard. */
+/**
+ * Entitlement that unlocks Collos Pro. Must match the RevenueCat dashboard —
+ * the fallback is the real identifier (`collos_pro`) rather than a guess, so a
+ * build that is missing the variable still looks for the entitlement that
+ * actually exists instead of silently never unlocking Pro.
+ */
 export const PRO_ENTITLEMENT =
-  readEnv(process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT) ?? "pro";
+  readEnv(process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT) ?? "collos_pro";
 
 /**
  * RevenueCat project ID (`prj_...`). Required by the Shipaton submission form,

@@ -75,6 +75,31 @@ So the eligibility gate is cleared and the address is known. The remaining actio
 typing it into the submission's student-email field at submit time — it is a
 submission field, not necessarily the Devpost account's own login email.
 
+### "But is it a web app?" — no, and the video is where that gets settled
+
+This is the single most dangerous misreading of the entry, because the rules say plainly
+that **"web apps are not eligible."** The facts are unambiguous:
+
+- The dependency that defines the product is **`react-native` 0.74.5** on **Expo SDK 51**.
+  The web build only exists because `react-native-web` renders the same components to the
+  DOM as an additional target.
+- **Native targets are configured, not aspirational:** `ios.bundleIdentifier` =
+  `android.package` = `com.collos.app`, `ios.supportsTablet`, `ios.config.usesNonExemptEncryption`
+  (iOS export compliance), and an Android `adaptiveIcon` with its own background colour.
+  A web app has no use for any of these.
+- **The scripts are device scripts:** `expo start --ios`, `expo start --android`, and
+  `eas.json` defines native build profiles (iOS simulator, Android APK, AAB).
+- **Platform-split native code ships:** `src/storage/fileStore.ts` writes through
+  `expo-file-system` (17.0.1) on native while `fileStore.web.ts` uses `localStorage`.
+  That split exists *because* it is a native app.
+
+So the risk is not eligibility — it is **presentation**. A video shot entirely in a
+browser invites exactly the wrong conclusion, and a judge will not go digging through
+`app.json` to correct it. Hence the rule for §6: the **phone is the primary evidence**
+(Expo Go, `npm start`, scan the QR code), and the browser appears only as one labelled
+cutaway for the live sandbox purchase — the beat the browser genuinely does better,
+because that is where the real RevenueCat Billing key is configured.
+
 ## 2. Eligibility gates
 
 Gates marked **[main]** apply to the main competition only — the Next Gen Award does
@@ -82,7 +107,7 @@ not require them. Verified against the category page and the walkthrough video.
 
 | # | Gate | Collos today |
 | --- | --- | --- |
-| 1 | iOS / iPadOS / macOS / Android app — web apps are **not** eligible | ⚠️ Native Expo app. Judges must be able to build and run it — show it running on a device or simulator in the video (the web export also runs) |
+| 1 | iOS / iPadOS / macOS / Android app — web apps are **not** eligible | ✅ Native Expo / React Native app with real iOS and Android targets (`ios.bundleIdentifier` and `android.package` are both `com.collos.app`). The web export is an extra target of the *same* codebase, not the product — see "But is it a web app?" below. Show it running on a phone or simulator in the video |
 | 2 | RevenueCat SDK powers ≥1 purchase | ✅ `react-native-purchases` 10.10.2, real offerings / purchase / restore / entitlement. For Next Gen, the labelled preview mode is explicitly acceptable ("sandboxed and not real purchases") |
 | 3 | New app; first public release inside 1 Aug – 30 Sep 2026 | ✅ Nothing released anywhere; all commits dated 27–28 Sep, inside the window |
 | 4 **[main]** | Fully published on a supported store | ➖ Not required for Next Gen. The build path exists anyway — see `RELEASE.md` |
@@ -135,17 +160,16 @@ remain open and store review remains unreachable before the deadline.
 
 Ordered by what unblocks the most.
 
-1. **Create the RevenueCat project** at <https://app.revenuecat.com> → *Create a
-   project* → name it Collos. Your account currently has none.
-2. **Add products and one entitlement** named `pro`; attach the products to it.
-3. **Create an offering** (make it the *default*) with a monthly and an annual
-   package.
-4. **Create a Web Billing app** in the project (*Project → Apps → New → Web
-   Billing*), then copy its public key into `EXPO_PUBLIC_REVENUECAT_WEB_KEY`. This is
-   what makes the live web demo take a real purchase. iOS/Android use their own keys
-   from their own apps.
-5. **Copy the project ID** (`prj_…`) into `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` so it
-   shows up in Settings.
+1. ~~Create the RevenueCat project~~ **Done 29 Sep:** project `Collos` exists.
+2. ~~Add products and one entitlement~~ **Done 29 Sep:** entitlement `collos_pro`,
+   products `monthly_499` ($4.99) and `yearly_3999` ($39.99).
+3. ~~Create an offering~~ **Done 29 Sep:** both packages are in the *default*
+   offering, and the entitlement is attached to them.
+4. ~~Create a Web Billing app and copy its key~~ **Done 29 Sep:** the Web Billing
+   public key, project ID and entitlement are set in Vercel production. iOS/Android
+   would use their own keys from their own apps.
+5. ~~Copy the project ID into `EXPO_PUBLIC_REVENUECAT_PROJECT_ID`~~ **Done 29 Sep** —
+   it is what Settings displays on screen.
 6. ~~Decide the path~~ **Done:** Next Gen.
 7. ~~Student verification~~ **Done 29 Sep** — confirmed by the organisers; the address
    `sithunyein@my.uopeople.edu` goes in the Devpost submission's student email field.
@@ -158,17 +182,16 @@ Ordered by what unblocks the most.
 10. Add a **7-day free trial** or a promo code to the default offering so judges can
    reach premium features.
 
-Setting the four environment variables is a one-line change in Vercel
-(*Project → Settings → Environment Variables*), followed by a redeploy.
+Steps 1–5 were the environment work (four `EXPO_PUBLIC_*` variables in Vercel:
+*Project → Settings → Environment Variables*, followed by a redeploy) and they are
+done — see the entry above. What is left is the part only you can do: **step 8
+(record the video), step 9 (fill the form), and optionally step 10**.
 
-**Status, 29 Sep: done.** Project `Collos` exists (Test Store / RevenueCat
-Billing app), entitlement `collos_pro` attached to `monthly_499` ($4.99) and
-`yearly_3999` ($39.99) in the default offering, and the web key, project ID
-and entitlement are set in Vercel production. Verified live: the paywall at
-app.collos.sithunyein.com loads the real offering ($4.99 / $39.99 / $3.33 per
-month) with no preview notice. On a phone in Expo Go purchases stay in
-labelled preview mode — iOS/Android store products are what native keys would
-buy, and Next Gen explicitly does not require them.
+**Status, 29 Sep.** Verified live: the paywall at app.collos.sithunyein.com loads
+the real offering ($4.99 / $39.99 / $3.33 per month) with no preview notice. On a
+phone in Expo Go purchases stay in labelled preview mode — iOS/Android store
+products are what native keys would buy, and Next Gen explicitly does not require
+them. `npm run typecheck` is clean on the current tree.
 
 ## 5. The Next Gen path, step by step
 
@@ -246,9 +269,13 @@ Two rules-side facts that are easy to miss:
 Judges are not required to watch beyond two minutes, and screeners score from the
 video plus the description. **Film on the device the app is built for** — a real phone
 running the app in Expo Go (`npm start`, scan the QR code), or the iOS Simulator. The
-browser build (app.collos.sithunyein.com) is a fine closing shot but not the main
-evidence: the rules ask for "footage that shows the Project functioning on the device
-for which it was built." No copyrighted music, no third-party trademarks or logos
+browser build (app.collos.sithunyein.com) is one labelled cutaway for the live sandbox
+purchase, not the main evidence: the rules ask for "footage that shows the Project
+functioning on the device for which it was built," and they separately disqualify web
+apps outright (see "But is it a web app?" in §2). Shooting the whole thing in a browser
+is the fastest way to lose an argument you would otherwise win on the config alone.
+Never film the Freebuff preview panel — it injects its own badge into the page; use a
+plain browser window. No copyrighted music, no third-party trademarks or logos
 anywhere in the frame — this is a submission requirement in the Official Rules, and
 violating it risks the whole entry.
 
@@ -259,9 +286,40 @@ violating it risks the whole entry.
 | 0:40–1:00 | Tap *Confirm* on Water break, watch 25% become 50% | "Every confirmation is saved the moment you tap it — close the app, come back tomorrow, and the plan still remembers. Nothing you confirmed gets lost." |
 | 1:00–1:20 | Circle tab, free state | "The Circle tab shows everyone involved. On the free plan you get one helper and one shared note a day — that's a deliberate limit, not a paywall on a core feature." |
 | 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites and unlimited shared notes. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
-| 1:45–2:00 | Circle screen now unlocked, then Settings | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling." |
+| 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.74.5, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
 
 Do not use copyrighted music or any third party's trademarks.
+
+### Proving it's a native app, on camera
+
+The rules ask for footage of the project "functioning on the device for which it was built" and
+disqualify web apps outright, so the video has to make the platform unambiguous. Nothing in the
+configuration needs to change to earn that — it already reads as native. These are the shots that
+make a judge see it, roughly in order of how much they persuade:
+
+1. **Open on the phone itself.** A hand holding the iPhone, then cut to a screen recording. A
+   browser window can be captured on any machine; a phone in a hand cannot.
+2. **Record on the device, not the browser** — iOS Control Centre → *Screen Recording*, or
+   Android's built-in recorder. The recording keeps what a web export cannot produce: the status
+   bar with its clock, Wi-Fi and battery, the notch or Dynamic Island, and the home indicator.
+3. **Show a native-only dialog.** Settings → *Reset all data* opens a **real system alert** on
+   iOS/Android; the web build deliberately falls back to a two-tap inline confirm because React
+   Native 0.74's `Alert` does not exist on web. Tap it, show the OS dialog, tap *Cancel*. That is a
+   visible platform divergence in four seconds, and it is already implemented.
+4. **Show the phone's own keyboard and the safe-area layout.** Use *add a moment* and type with the
+   native keyboard; the layout clears the notch and the home indicator.
+5. **Land on Settings → *This device*.** The card reads platform, OS version, device, the React
+   Native runtime (`0.74.5`), `com.collos.app` and app version out of the running app, and on a
+   phone it says *Native iOS app*. Then say the sentence that settles it: *"this is the iOS app;
+   the browser version is the same React Native codebase exported to web."*
+6. **Only then cut to the browser**, label it on screen (*web export — same app*), and use it for
+   the purchase beat alone.
+7. **Say it in writing too** — §7 already carries the sentence, and judges score from the video
+   *and* the repo. Both surfaces should tell the same story.
+
+Two traps: never let the browser be the first thing on screen, and don't leave Expo Go's dev menus
+in the take. Expo Go is honest and expected for Next Gen (no store release is required), but the
+video should show *the app*, not the tooling that launched it.
 
 ## 7. Devpost description (paste-ready)
 

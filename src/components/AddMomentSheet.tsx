@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import type { StoredTask } from "../storage/careStore";
 import type { CareTask } from "../data/mockCare";
-import { colors } from "../theme";
+import { colors, insets, shape } from "../theme";
 
 /**
  * The "Add a moment" sheet. Replaces a stub that only raised a notice — the
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     paddingHorizontal: 24,
     paddingTop: 12,
-    paddingBottom: 24,
+    paddingBottom: 24 + insets.bottom,
   },
   handle: {
     width: 40,

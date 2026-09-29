@@ -13,7 +13,7 @@ import {
 import { storeNote } from "../purchases/revenuecat";
 import type { PlanOption } from "../purchases/revenuecat";
 import type { ProController } from "../purchases/usePro";
-import { colors } from "../theme";
+import { colors, insets, shape } from "../theme";
 
 /**
  * Only list what the entitlement actually unlocks. Reminders were advertised here
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     paddingHorizontal: 24,
     paddingTop: 12,
-    paddingBottom: 20,
+    paddingBottom: 20 + insets.bottom,
   },
   modalScroll: { paddingBottom: 14 },
   modalHandle: {
