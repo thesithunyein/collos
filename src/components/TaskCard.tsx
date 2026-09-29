@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 8,
   },
-  taskTitle: { color: colors.ink, fontSize: 15, fontWeight: "800", flex: 1, letterSpacing: -0.2 },
+  taskTitle: { color: colors.ink, fontSize: 15, fontWeight: "600", flex: 1, letterSpacing: -0.2 },
   taskTitleDone: { color: colors.muted, textDecorationLine: "line-through" },
   taskTimeRow: { flexDirection: "row", alignItems: "center", gap: 3 },
   taskTime: { color: colors.muted, fontSize: 11, fontWeight: "700" },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   confirmedButton: { backgroundColor: colors.blue, borderColor: colors.blue },
-  confirmButtonText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
+  confirmButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
   confirmedButtonText: { color: colors.white },
   skipButton: {
     minHeight: 36,

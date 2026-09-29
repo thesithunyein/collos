@@ -83,6 +83,6 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.45)",
   },
   image: { width: "100%", height: "100%" },
-  initials: { color: colors.blue, fontWeight: "800" },
+  initials: { color: colors.blue, fontWeight: "600" },
   initialsOnBrand: { color: colors.white },
 });

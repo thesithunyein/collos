@@ -207,7 +207,7 @@ export function TodayScreen({
       >
         <View style={styles.header}>
           <View>
-            <Text style={styles.eyebrow}>{dateLine().toUpperCase()}</Text>
+            <Text style={styles.eyebrow}>{dateLine()}</Text>
             <Text style={styles.greeting}>
               {greeting()}, {currentUser.name}
             </Text>
@@ -228,7 +228,7 @@ export function TodayScreen({
         </View>
 
         <View style={styles.recipientSwitcher}>
-          <Text style={styles.sectionLabel}>CARING FOR</Text>
+          <Text style={styles.sectionLabel}>Caring for</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -279,7 +279,7 @@ export function TodayScreen({
               <Glow color="96,177,255" size={170} style={styles.heroGlowSmall} />
             <View style={styles.heroCard}>
               <View style={styles.heroContent}>
-                <Text style={styles.heroKicker}>TODAY’S CARE PLAN</Text>
+                <Text style={styles.heroKicker}>Today’s care plan</Text>
                 <Text style={styles.heroTitle}>A little goes a long way.</Text>
                 <Text style={styles.heroText}>
                   You’re helping {recipient.name} feel remembered and supported.
@@ -462,12 +462,12 @@ const styles = StyleSheet.create({
     paddingTop: 20 + insets.top,
     paddingBottom: 24,
   },
-  eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1.1 },
+  eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
   greeting: {
     color: colors.ink,
-    fontSize: 27,
-    fontWeight: "800",
-    letterSpacing: -0.7,
+    fontSize: 25,
+    fontWeight: "700",
+    letterSpacing: -0.6,
     marginTop: 6,
   },
   /** No fill or radius here: `Avatar` draws the portrait and the fallback. */
@@ -500,8 +500,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     color: colors.muted,
     fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 1.1,
+    fontWeight: "600",
+    letterSpacing: 0.2,
     marginBottom: 10,
   },
   recipientRow: { gap: 10, paddingRight: 4 },
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     ...elevation.card,
   },
   recipientChipSelected: { backgroundColor: colors.blue, borderColor: colors.blue, ...elevation.lifted },
-  chipName: { color: colors.ink, fontSize: 14, fontWeight: "800" },
+  chipName: { color: colors.ink, fontSize: 14, fontWeight: "600" },
   chipNameSelected: { color: colors.white },
   chipRelationship: { color: colors.muted, fontSize: 11, marginTop: 2 },
   chipRelationshipSelected: { color: colors.blueTint },
@@ -542,14 +542,14 @@ const styles = StyleSheet.create({
     marginBottom: 26,
   },
   heroContent: { flex: 1, paddingRight: 8 },
-  heroKicker: { color: colors.blueTint, fontSize: 10, fontWeight: "800", letterSpacing: 1.1 },
+  heroKicker: { color: colors.blueTint, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
   heroTitle: {
     color: colors.white,
-    fontSize: 22,
-    lineHeight: 27,
-    fontWeight: "800",
+    fontSize: 19,
+    lineHeight: 24,
+    fontWeight: "700",
     marginTop: 10,
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
   },
   heroText: { color: colors.blueTint, fontSize: 13, lineHeight: 19, marginTop: 8 },
   progressRing: {
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     borderColor: "transparent",
   },
-  progressValue: { color: colors.white, fontSize: 16, fontWeight: "800" },
+  progressValue: { color: colors.white, fontSize: 15, fontWeight: "700" },
   progressLabel: { color: colors.blueTint, fontSize: 10, marginTop: 1 },
   sectionHeader: {
     flexDirection: "row",
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 13,
   },
-  sectionTitle: { color: colors.ink, fontSize: 20, fontWeight: "800", letterSpacing: -0.4 },
+  sectionTitle: { color: colors.ink, fontSize: 18, fontWeight: "600", letterSpacing: -0.3 },
   sectionMeta: { color: colors.muted, fontSize: 12, marginTop: 3 },
   sectionActions: { flexDirection: "row", alignItems: "center", gap: 8 },
   pillButton: {
@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
      button sitting next to the one that is. */
   pillButtonQuiet: { backgroundColor: "transparent", borderWidth: 0, shadowOpacity: 0, elevation: 0 },
   pillButtonPressed: { opacity: 0.6 },
-  pillButtonText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
+  pillButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
   pillButtonTextQuiet: { color: colors.muted, fontSize: 12, fontWeight: "700" },
   taskList: { gap: 10 },
   notesCard: {
@@ -641,8 +641,8 @@ const styles = StyleSheet.create({
   },
   notesCopy: { flex: 1 },
   notesTitleRow: { flexDirection: "row", alignItems: "center", gap: 7 },
-  notesTitle: { color: colors.ink, fontSize: 14, fontWeight: "800" },
-  notesLockBadge: { color: colors.blue, fontSize: 9, fontWeight: "900", letterSpacing: 0.5 },
+  notesTitle: { color: colors.ink, fontSize: 14, fontWeight: "600" },
+  notesLockBadge: { color: colors.blue, fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
   notesText: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 3 },
   proCard: {
     backgroundColor: colors.blueWash,
@@ -663,8 +663,8 @@ const styles = StyleSheet.create({
   },
   proCopy: { flex: 1 },
   proTitleRow: { flexDirection: "row", alignItems: "center", gap: 7 },
-  proTitle: { color: colors.ink, fontSize: 14, fontWeight: "800" },
-  proBadge: { color: colors.blue, fontSize: 9, fontWeight: "900", letterSpacing: 0.5 },
+  proTitle: { color: colors.ink, fontSize: 14, fontWeight: "600" },
+  proBadge: { color: colors.blue, fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
   proText: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 3 },
   safetyNote: { flexDirection: "row", gap: 7, alignItems: "flex-start", marginTop: 19, paddingHorizontal: 2 },
   safetyText: { color: colors.muted, fontSize: 11, lineHeight: 17, flex: 1 },
@@ -681,7 +681,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     ...elevation.card,
   },
-  emptyTitle: { color: colors.ink, fontSize: 16, fontWeight: "800", marginTop: 10 },
+  emptyTitle: { color: colors.ink, fontSize: 16, fontWeight: "600", marginTop: 10 },
   emptyText: {
     color: colors.muted,
     textAlign: "center",
@@ -697,5 +697,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginTop: 15,
   },
-  secondaryButtonText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
+  secondaryButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
 });

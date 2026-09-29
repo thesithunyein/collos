@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   onboardingTop: { flexDirection: "row", alignItems: "center", gap: 10, paddingTop: 18 },
   logoMark: { width: 38, height: 38, borderRadius: 13, overflow: "hidden" },
   logoImage: { width: "100%", height: "100%" },
-  wordmark: { color: colors.white, fontSize: 22, fontWeight: "800", letterSpacing: -0.5 },
+  wordmark: { color: colors.white, fontSize: 21, fontWeight: "700", letterSpacing: -0.4 },
   onboardingArt: { flex: 1, justifyContent: "center", alignItems: "center", minHeight: 280 },
   sunHaloOuter: {
     position: "absolute",
@@ -128,10 +128,10 @@ const styles = StyleSheet.create({
   onboardingCopy: { paddingBottom: 22 },
   onboardingTitle: {
     color: colors.white,
-    fontSize: 42,
-    lineHeight: 46,
-    fontWeight: "800",
-    letterSpacing: -1.4,
+    fontSize: 38,
+    lineHeight: 42,
+    fontWeight: "700",
+    letterSpacing: -1.2,
   },
   onboardingTitleAccent: { color: colors.periwinkle },
   onboardingSubtitle: {
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  primaryButtonText: { color: colors.blue, fontSize: 16, fontWeight: "800" },
+  primaryButtonText: { color: colors.blue, fontSize: 16, fontWeight: "600" },
   onboardingFooter: { color: colors.blueMuted, fontSize: 11, textAlign: "center", marginTop: 17 },
   pressed: { opacity: 0.72 },
 });

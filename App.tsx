@@ -257,6 +257,8 @@ export default function App() {
           <SettingsScreen pro={pro} onResetData={resetAllData} />
         )}
 
+        <NavScrim />
+
         <View style={styles.bottomNav}>
           <NavItem icon="grid-outline" label="Today" active={tab === "today"} onPress={() => changeTab("today")} />
           <NavItem icon="people-outline" label="Circle" active={tab === "circle"} onPress={() => changeTab("circle")} />
@@ -336,6 +338,23 @@ export default function App() {
   );
 }
 
+const NAV_MASK_STEPS = 5;
+
+function NavScrim() {
+  const solid = 10 + insets.bottom;
+  return (
+    <View pointerEvents="none" style={[styles.navScrim, { height: solid + 48 }]}>
+      <View style={[styles.navScrimSolid, { height: solid }]} />
+      {Array.from({ length: NAV_MASK_STEPS }, (_, index) => (
+        <View
+          key={index}
+          style={[styles.navScrimFade, { bottom: solid, height: 10 * (index + 1), opacity: 0.2 }]}
+        />
+      ))}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   viewport: {
     flex: 1,
@@ -381,6 +400,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 18,
     right: 18,
+    // Above `NavScrim`, which masks the strip this float leaves below it.
+    zIndex: 2,
     bottom: 10 + insets.bottom,
     minHeight: 68,
     paddingTop: 8,
@@ -397,6 +418,36 @@ const styles = StyleSheet.create({
     shadowRadius: 22,
     shadowOffset: { width: 0, height: 10 },
     elevation: 6,
+  },
+  /**
+   * Covers the band of live content that used to show below the nav capsule.
+   *
+   * The capsule floats above the bottom edge on purpose, but with no blur behind
+   * it the 34px strip underneath was scrolling content cut off mid-card — the
+   * menu looked like it was hiding the page rather than floating over it. The
+   * mask is the screen's own background, so all it removes is the accident. The
+   * fade above it stops the two 18px gutters beside the capsule from meeting the
+   * mask on a hard horizontal cut.
+   */
+  navScrim: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
+  },
+  navScrimSolid: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.soft,
+  },
+  navScrimFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    backgroundColor: colors.soft,
   },
   notice: {
     position: "absolute",

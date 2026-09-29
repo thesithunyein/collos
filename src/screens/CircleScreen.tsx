@@ -78,7 +78,7 @@ export function CircleScreen({
     <View style={styles.screen}>
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.eyebrow}>CARE CIRCLE</Text>
+        <Text style={styles.eyebrow}>Care circle</Text>
         <Text style={styles.title}>Everyone helping out</Text>
         <Text style={styles.subtitle}>
           One place to see who is checking in, and what has been done for the people you care for.
@@ -105,7 +105,7 @@ export function CircleScreen({
           </Text>
         ) : null}
 
-        <Text style={styles.sectionLabel}>MEMBERS</Text>
+        <Text style={styles.sectionLabel}>Members</Text>
         <View style={styles.memberList}>
           {members.map((member) => (
             <View key={member.id} style={styles.memberRow}>
@@ -188,8 +188,8 @@ export function CircleScreen({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
   content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 130 },
-  eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1.1 },
-  title: { color: colors.ink, fontSize: 27, fontWeight: "800", letterSpacing: -0.7, marginTop: 6 },
+  eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
+  title: { color: colors.ink, fontSize: 25, fontWeight: "700", letterSpacing: -0.6, marginTop: 6 },
   subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },
   statRow: { flexDirection: "row", gap: 10, marginTop: 20 },
   statCard: {
@@ -202,13 +202,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     ...elevation.card,
   },
-  statValue: { color: colors.ink, fontSize: 20, fontWeight: "800" },
+  statValue: { color: colors.ink, fontSize: 19, fontWeight: "700" },
   statLabel: { color: colors.muted, fontSize: 10, fontWeight: "700", marginTop: 3, letterSpacing: 0.3 },
   sectionLabel: {
     color: colors.muted,
     fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 1.1,
+    fontWeight: "600",
+    letterSpacing: 0.2,
     marginTop: 26,
     marginBottom: 10,
   },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     ...elevation.card,
   },
   memberCopy: { flex: 1 },
-  memberName: { color: colors.ink, fontSize: 14, fontWeight: "800" },
+  memberName: { color: colors.ink, fontSize: 14, fontWeight: "600" },
   memberRole: { color: colors.muted, fontSize: 11, marginTop: 2 },
   donePill: {
     flexDirection: "row",
@@ -236,9 +236,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  donePillText: { color: colors.mint, fontSize: 10, fontWeight: "800" },
+  donePillText: { color: colors.mint, fontSize: 10, fontWeight: "600" },
   pendingPill: { backgroundColor: colors.soft, borderRadius: 9, paddingHorizontal: 8, paddingVertical: 4 },
-  pendingPillText: { color: colors.muted, fontSize: 10, fontWeight: "800" },
+  pendingPillText: { color: colors.muted, fontSize: 10, fontWeight: "600" },
   memberHint: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 10, paddingHorizontal: 2 },
   unlockedCard: {
     backgroundColor: "rgba(255,255,255,0.9)",
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   unlockedHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
-  unlockedTitle: { color: colors.ink, fontSize: 15, fontWeight: "800" },
+  unlockedTitle: { color: colors.ink, fontSize: 15, fontWeight: "600" },
   unlockedText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 8 },
   lockedCard: {
     backgroundColor: colors.blueWash,
@@ -268,8 +268,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  lockedBadge: { color: colors.blue, fontSize: 10, fontWeight: "900", letterSpacing: 0.6 },
-  lockedTitle: { color: colors.ink, fontSize: 15, fontWeight: "800", marginTop: 10 },
+  lockedBadge: { color: colors.blue, fontSize: 10, fontWeight: "700", letterSpacing: 0.6 },
+  lockedTitle: { color: colors.ink, fontSize: 15, fontWeight: "600", marginTop: 10 },
   lockedText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 6 },
   primaryButton: {
     minHeight: 48,
@@ -281,6 +281,6 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 15,
   },
-  primaryButtonText: { color: colors.white, fontSize: 14, fontWeight: "800" },
+  primaryButtonText: { color: colors.white, fontSize: 14, fontWeight: "600" },
   pressed: { opacity: 0.72 },
 });

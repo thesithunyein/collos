@@ -78,5 +78,5 @@ const styles = StyleSheet.create({
   // label sits back, the active one is genuinely bold. Weight alone would be too
   // subtle at 11pt, so tint and weight move together.
   navLabel: { color: colors.muted, fontSize: 11, fontWeight: "600" },
-  navLabelActive: { color: colors.blue, fontWeight: "800" },
+  navLabelActive: { color: colors.blue, fontWeight: "600" },
 });

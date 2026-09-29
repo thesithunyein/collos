@@ -56,7 +56,7 @@ export function SettingsScreen({
     <View style={styles.screen}>
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.eyebrow}>SETTINGS</Text>
+        <Text style={styles.eyebrow}>Settings</Text>
         <Text style={styles.title}>Your account</Text>
         <Text style={styles.subtitle}>
           Manage Collos Pro, restore a purchase, and check that the store connection is healthy.
@@ -137,7 +137,7 @@ export function SettingsScreen({
           ) : null}
         </View>
 
-        <Text style={styles.sectionLabel}>STORE CONNECTION</Text>
+        <Text style={styles.sectionLabel}>Store connection</Text>
         <View style={styles.detailCard}>
           <DetailRow label="Status" value={configured ? "Connected" : "Preview mode"} />
           <DetailRow label="Platform" value={platform} />
@@ -154,7 +154,7 @@ export function SettingsScreen({
           you contact support, include the app user ID so your purchase record can be found.
         </Text>
 
-        <Text style={styles.sectionLabel}>YOUR DATA</Text>
+        <Text style={styles.sectionLabel}>Your data</Text>
         <View style={styles.detailCard}>
           <DetailRow label="Storage" value="On this device only" />
           <DetailRow label="Accounts" value="None — no sign-up" />
@@ -237,8 +237,8 @@ function formatDate(iso: string): string {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
   content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 130 },
-  eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1.1 },
-  title: { color: colors.ink, fontSize: 27, fontWeight: "800", letterSpacing: -0.7, marginTop: 6 },
+  eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
+  title: { color: colors.ink, fontSize: 25, fontWeight: "700", letterSpacing: -0.6, marginTop: 6 },
   subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },
   statusCard: {
     backgroundColor: colors.white,
@@ -261,12 +261,12 @@ const styles = StyleSheet.create({
   },
   statusIconPro: { backgroundColor: colors.blue },
   statusCopy: { flex: 1 },
-  statusTitle: { color: colors.ink, fontSize: 15, fontWeight: "800" },
+  statusTitle: { color: colors.ink, fontSize: 15, fontWeight: "600" },
   statusText: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 3 },
   pill: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
   pillOn: { backgroundColor: colors.mintWash },
   pillOff: { backgroundColor: colors.soft },
-  pillText: { fontSize: 9, fontWeight: "900", letterSpacing: 0.5 },
+  pillText: { fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
   pillTextOn: { color: colors.mint },
   pillTextOff: { color: colors.muted },
   statusActions: { gap: 8, marginTop: 14 },
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
-  actionButtonText: { color: colors.blue, fontSize: 13, fontWeight: "800" },
+  actionButtonText: { color: colors.blue, fontSize: 13, fontWeight: "600" },
   messageRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -295,8 +295,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     color: colors.muted,
     fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 1.1,
+    fontWeight: "600",
+    letterSpacing: 0.2,
     marginTop: 26,
     marginBottom: 10,
   },
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   resetButtonArmed: { backgroundColor: colors.danger, borderColor: colors.danger },
-  resetText: { color: colors.danger, fontSize: 13, fontWeight: "800" },
+  resetText: { color: colors.danger, fontSize: 13, fontWeight: "600" },
   resetTextArmed: { color: colors.white },
   pressed: { opacity: 0.72 },
 });

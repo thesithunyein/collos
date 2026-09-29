@@ -163,6 +163,23 @@ npm run screenshots:devpost
 
 That writes six screenshots to `submission/screenshots/` at **1179×2556** — the exact size Devpost asks for, with no device frame. It captures at 393×852 CSS pixels with a 3× device scale factor, so the output needs no resampling. The flow drives the real app through onboarding, the daily plan, the locked circle, the paywall, the unlocked circle, and Settings.
 
+### Type is the thing that made it read as generated
+
+The first version of this app set **51 styles at weight 800 and six at 900**, against two at 600, and put uppercase
+letterspaced micro-labels on four different screens. That combination is the visual signature of a generated UI: every
+element shouts at the same volume, so nothing has hierarchy and the eye finds no calm surface. It was the single most
+reliable tell that the product was not hand-built, and no amount of correct behaviour fixed it.
+
+The range is now 600 for row titles and labels, 700 for screen titles, numbers and the one hero card, and nothing above
+it. The uppercase labels became sentence case (`Care circle`, `Members`, `Store connection`) with the tracking that
+was tuned for capitals removed, and the oversized display sizes came down with them — screen titles 27 to 25, section
+titles 20 to 18, the hero card title 22 to 19.
+
+The other half of "this looks generated" is **density**, which is a product decision rather than a styling one: Today
+carries a greeting, a recipient switcher, a hero card, a section header with two actions, four moment cards each with two
+buttons, a notes row and a Pro row. Changing weights makes that quieter; only removing elements makes it sparse. Nothing
+was cut here, so this is worth revisiting if the screen still feels busy.
+
 Those six frames do not all come from the same build, and the split is deliberate rather than incidental:
 
 ```bash

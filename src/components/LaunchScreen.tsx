@@ -85,9 +85,9 @@ const styles = StyleSheet.create({
   badgeImage: { width: "100%", height: "100%" },
   wordmark: {
     color: colors.ink,
-    fontSize: 26,
-    fontWeight: "800",
-    letterSpacing: -0.9,
+    fontSize: 24,
+    fontWeight: "700",
+    letterSpacing: -0.8,
     marginTop: 26,
   },
 });
