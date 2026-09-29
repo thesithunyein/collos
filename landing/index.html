@@ -25,6 +25,97 @@
     <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "MobileApplication",
+            "name": "Collos",
+            "applicationCategory": "LifestyleApplication",
+            "operatingSystem": "iOS, Android",
+            "url": "https://collos.sithunyein.com/",
+            "downloadUrl": "https://app.collos.sithunyein.com/",
+            "license": "https://github.com/thesithunyein/collos/blob/main/LICENSE",
+            "description": "A care-coordination app that turns check-ins, water breaks and shared notes into one calm daily plan for a family care circle.",
+            "offers": [
+              { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD" },
+              { "@type": "Offer", "name": "Collos Pro, monthly", "price": "4.99", "priceCurrency": "USD" },
+              { "@type": "Offer", "name": "Collos Pro, annual", "price": "39.99", "priceCurrency": "USD" }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is Collos free?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Today's plan, every moment on it, adding your own moments and one shared note a day are free, for as many people as you care for. Collos Pro is optional."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What does Collos Pro actually add?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "One thing: Pro removes the shared-notes limit. The free plan keeps one note a day for each person, Pro keeps as many as your circle needs. Notes are stored on your device either way and survive a restart."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do I need an account?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. There is no sign-up, no email address and no password. The app opens straight into your plan."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Where is my care data stored?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "On your device and nowhere else. Collos writes the plan, the confirmations and the notes to local storage, and there is no backend that receives them."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can two people share the same care plan on their own phones?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Not yet. The plan lives on one device today. A circle shared between phones is the next thing being built, and the app and this site say so rather than implying it already works."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How do I cancel or restore a subscription?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Collos Pro is billed by the App Store, Google Play or RevenueCat Billing. Use Restore purchases in the app's Settings screen, or cancel from the store account that billed you."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Which devices does Collos run on?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Collos is a native iOS and Android app built with React Native and Expo. The same codebase also exports to the web, which is what runs at app.collos.sithunyein.com."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is Collos medical advice?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. Collos coordinates everyday care between people. It holds no medical records, offers no diagnosis and does not replace a qualified care professional."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div class="nav-wrap">
@@ -33,9 +124,14 @@
           <img class="brand-mark" src="logo.png" width="34" height="34" alt="" />
           <span>collos</span>
         </a>
-        <nav class="nav-links" aria-label="Main navigation">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+          Sections
+          <span aria-hidden="true">&#9662;</span>
+        </button>
+        <nav class="nav-links" id="nav-links" aria-label="Main navigation">
           <a href="#how-it-works">How it works</a>
-          <a href="#care-circle">Care circle</a>
+          <a href="#plans">Plans</a>
+          <a href="docs">Docs</a>
           <a href="#faq">FAQ</a>
         </nav>
         <a class="nav-cta" href="https://app.collos.sithunyein.com" target="_blank" rel="noreferrer">
@@ -133,27 +229,42 @@
       <section class="section shell" id="how-it-works">
         <div class="section-intro">
           <p class="eyebrow">HOW IT WORKS</p>
-          <h2>The right kind of<br /><em>simple.</em></h2>
-          <p>Care is already full of decisions. Collos takes one small thing off your plate: remembering who is doing what, and when.</p>
+          <h2>Care, in three<br /><em>small steps.</em></h2>
+          <p>Care work is invisible and easy to drop. Collos takes one thing off your plate: remembering who is doing what, and when.</p>
         </div>
-        <div class="feature-grid">
-          <article class="glass-card feature-card">
-            <span class="feature-number">01</span>
+
+        <div class="steps">
+          <article class="glass-card step-card">
+            <span class="step-number">01</span>
             <div class="feature-icon feature-sky" aria-hidden="true">&#9829;</div>
-            <h3>Choose your circle</h3>
-            <p>Set up the people and recipients who make up your everyday care rhythm.</p>
+            <h3>Set up who you care for</h3>
+            <p>Add the people in your plan in about ten seconds. Switch between them in one tap, without losing your place.</p>
+            <div class="step-ui" aria-hidden="true">
+              <span class="chip chip-on"><span class="chip-face">M</span>Margaret</span>
+              <span class="chip"><span class="chip-face">D</span>Daniel</span>
+            </div>
           </article>
-          <article class="glass-card feature-card feature-card-lift">
-            <span class="feature-number">02</span>
+
+          <article class="glass-card step-card step-card-lift">
+            <span class="step-number">02</span>
             <div class="feature-icon feature-blush" aria-hidden="true">&#10024;</div>
-            <h3>Plan small moments</h3>
-            <p>Turn check-ins and shared notes into one plan everyone can see.</p>
+            <h3>Get a short plan for today</h3>
+            <p>A check-in, a water break, a walk, an evening note — small enough that today actually happens.</p>
+            <div class="step-ui" aria-hidden="true">
+              <span class="mini-row"><span class="plan-dot plan-dot-blush"></span>Water break<em>10:30</em></span>
+              <span class="mini-row mini-row-open"><span class="plan-dot plan-dot-mint"></span>Fresh air<em>2:00 PM</em></span>
+            </div>
           </article>
-          <article class="glass-card feature-card">
-            <span class="feature-number">03</span>
+
+          <article class="glass-card step-card">
+            <span class="step-number">03</span>
             <div class="feature-icon feature-mint" aria-hidden="true">&#10003;</div>
-            <h3>Show up, together</h3>
-            <p>Confirm what is done, skip what is not, and leave the next person a clear handoff.</p>
+            <h3>Confirm, skip, or leave a note</h3>
+            <p>What happened is recorded the moment you tap it, and still there when you come back tomorrow.</p>
+            <div class="step-ui" aria-hidden="true">
+              <span class="mini-progress"><span></span></span>
+              <span class="mini-caption">1 of 4 confirmed &middot; kept on this device</span>
+            </div>
           </article>
         </div>
       </section>
@@ -188,6 +299,119 @@
         </div>
       </section>
 
+      <!-- PLANS — the real configuration, not a sales ladder. Free is the whole
+           daily plan; Pro does exactly one thing, and the copy says so. -->
+      <section class="section shell" id="plans">
+        <div class="section-intro">
+          <p class="eyebrow">PLANS</p>
+          <h2>Free where it counts.<br /><em>Paid where it's earned.</em></h2>
+          <p>The care plan itself is free and stays free. Collos Pro is optional, and it is what pays for the shared circle we are building next.</p>
+        </div>
+
+        <div class="plans">
+          <article class="glass-card plan-card">
+            <p class="plan-name">Free</p>
+            <p class="plan-price"><span class="plan-amount">$0</span><span class="plan-period">forever</span></p>
+            <p class="plan-note">The whole daily plan, for as many people as you care for.</p>
+            <ul class="plan-list">
+              <li>Today's plan, with confirm and skip on every moment</li>
+              <li>Add your own moments to any plan</li>
+              <li>One shared note a day for each person</li>
+              <li>Everything kept on your device, with no account</li>
+            </ul>
+            <a class="button button-outline" href="https://app.collos.sithunyein.com" target="_blank" rel="noreferrer">Open the app</a>
+          </article>
+
+          <article class="glass-card plan-card plan-card-pro">
+            <p class="plan-badge">OPTIONAL</p>
+            <p class="plan-name">Collos Pro</p>
+            <p class="plan-price"><span class="plan-amount">$4.99</span><span class="plan-period">a month</span></p>
+            <p class="plan-alt">or <strong>$39.99 a year</strong> <span class="plan-save">save 33%</span></p>
+            <ul class="plan-list">
+              <li><strong>Unlimited shared notes</strong>, instead of one a day</li>
+              <li>Every note kept in one place on your device, still there after a restart</li>
+              <li>Cancel any time from the store that billed you</li>
+            </ul>
+            <a class="button button-blue" href="https://app.collos.sithunyein.com" target="_blank" rel="noreferrer">See the plans in the app</a>
+            <p class="plan-fine">Bought inside the app, through the App Store, Google Play, or RevenueCat Billing in the browser. Your store shows the price in your own currency.</p>
+          </article>
+        </div>
+
+        <p class="plans-note">That is the entire difference between the two plans. There is no second tier hiding behind this one, and nothing you can already do stops working if you never pay.</p>
+      </section>
+
+      <!-- DOCS — the written half of the product: how it is built, where the data
+           lives, and how to run it yourself. -->
+      <section class="docs-strip shell">
+        <div class="glass-card docs-card">
+          <div class="docs-copy">
+            <p class="eyebrow">DOCS</p>
+            <h3>Written down, not implied</h3>
+            <p>Where your data actually lives, what Pro unlocks in code, how to run Collos yourself, and the two traps this project has already fallen into once.</p>
+          </div>
+          <a class="button button-blue" href="docs">Read the docs <span aria-hidden="true">&#8599;</span></a>
+        </div>
+      </section>
+
+      <!-- FAQ — native details/summary, so it works before the JavaScript loads. -->
+      <section class="section shell" id="faq">
+        <div class="faq-grid">
+          <div class="faq-intro">
+            <p class="eyebrow">FAQ</p>
+            <h2>Asked,<br /><em>answered plainly.</em></h2>
+            <p>Including the questions a product page usually dodges.</p>
+            <a class="text-link" href="docs">Go deeper in the docs &#8599;</a>
+          </div>
+
+          <div class="faq-list">
+            <details class="faq-item" name="faq">
+              <summary>Is Collos free?</summary>
+              <p>Yes. Today's plan, every moment on it, adding your own moments, and one shared note a day are free — for as many people as you care for. Collos Pro is optional and nothing that already works stops working if you never buy it.</p>
+            </details>
+
+            <details class="faq-item" name="faq">
+              <summary>What does Collos Pro actually add?</summary>
+              <p>One thing: it removes the shared-notes limit. The free plan keeps one note a day for each person; Pro keeps as many as your circle needs. Notes go to your device either way, and they are still there after a restart. That is the whole difference — we would rather sell one real feature than a list of promises.</p>
+            </details>
+
+            <details class="faq-item" name="faq">
+              <summary>Do I need an account?</summary>
+              <p>No. There is no sign-up, no email address and no password. The app opens straight into your plan, and there is nothing to verify before you can use it.</p>
+            </details>
+
+            <details class="faq-item" name="faq">
+              <summary>Where is my care data stored?</summary>
+              <p>On your device, and nowhere else. Collos writes the plan, the confirmations, the moments you add and the notes to local storage &mdash; <code>localStorage</code> in the browser, the file system on a phone. There is no backend receiving it, which also means: if you delete the app, it is gone. Do not use Collos as your only record of anything important.</p>
+            </details>
+
+            <details class="faq-item" name="faq">
+              <summary>Can my sister and I share one care plan on our own phones?</summary>
+              <p>Not yet, and this site will not pretend otherwise. Today the plan lives on one device, so a circle shared <em>between</em> phones is the next thing being built. Until it ships, the honest way to use Collos together is one device handed over &mdash; which is what the evening note is for.</p>
+            </details>
+
+            <details class="faq-item" name="faq">
+              <summary>How do I cancel or restore a subscription?</summary>
+              <p>Collos Pro is billed by the App Store, Google Play or RevenueCat Billing, so cancelling happens where you bought it &mdash; your store account. If you reinstall or move device, open Settings in the app and tap <strong>Restore purchases</strong>. That screen also shows your app user ID and entitlement state, so support can find your record if something goes wrong.</p>
+            </details>
+
+            <details class="faq-item" name="faq">
+              <summary>Which devices does Collos run on?</summary>
+              <p>Collos is a native iOS and Android app, built with React Native and Expo. The same codebase also exports to the web, which is what runs at app.collos.sithunyein.com &mdash; useful for trying it in a browser, and the build where the subscription goes through RevenueCat Billing.</p>
+            </details>
+
+            <details class="faq-item" name="faq">
+              <summary>Is Collos medical advice?</summary>
+              <p>No. Collos coordinates everyday care between people: who checked in, who is bringing what, what still needs doing. It holds no medical records, offers no diagnosis, and does not replace a qualified care professional. In an emergency, contact local emergency services.</p>
+            </details>
+
+            <details class="faq-item" name="faq">
+              <summary>Who builds Collos, and can I read the code?</summary>
+              <p>Collos is an independent project, MIT licensed. The source, the release runbook and the store listing copy are all public on <a href="https://github.com/thesithunyein/collos" target="_blank" rel="noreferrer">GitHub</a>, and the docs page links the interesting parts.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
       <section class="cta shell">
         <div class="glass-card cta-card">
           <div><p class="eyebrow">START WITH ONE SMALL THING</p><h2>Make care feel<br /><em>lighter.</em></h2></div>
@@ -196,10 +420,10 @@
       </section>
     </main>
 
-    <footer class="site-footer" id="faq">
+    <footer class="site-footer">
       <div class="shell footer-grid">
         <div><a class="brand footer-brand" href="#top"><img class="brand-mark" src="logo.png" width="36" height="36" alt="" /><span>collos</span></a><p>Care coordination for the small things that matter.</p></div>
-        <div><p class="footer-heading">Explore</p><a href="#how-it-works">How it works</a><a href="#care-circle">Care circle</a><a href="privacy">Privacy</a><a href="terms">Terms</a><a href="https://github.com/thesithunyein/collos" target="_blank" rel="noreferrer">GitHub &#8599;</a></div>
+        <div><p class="footer-heading">Explore</p><a href="#how-it-works">How it works</a><a href="#plans">Plans</a><a href="docs">Docs</a><a href="#faq">FAQ</a><a href="#care-circle">Care circle</a><a href="privacy">Privacy</a><a href="terms">Terms</a><a href="https://github.com/thesithunyein/collos" target="_blank" rel="noreferrer">GitHub &#8599;</a></div>
         <div><p class="footer-heading">A note on safety</p><p>Collos is for care coordination only. It is not medical advice and does not replace a qualified care professional.</p></div>
       </div>
       <div class="shell footer-bottom"><span>&copy; 2026 Collos</span><span>Made for everyday care.</span></div>

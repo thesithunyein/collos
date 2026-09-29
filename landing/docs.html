@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#2F63D6" />
+    <meta
+      name="description"
+      content="Collos docs: where your care data lives, what Collos Pro unlocks, how subscriptions and restore work, how to run the app yourself, and the traps this project has already fallen into."
+    />
+    <meta name="robots" content="index, follow" />
+    <title>Docs | Collos</title>
+    <link rel="canonical" href="https://collos.sithunyein.com/docs" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Collos" />
+    <meta property="og:title" content="Docs | Collos" />
+    <meta
+      property="og:description"
+      content="Where the data lives, what Pro unlocks, and how to run Collos yourself."
+    />
+    <meta property="og:url" content="https://collos.sithunyein.com/docs" />
+    <meta property="og:image" content="https://collos.sithunyein.com/app-dashboard.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fustat:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+  </head>
+  <body>
+    <div class="nav-wrap">
+      <header class="glass-nav">
+        <a class="brand" href="/" aria-label="Collos home">
+          <img class="brand-mark" src="logo.png" width="34" height="34" alt="" />
+          <span>collos</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+          Sections
+          <span aria-hidden="true">&#9662;</span>
+        </button>
+        <nav class="nav-links" id="nav-links" aria-label="Main navigation">
+          <a href="/#how-it-works">How it works</a>
+          <a href="/#plans">Plans</a>
+          <a href="/docs">Docs</a>
+          <a href="/#faq">FAQ</a>
+        </nav>
+        <a class="nav-cta" href="https://app.collos.sithunyein.com" target="_blank" rel="noreferrer">
+          Open the app
+          <span class="nav-cta-arrow" aria-hidden="true">&#8599;</span>
+        </a>
+      </header>
+    </div>
+
+    <main id="top">
+      <section class="docs-hero shell">
+        <p class="eyebrow">DOCS</p>
+        <h1>The product page,<br /><span class="tone">in full.</span></h1>
+        <p class="docs-lede">
+          Where your care data is kept, what Collos Pro actually changes in code, how to run the app
+          on your own machine, and the two mistakes this project has already made once so you do not
+          repeat them.
+        </p>
+        <p class="docs-meta">Last updated 29 September 2026</p>
+      </section>
+
+      <div class="shell docs-layout">
+        <aside class="docs-aside">
+          <p>On this page</p>
+          <nav class="docs-toc" aria-label="On this page">
+            <a href="#what-it-is">What Collos is</a>
+            <a href="#quick-start">Quick start</a>
+            <a href="#data">Where your data lives</a>
+            <a href="#plans">Plans and purchases</a>
+            <a href="#run-locally">Run it yourself</a>
+            <a href="#architecture">How it is built</a>
+            <a href="#assets">Screenshots and assets</a>
+            <a href="#troubleshooting">Troubleshooting</a>
+            <a href="#support">Support</a>
+          </nav>
+        </aside>
+
+        <article class="docs-body">
+          <section id="what-it-is">
+            <h2>What Collos is — and what it is not</h2>
+            <p>
+              Collos is a care-coordination app for the person in a family who has become the
+              organiser. It turns check-ins, a water break, a walk and an evening note into one short
+              daily plan, and it remembers what has already been done so the next person does not
+              have to ask.
+            </p>
+            <p>It is deliberately narrow. Collos:</p>
+            <ul>
+              <li>holds <strong>no medical records</strong>, no diagnosis and no clinical claims;</li>
+              <li>does not replace a qualified care professional, and says so in the app;</li>
+              <li>does not sync between phones yet — the plan lives on the device in front of you;</li>
+              <li>does not ask for an account, because there is nothing to log in to.</li>
+            </ul>
+            <div class="docs-note">
+              <strong>The one limitation worth reading twice</strong>
+              The plan is stored on the device. If you delete the app, or reset the device, the plan
+              goes with it. Do not keep anything there that you would be upset to lose.
+            </div>
+          </section>
+
+          <section id="quick-start">
+            <h2>Quick start</h2>
+            <p>
+              Open <a href="https://app.collos.sithunyein.com">app.collos.sithunyein.com</a> in a
+              browser, or run the app on a phone with Expo Go. Either way you land in onboarding:
+            </p>
+            <ul>
+              <li>Tap <strong>Set up my care circle</strong> to create the first plan.</li>
+              <li>Add or switch between the people you care for at the top of the Today screen.</li>
+              <li>Confirm a moment, or skip it. Both are recorded the moment you tap.</li>
+              <li>
+                Tap <strong>Shared notes</strong> to leave a note for whoever picks the plan up next.
+              </li>
+            </ul>
+            <p>
+              Settings holds the store connection details, a restore button, and
+              <strong>Reset all data on this device</strong> if you want a clean slate.
+            </p>
+          </section>
+
+          <section id="data">
+            <h2>Where your data lives</h2>
+            <p>
+              Everything you enter — confirmations, skipped moments, added moments, notes and the
+              recipient you last viewed — is written to device-local storage immediately, and reloaded
+              when the app opens.
+            </p>
+            <pre><code>src/storage/careStore.ts   the state itself: load, save, transitions
+src/storage/fileStore.ts   native: expo-file-system
+src/storage/fileStore.web.ts   browser: localStorage</code></pre>
+            <p>
+              There is no backend. Nothing you type is uploaded, which is why the
+              <a href="privacy">privacy policy</a> can make the promise it makes. The single exception
+              is a subscription: RevenueCat receives an anonymous app user ID and the purchase, and
+              nothing else.
+            </p>
+            <p>
+              Notes follow the same rule. The free plan keeps one note a day for each person, and
+              Pro removes that limit — but a note is stored locally either way, so the difference is
+              a cap, not a sync.
+            </p>
+          </section>
+
+          <section id="plans">
+            <h2>Plans and purchases</h2>
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Plan</th>
+                  <th>Price</th>
+                  <th>What it changes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Free</strong></td>
+                  <td>$0</td>
+                  <td>
+                    The whole daily plan, every moment, adding your own moments, and one shared note a
+                    day for each person.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Collos Pro</strong></td>
+                  <td>$4.99 / month<br />$39.99 / year</td>
+                  <td>Removes the shared-notes cap. As many notes as your circle needs.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              Pro is billed by the store you bought it in: the App Store, Google Play, or RevenueCat
+              Billing when you subscribe in a browser. Your store shows the price in your own
+              currency, and cancelling happens in that store account — not in Collos.
+            </p>
+            <h3>Restoring a purchase</h3>
+            <p>
+              Open <strong>Settings</strong> and tap <strong>Restore purchases</strong>. The same
+              screen shows the app user ID, the entitlement identifier and the RevenueCat project ID,
+              so support can find the record if a restore ever fails.
+            </p>
+            <h3>In a development build</h3>
+            <p>
+              A purchase inside Expo Go uses JavaScript-level mocks: the flow is complete and clearly
+              labelled, but no money moves. Real store purchases need a development or production
+              build, which is what <code>eas.json</code> is for.
+            </p>
+          </section>
+
+          <section id="run-locally">
+            <h2>Run it yourself</h2>
+            <pre><code>git clone https://github.com/thesithunyein/collos
+cd collos
+npm install
+npm start          # Expo dev server: i, a, or scan the QR code
+npm run typecheck  # tsc --noEmit
+npm run build:web  # the browser build, written to dist/</code></pre>
+            <p>
+              Subscriptions are optional locally. With no RevenueCat key present the app runs in a
+              clearly labelled <strong>preview mode</strong>: every screen works, prices are shown,
+              and no payment is taken.
+            </p>
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Variable</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>EXPO_PUBLIC_REVENUECAT_IOS_KEY</code></td>
+                  <td>App Store purchases</td>
+                </tr>
+                <tr>
+                  <td><code>EXPO_PUBLIC_REVENUECAT_ANDROID_KEY</code></td>
+                  <td>Google Play purchases</td>
+                </tr>
+                <tr>
+                  <td><code>EXPO_PUBLIC_REVENUECAT_WEB_KEY</code></td>
+                  <td>Browser purchases through RevenueCat Billing</td>
+                </tr>
+                <tr>
+                  <td><code>EXPO_PUBLIC_REVENUECAT_ENTITLEMENT</code></td>
+                  <td><code>collos_pro</code> — must match the RevenueCat dashboard exactly</td>
+                </tr>
+                <tr>
+                  <td><code>EXPO_PUBLIC_REVENUECAT_PROJECT_ID</code></td>
+                  <td>The <code>proj…</code> id, shown in the app's Settings screen</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              All five are <code>EXPO_PUBLIC_*</code> values and public by design. They are documented
+              in <code>.env.example</code>; copy it to <code>.env</code> and fill it in.
+            </p>
+          </section>
+
+          <section id="architecture">
+            <h2>How it is built</h2>
+            <p>
+              One React Native codebase, two output targets. The native app and the browser build share
+              every screen; only the storage primitive differs per platform.
+            </p>
+            <pre><code>App.tsx                     app shell: stage, tabs, sheets, persistence wiring
+src/screens/                Onboarding, Today, Circle, Settings
+src/components/             TaskCard, NavItem, NotesSheet, AddMomentSheet, PaywallModal
+src/storage/                device-local state, split native vs web
+src/purchases/              the only place the RevenueCat SDK is imported
+src/theme.ts                colour, radius scale, safe-area insets</code></pre>
+            <ul>
+              <li>
+                <strong>Expo SDK 51, React Native 0.74.5.</strong> Identifiers are
+                <code>com.collos.app</code> on both iOS and Android, and EAS builds both from
+                <code>eas.json</code>.
+              </li>
+              <li>
+                <strong>Dependencies are pinned, deliberately.</strong> <code>expo-font</code> is held
+                at <code>~12.0.10</code> with an <code>overrides</code> entry, because a floating
+                version resolves to a release that calls <code>registerWebModule</code> and blanks the
+                web build at runtime.
+              </li>
+              <li>
+                <strong>The entitlement gates one thing.</strong> Notes are capped in
+                <code>careStore</code> and the cap is lifted when the RevenueCat entitlement is
+                active. Nothing in the paywall promises anything the code cannot do.
+              </li>
+            </ul>
+          </section>
+
+          <section id="assets">
+            <h2>Screenshots and assets</h2>
+            <p>
+              The phone previews on the product page are real captures of the running app rather than
+              hand-built mockups, and the capture script writes them at the exact sizes the stores
+              require:
+            </p>
+            <pre><code>npm run screenshots          # the two previews used on the landing page
+npm run screenshots:devpost   # 1179x2556, the submission size
+npm run screenshots:appstore  # 1320x2868, the 6.9-inch set
+npm run screenshots:playstore # 1080x1920</code></pre>
+            <p>
+              Every icon and favicon is generated from one source image by
+              <code>python assets/make-icons.py</code>, so the app icon, the Android adaptive
+              foreground, both favicons and the splash mark cannot drift apart.
+            </p>
+          </section>
+
+          <section id="troubleshooting">
+            <h2>Troubleshooting</h2>
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Symptom</th>
+                  <th>Cause</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Blank white page in the browser build</td>
+                  <td>
+                    A floated Expo dependency. Keep <code>expo-font</code> pinned and move
+                    <code>expo</code>, <code>expo-font</code> and <code>@expo/vector-icons</code>
+                    together if you upgrade.
+                  </td>
+                </tr>
+                <tr>
+                  <td>The paywall says “Preview” in a build where keys are set</td>
+                  <td>
+                    The variable is missing from that environment. EAS does not read a local
+                    <code>.env</code>; set the variables per environment and rebuild.
+                  </td>
+                </tr>
+                <tr>
+                  <td>A purchase succeeds but Pro stays off</td>
+                  <td>
+                    The entitlement identifier does not match. It must be <code>collos_pro</code>
+                    unless <code>EXPO_PUBLIC_REVENUECAT_ENTITLEMENT</code> says otherwise.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Plans never load</td>
+                  <td>No <strong>default</strong> offering, or packages missing from it.</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section id="support">
+            <h2>Support</h2>
+            <p>
+              Questions about a purchase, a bug, or something this page does not answer: email
+              <a href="mailto:sithunyein.mailto@gmail.com">sithunyein.mailto@gmail.com</a>, or open an
+              issue on <a href="https://github.com/thesithunyein/collos/issues">GitHub</a>. Include
+              the app user ID from Settings if it is about a subscription — it is the fastest way to
+              find the record.
+            </p>
+            <p class="legal-back">
+              <a class="button button-outline" href="/">Back to Collos</a>
+            </p>
+          </section>
+        </article>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-grid">
+        <div>
+          <a class="brand footer-brand" href="/"
+            ><img class="brand-mark" src="logo.png" width="36" height="36" alt="" /><span>collos</span></a
+          >
+          <p>Care coordination for the small things that matter.</p>
+        </div>
+        <div>
+          <p class="footer-heading">Explore</p>
+          <a href="/#how-it-works">How it works</a>
+          <a href="/#plans">Plans</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/docs">Docs</a>
+          <a href="privacy">Privacy</a>
+          <a href="terms">Terms</a>
+          <a href="https://github.com/thesithunyein/collos" target="_blank" rel="noreferrer">GitHub &#8599;</a>
+        </div>
+        <div>
+          <p class="footer-heading">A note on safety</p>
+          <p>
+            Collos is for care coordination only. It is not medical advice and does not replace a
+            qualified care professional.
+          </p>
+        </div>
+      </div>
+      <div class="shell footer-bottom"><span>&copy; 2026 Collos</span><span>Made for everyday care.</span></div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

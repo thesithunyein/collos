@@ -117,6 +117,17 @@ Web mode runs the full interaction flow. Web purchases bill through RevenueCat B
 ## Public landing page
 
 The static marketing site lives in `landing/` so it can deploy independently without changing the Expo app. It uses the existing Collos brand direction and has no runtime dependencies.
+
+The page is one file plus a docs page, and each section has a rule about what it may say:
+
+| Surface | What it must match |
+| --- | --- |
+| `#how-it-works` | The three steps are the real flow; the little UI fragments are the app's own components, not invented art. |
+| `#plans` | The prices and the free-tier limit are the live RevenueCat offering and `FREE_NOTES_PER_DAY`. Change one, change the other. |
+| `#faq` | Every answer describes shipped behaviour, including the ones that admit a gap (no cross-device circle yet). Native `<details>` with `name="faq"`, so it works before the JavaScript loads. |
+| `docs.html` | The architecture, the environment variables and the troubleshooting table must stay true to this README and to `RELEASE.md`. |
+
+`docs.html` is the written half of the product: what the app is not, where the data lives, what Pro changes in code, how to run it locally, and the traps this project has already fallen into. `vercel.json` sets `cleanUrls`, so it is reachable at `/docs`, and the landing nav links there. The FAQ is also published as `FAQPage` structured data in `index.html`, which is why those two files have to be edited together.
 The two phone previews are real captures of the running app (`landing/app-onboarding.png` and `landing/app-dashboard.png`), not hand-built CSS mockups. The cat logo at the top of this README is the source of truth for every icon: `python assets/make-icons.py` regenerates the App Store icon, the Android adaptive foreground, both favicons, and the splash mark from it. The site therefore cannot advertise a dashboard the app does not render: an earlier mockup kept claiming "50%" and "2 of 4 confirmed" months after the app showed 25% and 1 of 4. Re-capture them after any UI change so the two stay in sync:
 
 ```bash
