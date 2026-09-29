@@ -8,9 +8,9 @@ import * as fileStore from "./fileStore";
 /**
  * Device-local persistence for the care plan.
  *
- * Before this module the whole app lived in `useState`: a judge who confirmed a
- * task and reloaded the page watched the app forget. Now every status change
- * survives a restart, on web and on device.
+ * Before this module the whole app lived in `useState`: confirming a task and
+ * reloading the page made the app forget it. Now every status change survives a
+ * restart, on web and on device.
  *
  * The point is deliberately *device-local*: nothing leaves the device, which
  * matches what the privacy policy and the store listing actually claim. Sharing a
@@ -40,22 +40,42 @@ export type StoredTask = {
   tone: CareTask["tone"];
 };
 
+export type StoredNote = {
+  id: string;
+  recipientId: string;
+  text: string;
+  /** Local calendar day, `YYYY-MM-DD`. Drives the free plan's one-a-day limit. */
+  day: string;
+  /** ISO timestamp, for ordering. */
+  createdAt: string;
+};
+
 export type StoredState = {
   version: 1;
   /** Per recipient, per task: the last status the user chose for it. */
   statuses: Record<string, Record<string, TaskStatus>>;
   /** Moments the user added themselves, kept separately from the built-ins. */
   customTasks: Record<string, StoredTask[]>;
+  /** Notes left for whoever picks up the plan next. Newest first. */
+  notes: StoredNote[];
   /** The recipient last viewed, so a restart reopens the same plan. */
   activeRecipientId: string | null;
   seenOnboarding: boolean;
 };
+
+/**
+ * The free plan keeps one note a day; Collos Pro keeps as many as you like.
+ * This is the entitlement's only paid feature, so it has to be enforced for
+ * real rather than described.
+ */
+export const FREE_NOTES_PER_DAY = 1;
 
 export function emptyStoredState(): StoredState {
   return {
     version: 1,
     statuses: {},
     customTasks: {},
+    notes: [],
     activeRecipientId: null,
     seenOnboarding: false,
   };
@@ -72,6 +92,8 @@ function parse(raw: string | null): StoredState | null {
       version: 1,
       statuses: parsed.statuses ?? {},
       customTasks: parsed.customTasks ?? {},
+      // Notes arrived after v1 shipped, so an older payload must still load.
+      notes: Array.isArray(parsed.notes) ? parsed.notes : [],
       activeRecipientId: parsed.activeRecipientId ?? null,
       seenOnboarding: Boolean(parsed.seenOnboarding),
     };
@@ -183,4 +205,46 @@ export function tasksForRecipient(state: StoredState, recipient: CareRecipient):
 
 export function newMomentId(): string {
   return `moment-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
+}
+
+/* --- notes ----------------------------------------------------------------- */
+
+/** Local date key. `toISOString` would shift the day for anyone east of UTC. */
+export function todayKey(now: Date = new Date()): string {
+  const month = `${now.getMonth() + 1}`.padStart(2, "0");
+  const day = `${now.getDate()}`.padStart(2, "0");
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+export function withAddedNote(
+  state: StoredState,
+  recipientId: string,
+  text: string,
+): StoredState {
+  const note: StoredNote = {
+    id: `note-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`,
+    recipientId,
+    text,
+    day: todayKey(),
+    createdAt: new Date().toISOString(),
+  };
+  return {
+    ...state,
+    seenOnboarding: true,
+    activeRecipientId: recipientId,
+    notes: [note, ...state.notes],
+  };
+}
+
+/** Newest first. */
+export function notesForRecipient(state: StoredState, recipientId: string): StoredNote[] {
+  return state.notes.filter((note) => note.recipientId === recipientId);
+}
+
+export function notesLeftToday(state: StoredState, recipientId: string): number {
+  const today = todayKey();
+  const used = state.notes.filter(
+    (note) => note.recipientId === recipientId && note.day === today,
+  ).length;
+  return Math.max(0, FREE_NOTES_PER_DAY - used);
 }

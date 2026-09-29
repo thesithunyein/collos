@@ -16,8 +16,8 @@ const TONES = {
 /**
  * One moment on today's plan. The check button now *moves*: a quick press
  * shrinks the card a few percent and springs it back on release, so a confirm
- * reads as a physical action rather than a repaint — this is the tap a demo
- * video leans on, so it should feel the best in the app.
+ * reads as a physical action rather than a repaint. It is the tap people
+ * repeat most often, so it is the one that has to feel best.
  */
 export function TaskCard({
   task,

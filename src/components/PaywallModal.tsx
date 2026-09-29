@@ -16,15 +16,16 @@ import type { ProController } from "../purchases/usePro";
 import { colors, insets, shape } from "../theme";
 
 /**
- * Only list what the entitlement actually unlocks. Reminders were advertised here
- * long before any notification code existed, which is a store-review rejection
- * (guideline 2.3.1) and the same drift that once put a "50%" dashboard on the
- * landing page. Add the line back in the same change that ships delivery.
+ * Only list what the entitlement actually unlocks, and only what is shipped.
+ * Reminders were advertised here long before any notification code existed
+ * (a store-review rejection, guideline 2.3.1), and invites were listed after
+ * the shared circle was deferred. Both are gone: each line below is a thing a
+ * person can do the moment they pay, which is why shared notes is one of them.
  */
 const FEATURES = [
-  "Invite more people to your care circle",
-  "Save shared notes in one calm place",
-  "Keep the whole circle on one plan",
+  "Unlimited shared notes, not one a day",
+  "Every note kept in one calm place on your device",
+  "Notes still there after a restart",
 ];
 
 export function PaywallModal({
@@ -72,7 +73,7 @@ export function PaywallModal({
             </View>
             <Text style={styles.modalTitle}>More room for care</Text>
             <Text style={styles.modalText}>
-              Keep your circle in sync with shared notes and room for everyone who helps.
+              Leave as many notes as your circle needs, kept on the device that needs them.
             </Text>
 
             <View style={styles.featureList}>
@@ -185,7 +186,7 @@ export function PaywallModal({
 
             {pro.mode === "preview" ? (
               <Text style={styles.storeNote}>
-                Preview build · RevenueCat isn’t connected in this environment yet, so no payment is taken.
+                Preview mode · no payment is taken here. Prices are the live Collos plans.
               </Text>
             ) : (
               <Text style={styles.storeNote}>{storeNote()}</Text>

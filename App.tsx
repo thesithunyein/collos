@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { NavItem } from "./src/components/NavItem";
 import { PaywallModal } from "./src/components/PaywallModal";
 import { AddMomentSheet } from "./src/components/AddMomentSheet";
+import { NotesSheet } from "./src/components/NotesSheet";
 import type { CareRecipient } from "./src/data/mockCare";
 import { mockRecipients } from "./src/data/mockCare";
 import type { TaskStatus } from "./src/data/mockCare";
@@ -20,9 +21,13 @@ import {
   emptyStoredState,
   loadStoredState,
   newMomentId,
+  notesForRecipient,
+  notesLeftToday,
   saveStoredState,
   tasksForRecipient,
+  todayKey,
   withActiveRecipient,
+  withAddedNote,
   withCustomMoment,
   withResetDay,
   withTaskStatus,
@@ -31,46 +36,32 @@ import {
 type Stage = "onboarding" | "app";
 type Tab = "today" | "circle" | "settings";
 
-/** Duration of the cross-fade when switching tabs, kept subtle on purpose. */
-const TAB_FADE_MS = 150;
-
 export default function App() {
   // `hydrated` gates first paint: without it the app renders the default plan,
   // then snaps to the persisted one — a visible flicker and, worse, a moment
-  // where a judge pressing "Confirm" would write onto unpersisted state.
+  // where a tap on "Confirm" would write onto unpersisted state.
   const [hydrated, setHydrated] = useState(false);
   const [stored, setStored] = useState<StoredState>(emptyStoredState);
   const [stage, setStage] = useState<Stage>("onboarding");
   const [tab, setTab] = useState<Tab>("today");
   const [isPaywallOpen, setPaywallOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [loadError, setLoadError] = useState(false);
   const [notice, setNotice] = useState("");
   const [isAddingMoment, setAddingMoment] = useState(false);
+  const [isNotesOpen, setNotesOpen] = useState(false);
 
-  // Tab cross-fade: the screen content fades and lifts a few pixels on every
-  // tab change, so navigation reads as motion instead of a hard repaint.
-  const contentFade = useRef(new Animated.Value(1)).current;
-  // Mirrors `tab` so the rapid-tap guard can read the latest value without
-  // being rebuilt on every render (same pattern as `storedRef` below).
-  const tabRef = useRef<Tab>("today");
-  const changeTab = useCallback((nextTab: Tab) => {
-    if (nextTab === tabRef.current) return;
-    tabRef.current = nextTab;
-    setTab(nextTab);
-    Animated.sequence([
-        Animated.timing(contentFade, {
-          toValue: 0,
-          duration: TAB_FADE_MS / 2,
-          useNativeDriver: nativeAnimDriver,
-        }),
-        Animated.timing(contentFade, {
-          toValue: 1,
-          duration: TAB_FADE_MS,
-          useNativeDriver: nativeAnimDriver,
-        }),
-      ]).start();
-  }, [contentFade]);
+  /**
+   * Switching tabs is a plain state change on purpose.
+   *
+   * This used to wrap the tab bar in an `Animated.View` to cross-fade it, which
+   * quietly broke every sheet in the app: React Native Web renders `Modal`
+   * inside the app tree, and a transformed ancestor becomes the containing
+   * block for its `position: fixed` content, so the notes sheet, the add-moment
+   * sheet and the paywall were laid out inside the 76px tab bar and clipped by
+   * the frame instead of covering the screen. The tab icons still spring on
+   * their own; navigation does not need a transition that costs correctness.
+   */
+  const changeTab = useCallback((nextTab: Tab) => setTab(nextTab), []);
 
   // The notice toast rises into place on the native driver when it appears;
   // exit stays instant because it is only 2.8s and a slow exit reads as lag.
@@ -127,6 +118,21 @@ export default function App() {
   const completedCount = tasks.filter((task) => task.status === "confirmed").length;
   const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
 
+  // Notes are real, persisted state — the one paid feature, so the whole circle
+  // screen and the Today strip read from it rather than from sample numbers.
+  const recipientNotes = useMemo(() => notesForRecipient(stored, recipient.id), [stored, recipient]);
+  const notesToday = useMemo(() => {
+    const today = todayKey();
+    return stored.notes.filter((note) => note.day === today).length;
+  }, [stored.notes]);
+  const confirmedTodayByRecipientId = useMemo(() => {
+    const result: Record<string, boolean> = {};
+    for (const item of mockRecipients) {
+      result[item.id] = tasksForRecipient(stored, item).some((task) => task.status === "confirmed");
+    }
+    return result;
+  }, [stored]);
+
   const showNotice = (message: string) => {
     setNotice(message);
     setTimeout(() => setNotice(""), 2800);
@@ -148,7 +154,7 @@ export default function App() {
     if (!pro.pro || !isPaywallOpen) return;
     const timer = setTimeout(() => {
       setPaywallOpen(false);
-      showNotice("Collos Pro unlocked — shared notes and invites are open.");
+      showNotice("Collos Pro unlocked — unlimited shared notes are on.");
     }, 1100);
     return () => clearTimeout(timer);
   }, [pro.pro, isPaywallOpen]);
@@ -181,19 +187,19 @@ export default function App() {
     mutate(withResetDay(storedRef.current, recipient.id));
     showNotice(`Today’s moments for ${recipient.name} are open again.`);
   };
+  const saveNote = (text: string) => {
+    mutate(withAddedNote(storedRef.current, recipient.id, text));
+    showNotice(`Note saved for ${recipient.name} — kept on this device.`);
+  };
+
+  const openNotes = () => setNotesOpen(true);
+
   const resetAllData = async () => {
     await clearStoredState();
     setStored(emptyStoredState());
     storedRef.current = emptyStoredState();
     setStage("onboarding");
-    tabRef.current = "today";
     setTab("today");
-  };
-
-  const retryLoad = () => {
-    setLoadError(false);
-    setLoading(true);
-    setTimeout(() => setLoading(false), 450);
   };
 
   if (!hydrated) {
@@ -224,49 +230,40 @@ export default function App() {
             completedCount={completedCount}
             progress={progress}
             isLoading={isLoading}
-            loadError={loadError}
             pro={pro.pro}
+            noteCount={recipientNotes.length}
             onSelectRecipient={selectRecipient}
             onUpdateTask={updateTask}
-            onRetry={retryLoad}
-            onAddRecipient={() =>
-              showNotice(
-                pro.pro
-                  ? "Recipient invites are ready to connect."
-                  : "Inviting more recipients is part of Collos Pro.",
-              )
-            }
             onEditPlan={resetDay}
             onAddMoment={() => setAddingMoment(true)}
             onOpenPaywall={() => setPaywallOpen(true)}
-            onOpenSharedNotes={() => showNotice("Your shared notes will appear here.")}
+            onOpenNotes={openNotes}
+            onOpenAccount={() => changeTab("settings")}
           />
         ) : tab === "circle" ? (
           <CircleScreen
             recipients={mockRecipients}
+            confirmedTodayByRecipientId={confirmedTodayByRecipientId}
+            notesToday={notesToday}
+            notesTotal={stored.notes.length}
             pro={pro.pro}
+            onOpenNotes={openNotes}
             onUnlock={() => setPaywallOpen(true)}
-            onInvite={() => showNotice("Send an invite link to anyone you trust.")}
           />
         ) : (
           <SettingsScreen pro={pro} onResetData={resetAllData} />
         )}
 
-        <Animated.View
-          pointerEvents="box-none"
-          style={[styles.tabLayer, { opacity: contentFade }]}
-        >
-          <View style={styles.bottomNav}>
-            <NavItem icon="grid-outline" label="Today" active={tab === "today"} onPress={() => changeTab("today")} />
-            <NavItem icon="people-outline" label="Circle" active={tab === "circle"} onPress={() => changeTab("circle")} />
-            <NavItem
-              icon="settings-outline"
-              label="Settings"
-              active={tab === "settings"}
-              onPress={() => changeTab("settings")}
-            />
-          </View>
-        </Animated.View>
+        <View style={styles.bottomNav}>
+          <NavItem icon="grid-outline" label="Today" active={tab === "today"} onPress={() => changeTab("today")} />
+          <NavItem icon="people-outline" label="Circle" active={tab === "circle"} onPress={() => changeTab("circle")} />
+          <NavItem
+            icon="settings-outline"
+            label="Settings"
+            active={tab === "settings"}
+            onPress={() => changeTab("settings")}
+          />
+        </View>
 
         {noticeShown ? (
           <Animated.View
@@ -295,6 +292,20 @@ export default function App() {
           visible={isAddingMoment}
           onClose={() => setAddingMoment(false)}
           onSubmit={addMoment}
+        />
+
+        <NotesSheet
+          visible={isNotesOpen}
+          recipientName={recipient.name}
+          notes={recipientNotes}
+          pro={pro.pro}
+          notesLeftToday={notesLeftToday(stored, recipient.id)}
+          onClose={() => setNotesOpen(false)}
+          onSave={saveNote}
+          onUnlock={() => {
+            setNotesOpen(false);
+            setPaywallOpen(true);
+          }}
         />
 
         <PaywallModal
@@ -370,7 +381,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
   },
-  tabLayer: { position: "absolute", left: 0, right: 0, bottom: 0 },
   notice: {
     position: "absolute",
     left: 20,

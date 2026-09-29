@@ -16,8 +16,8 @@ import {
  *                restores and entitlement checks all hit RevenueCat.
  *  - `preview` — no key configured yet. The UI still renders a complete, honest
  *                purchase flow against clearly-labelled sample plans so the public
- *                demo is not a dead end. Nothing is charged and nothing pretends
- *                to be a real transaction.
+ *                web build is not a dead end. Nothing is charged and nothing
+ *                pretends to be a real transaction.
  */
 
 export type ProMode = "live" | "preview";
@@ -284,8 +284,8 @@ export function purchaseErrorMessage(error: unknown): string {
 }
 
 /**
- * Runs a purchase. In preview mode this unlocks locally and says so, so the demo
- * flow is complete without ever implying a real transaction took place.
+ * Runs a purchase. In preview mode this unlocks locally and says so, so the flow
+ * is complete without ever implying a real transaction took place.
  */
 export async function purchasePlan(plan: PlanOption): Promise<PurchaseOutcome> {
   // No SDK key, or an offering came back without a real package: this is a preview

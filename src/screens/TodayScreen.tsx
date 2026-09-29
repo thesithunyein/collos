@@ -4,20 +4,28 @@ import React, { useEffect, useRef, useState } from "react";
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TaskCard } from "../components/TaskCard";
 import type { CareRecipient, CareTask, TaskStatus } from "../data/mockCare";
-import { colors, insets, nativeAnimDriver, shape } from "../theme";
+import { colors, insets, shape } from "../theme";
 
 /**
- * The hero's progress number counts up on mount and eases to each new value,
- * so the signature demo beat — confirming a moment and watching the plan
- * respond — reads as motion, not a repaint. Capped-duration tween: with the
- * default 400ms cap the ring visibly ticks 0→100 rather than snapping.
+ * The hero's progress number eases from its previous value to each new one, so
+ * confirming a moment and watching the plan respond reads as motion rather
+ * than a repaint.
+ *
+ * Two details matter. It starts *at* the current value and never at zero: the
+ * number is read from a JS listener, and a tween that began at 0 showed `0%`
+ * next to "1 of 4 confirmed" for anyone who looked before the animation ran
+ * (a throttled background tab never runs it at all). And it deliberately uses
+ * the JS driver rather than the native one, because a native-driven value is
+ * not readable from JS — the label would sit at its initial value forever.
+ * The ring itself is unchanged; only this label is animated.
  */
 function useCountUp(target: number, duration = 400): Animated.Value {
-  const value = useRef(new Animated.Value(0)).current;
-  const current = useRef(0);
+  const value = useRef(new Animated.Value(target)).current;
+  const current = useRef(target);
 
   useEffect(() => {
     const from = current.current;
+    if (from === target) return;
     const listenerId = value.addListener(({ value: shown }) => {
       current.current = shown;
     });
@@ -25,7 +33,7 @@ function useCountUp(target: number, duration = 400): Animated.Value {
       toValue: target,
       duration: Math.min(duration, 260 + Math.abs(target - from) * 3),
       easing: Easing.out(Easing.quad),
-      useNativeDriver: nativeAnimDriver,
+      useNativeDriver: false,
     }).start();
     return () => value.removeListener(listenerId);
   }, [target, duration, value]);
@@ -37,14 +45,14 @@ function ProgressRing({ progress }: { progress: number }) {
   const animated = useCountUp(progress);
   return (
     <View style={styles.progressRing}>
-      <CountedProgress value={animated} />
+      <CountedProgress value={animated} initial={progress} />
       <Text style={styles.progressLabel}>done</Text>
     </View>
   );
 }
 
-function CountedProgress({ value }: { value: Animated.Value }) {
-  const [label, setLabel] = useState(0);
+function CountedProgress({ value, initial }: { value: Animated.Value; initial: number }) {
+  const [label, setLabel] = useState(initial);
   useEffect(() => {
     const id = value.addListener(({ value: shown }) => setLabel(Math.round(shown)));
     return () => value.removeListener(id);
@@ -59,16 +67,17 @@ export type TodayScreenProps = {
   completedCount: number;
   progress: number;
   isLoading: boolean;
-  loadError: boolean;
   pro: boolean;
+  /** Notes kept for this recipient on this device. */
+  noteCount: number;
   onSelectRecipient: (recipient: CareRecipient) => void;
   onUpdateTask: (taskId: string, status: TaskStatus) => void;
-  onRetry: () => void;
-  onAddRecipient: () => void;
   onEditPlan: () => void;
   onAddMoment: () => void;
   onOpenPaywall: () => void;
-  onOpenSharedNotes: () => void;
+  onOpenNotes: () => void;
+  /** The avatar is the way into your account and settings. */
+  onOpenAccount: () => void;
 };
 
 export function TodayScreen({
@@ -78,16 +87,15 @@ export function TodayScreen({
   completedCount,
   progress,
   isLoading,
-  loadError,
   pro,
+  noteCount,
   onSelectRecipient,
   onUpdateTask,
-  onRetry,
-  onAddRecipient,
   onEditPlan,
   onAddMoment,
   onOpenPaywall,
-  onOpenSharedNotes,
+  onOpenNotes,
+  onOpenAccount,
 }: TodayScreenProps) {
   return (
     <View style={styles.app}>
@@ -103,7 +111,8 @@ export function TodayScreen({
           </View>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Open profile"
+            accessibilityLabel="Open your account and settings"
+            onPress={onOpenAccount}
             style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}
           >
             <Text style={styles.avatarText}>S</Text>
@@ -151,30 +160,10 @@ export function TodayScreen({
                 </Pressable>
               );
             })}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Add a care recipient"
-              onPress={onAddRecipient}
-              style={({ pressed }) => [styles.addRecipient, pressed && styles.pressed]}
-            >
-              <Ionicons name="add" size={20} color={colors.blue} />
-              <Text style={styles.addRecipientText}>Add</Text>
-            </Pressable>
           </ScrollView>
         </View>
 
-        {loadError ? (
-          <View style={styles.errorCard}>
-            <Ionicons name="cloud-offline-outline" size={22} color={colors.danger} />
-            <View style={styles.errorCopy}>
-              <Text style={styles.errorTitle}>Couldn’t load today’s plan</Text>
-              <Text style={styles.errorText}>Check your connection and try again.</Text>
-            </View>
-            <Pressable accessibilityRole="button" onPress={onRetry} style={styles.retryButton}>
-              <Text style={styles.retryText}>Retry</Text>
-            </Pressable>
-          </View>
-        ) : isLoading ? (
+        {isLoading ? (
           <View style={styles.skeletonStack} accessibilityLabel="Loading care plan">
             <View style={[styles.skeleton, styles.skeletonHero]} />
             <View style={styles.skeleton} />
@@ -252,7 +241,12 @@ export function TodayScreen({
               </View>
             )}
 
-            <SharedNotesStrip pro={pro} onOpen={onOpenSharedNotes} onUnlock={onOpenPaywall} />
+            <SharedNotesStrip
+              pro={pro}
+              noteCount={noteCount}
+              recipientName={recipient.name}
+              onOpen={onOpenNotes}
+            />
 
             <Pressable
               accessibilityRole="button"
@@ -272,8 +266,8 @@ export function TodayScreen({
                 </View>
                 <Text style={styles.proText}>
                   {pro
-                    ? "Shared notes and unlimited invites are unlocked."
-                    : "Shared notes and more space for your circle."}
+                    ? "Unlimited shared notes are unlocked."
+                    : "One shared note a day. Pro keeps as many as you like."}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={colors.blue} />
@@ -311,40 +305,46 @@ function greeting(): string {
 }
 
 /**
- * The surface that proves the entitlement does something: free users see a
- * locked preview, Pro users get the real thing.
+ * The way into shared notes — the feature the entitlement actually sells. Both
+ * tiers open the same sheet; the free plan is limited inside it, so nobody hits
+ * a wall before they have seen what the feature is.
  */
 function SharedNotesStrip({
   pro,
+  noteCount,
+  recipientName,
   onOpen,
-  onUnlock,
 }: {
   pro: boolean;
+  noteCount: number;
+  recipientName: string;
   onOpen: () => void;
-  onUnlock: () => void;
 }) {
+  const kept =
+    noteCount === 0
+      ? "No notes yet — leave the first one."
+      : `${noteCount} note${noteCount === 1 ? "" : "s"} kept for ${recipientName} on this device.`;
+
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={pro ? "Open shared notes" : "Unlock shared notes with Collos Pro"}
-      onPress={pro ? onOpen : onUnlock}
+      accessibilityLabel={
+        pro ? `Open shared notes, ${noteCount} saved` : "Open shared notes, free plan"
+      }
+      onPress={onOpen}
       style={({ pressed }) => [styles.notesCard, pressed && styles.pressed]}
     >
       <View style={styles.notesIcon}>
-        <Ionicons name={pro ? "chatbubble-ellipses" : "lock-closed"} size={17} color={colors.blue} />
+        <Ionicons name="chatbubble-ellipses" size={17} color={colors.blue} />
       </View>
       <View style={styles.notesCopy}>
         <View style={styles.notesTitleRow}>
           <Text style={styles.notesTitle}>Shared notes</Text>
-          {!pro ? <Text style={styles.notesLockBadge}>PRO</Text> : null}
+          {!pro ? <Text style={styles.notesLockBadge}>1 / DAY</Text> : null}
         </View>
-        <Text style={styles.notesText}>
-          {pro
-            ? "Leave a note for the next person who picks up the plan."
-            : "Everyone in your circle can leave one calm note a day."}
-        </Text>
+        <Text style={styles.notesText}>{pro ? kept : "The free plan keeps one note a day. Pro keeps as many as you like."}</Text>
       </View>
-      <Ionicons name={pro ? "chevron-forward" : "lock-closed-outline"} size={18} color={colors.muted} />
+      <Ionicons name="chevron-forward" size={18} color={colors.muted} />
     </Pressable>
   );
 }
@@ -426,19 +426,6 @@ const styles = StyleSheet.create({
   chipNameSelected: { color: colors.white },
   chipRelationship: { color: colors.muted, fontSize: 11, marginTop: 2 },
   chipRelationshipSelected: { color: colors.blueTint },
-  addRecipient: {
-    minHeight: 60,
-    minWidth: 66,
-    borderRadius: 17,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderStyle: "dashed",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
-    backgroundColor: colors.white,
-  },
-  addRecipientText: { color: colors.blue, fontSize: 11, fontWeight: "700" },
   heroGlowWrap: { position: "relative" },
   heroGlowLarge: {
     position: "absolute",
@@ -560,21 +547,6 @@ const styles = StyleSheet.create({
   skeletonStack: { gap: 12 },
   skeleton: { height: 112, borderRadius: 22, backgroundColor: colors.skeleton },
   skeletonHero: { height: 154 },
-  errorCard: {
-    backgroundColor: colors.errorWash,
-    borderColor: colors.errorBorder,
-    borderWidth: 1,
-    borderRadius: 18,
-    padding: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  errorCopy: { flex: 1 },
-  errorTitle: { color: colors.ink, fontSize: 13, fontWeight: "800" },
-  errorText: { color: colors.muted, fontSize: 11, marginTop: 3 },
-  retryButton: { minHeight: 40, justifyContent: "center", paddingHorizontal: 10 },
-  retryText: { color: colors.danger, fontSize: 12, fontWeight: "800" },
   emptyCard: {
     backgroundColor: colors.white,
     borderRadius: 20,

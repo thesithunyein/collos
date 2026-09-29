@@ -98,7 +98,7 @@ GENTLE, NOT DEMANDING
 Collos is built for people who are already doing a lot, and it is designed to take one small thing off your plate. No streaks, no scores, no pressure.
 
 COLLOS PRO
-Collos Pro adds unlimited invites and shared notes to your care circle, as a monthly or annual subscription. Payment is charged to your store account and renews until you cancel; manage or cancel it in your account settings.
+Collos Pro removes the shared-notes limit for everyone in your care circle, as a monthly or annual subscription. Payment is charged to your store account and renews until you cancel; manage or cancel it in your account settings.
 
 PRIVATE BY DESIGN
 Your care circle is yours. Collos does not sell data, does not show ads, and does not require a social account. There is no medical record and no diagnosis anywhere in the app.
@@ -126,15 +126,16 @@ To reach the subscription:
 2. Tap "Circle" in the bottom navigation.
 3. Tap "Unlock with Pro" to open the paywall. It loads live packages from the
    default RevenueCat offering, so the StoreKit price sheet is real.
-4. A 7-day free trial is attached to the monthly package. No promo code is needed.
+4. Tapping "Continue with Pro" opens the real StoreKit price sheet for the monthly or
+   annual package. Nothing is charged to a reviewer account.
 
 The "Settings" tab shows the RevenueCat app user ID, the entitlement identifier
 ("pro") and the project ID, and provides "Restore purchases" and
 "Manage subscription".
 
-The entitlement is not cosmetic: with Pro active, the Circle screen unlocks
-multiple invites and unlimited shared notes. Compare step 2 with the same screen
-after purchasing.
+The entitlement is not cosmetic: the free plan keeps one shared note a day per
+person, and the Circle screen unlocks unlimited notes once Pro is active. Compare
+step 2 with the same screen after purchasing.
 
 Collos makes no medical claims and contains no medical records.
 ```

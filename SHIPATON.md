@@ -134,8 +134,9 @@ remain open and store review remains unreachable before the deadline.
   packages, shows the real localised price, preselects the highlighted plan,
   computes a per-month equivalent and a "save X%" badge, and handles cancelled,
   failed, and already-subscribed outcomes separately.
-- **The entitlement gates real UI.** Pro is not decorative: the care-circle invites
-  and shared notes are gated, and unlocking Pro visibly changes the Circle screen.
+- **The entitlement gates real UI.** Pro is not decorative: shared notes are capped at
+  one a day per person on the free plan, and unlocking Pro lifts that cap and visibly
+  changes the Circle screen.
 - **Three real screens instead of two.** "Circle" and "Settings" were toast stubs
   ("Settings are coming in a future build"). Both are real now. Settings carries
   Restore purchases, Manage subscription, and a store-connection panel showing the
@@ -284,8 +285,8 @@ violating it risks the whole entry.
 | 0:00–0:15 | Onboarding screen | "This is Collos. When you help look after someone, the little things are the first to slip — did she drink water, did anyone actually check in, who is visiting on Sunday. Collos is one calm place for a care circle to keep track." |
 | 0:15–0:40 | Tap *Set up my care circle*, dashboard | "You set up who you're caring for, and each day gets a short care plan. Confirm what happened, skip what didn't." |
 | 0:40–1:00 | Tap *Confirm* on Water break, watch 25% become 50% | "Every confirmation is saved the moment you tap it — close the app, come back tomorrow, and the plan still remembers. Nothing you confirmed gets lost." |
-| 1:00–1:20 | Circle tab, free state | "The Circle tab shows everyone involved. On the free plan you get one helper and one shared note a day — that's a deliberate limit, not a paywall on a core feature." |
-| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro adds unlimited invites and unlimited shared notes. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
+| 1:00–1:20 | Circle tab (free), then Today → *Shared notes* and write one | "The Circle tab shows who is in the plan and who has checked in today. Shared notes are the one thing the free plan caps — one a day for each person — and they are kept on this device, still there after a restart." |
+| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro lifts the shared-notes limit — one a day per person on the free plan, as many as your circle needs on Pro. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
 | 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.74.5, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
 
 Do not use copyrighted music or any third party's trademarks.
@@ -345,8 +346,8 @@ Recipients are switched with one tap when you are caring for more than one perso
 you can add your own moments to any plan. The Circle screen shows who is involved and
 who has checked in today.
 
-**How it makes money.** A free tier covering one helper and one shared note a day, and
-Collos Pro — unlimited invites and unlimited shared notes — as a monthly or annual
+**How it makes money.** A free tier covering the full daily plan and one shared note a
+day per person, and Collos Pro — unlimited shared notes — as a monthly or annual
 subscription through RevenueCat. The entitlement is enforced in the
 UI, not just displayed.
 
@@ -391,7 +392,7 @@ one person who ends up carrying the mental load alone.
 | Demo video | Public YouTube/Vimeo link, once recorded (§6) |
 | Built with | React Native, Expo, TypeScript, RevenueCat |
 | **Student email** | `sithunyein@my.uopeople.edu` — **confirmed by the organisers 29 Sep**, and the address they explicitly told you to enter in this field |
-| RevenueCat project ID | `prj_…` — the value set as `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` in Vercel; the app's **Settings** screen displays it |
+| RevenueCat project ID | `projaa1359ce` — the value set as `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` in Vercel; the app's **Settings → Store connection** screen displays the same value, so a reviewer can compare the two |
 | Screenshot | Any file from `submission/screenshots/` (1179×2556, no device frame) |
 | Icon | `assets/icon.png` (1024×1024) |
 | Category | **Next Gen Award** — plus Design Award and Peace Prize only if you can evidence them (§8) |

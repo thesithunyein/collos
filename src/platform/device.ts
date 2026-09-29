@@ -1,11 +1,11 @@
 /**
  * What this build is actually running on, read from the app at runtime.
  *
- * The Settings screen shows these values so that anyone watching the demo — or
- * reading the repository — can tell the native app apart from the web export of
- * the same codebase. Nothing here is a hard-coded label: the platform, OS
+ * The Settings screen shows these values so that anyone using the app — or
+ * reading the repository — can tell the native build apart from the web export
+ * of the same codebase. Nothing here is a hard-coded label: the platform, OS
  * version, device name and React Native runtime come from the process that is
- * being demoed, and the app identifier comes from `app.json`, which is also
+ * actually running, and the app identifier comes from `app.json`, which is also
  * what EAS reads when it builds the iOS and Android binaries.
  *
  * `expo-constants` would answer some of this, but it is only a transitive

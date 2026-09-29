@@ -26,6 +26,12 @@
  *   node scripts/capture-app-screenshots.mjs --set playstore
  *   node scripts/capture-app-screenshots.mjs --base-url http://localhost:8081 --out-dir landing
  *
+ * `--only 04-paywall` runs the tour only as far as the screenshots you name and
+ * writes just those, which is how the paywall shot is taken against the live app
+ * (where the real RevenueCat offering loads) without ever pressing *Continue with
+ * Pro* — a purchase there would leave the browser on Stripe, not on the app.
+ * Separate several with commas: `--only 03-circle-free,04-paywall`.
+ *
  * Requires a local Chrome or Edge. Override with CHROME_PATH if neither is found
  * in the usual places. No npm dependencies: it talks to the browser over the
  * DevTools protocol using Node's built-in WebSocket.
@@ -45,6 +51,7 @@ const arg = (name, fallback) => {
 };
 
 const SET = arg("set", "landing");
+const ONLY = arg("only", "");
 if (!["landing", "devpost", "appstore", "playstore"].includes(SET)) {
   console.error(
     `Unknown --set "${SET}". Use "landing", "devpost", "appstore" or "playstore".`,
@@ -111,7 +118,7 @@ const APP_TOUR = [
     file: "03-circle-free.png",
     label: "care circle (free)",
     press: "Circle",
-    expect: "Invite more people",
+    expect: "Unlimited shared notes",
   },
   {
     file: "04-paywall.png",
@@ -123,7 +130,7 @@ const APP_TOUR = [
     file: "05-circle-pro.png",
     label: "care circle (Pro unlocked)",
     press: "Continue with Pro",
-    expect: "Invites are unlocked",
+    expect: "Unlimited notes are on",
     settleMs: 1400,
   },
   {
@@ -394,7 +401,17 @@ try {
   await cdp.evaluate("document.fonts && document.fonts.ready");
   await sleep(900);
 
-  for (const step of flow) {
+  // `--only` narrows what gets written, and stops the tour once the last named
+  // step is captured so a step that only exists for a later screenshot (like the
+  // live purchase) never runs.
+  const isSelected = (file) =>
+    !ONLY || ONLY.split(",").some((token) => file.includes(token.trim()));
+  const lastWanted = ONLY
+    ? flow.reduce((last, step, index) => (isSelected(step.file) ? index : last), -1)
+    : flow.length - 1;
+
+  for (const [index, step] of flow.entries()) {
+    if (index > lastWanted) break;
     if (step.press) {
       if (!(await cdp.scrollTo(step.press))) {
         throw new Error(`Could not find a control matching ${JSON.stringify(step.press)}`);
@@ -420,7 +437,7 @@ try {
       console.log(`  ${step.label}`);
       await sleep(400);
     }
-    await cdp.shoot(step.file);
+    if (isSelected(step.file)) await cdp.shoot(step.file);
   }
 
   console.log("Done.");

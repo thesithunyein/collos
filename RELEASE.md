@@ -61,9 +61,12 @@ shared tree was touched and you need `rm -rf node_modules && npm ci` once there 
 In <https://app.revenuecat.com>, with no project yet, the first screen offers *Create a
 project*. Then, inside it:
 
-1. **Entitlement** — create one with identifier `pro`, exactly. The app reads
-   `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT` and defaults to `pro`; if the identifier
+1. **Entitlement** — create one with identifier `collos_pro`, exactly. The app reads
+   `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT` and falls back to `collos_pro`; if the identifier
    differs, Pro can never activate no matter how well the purchase flow works.
+   *(This project shipped the mismatch once: the code defaulted to `pro` while the dashboard
+   said `collos_pro`, so a build without the variable looked for an entitlement that did
+   not exist and silently never unlocked.)*
 2. **Products** — one per store, per billing period. A monthly and an annual on each
    store you intend to ship.
 3. **Offering** — create one and mark it the **default**. This is the one the app
@@ -132,8 +135,8 @@ npm run build:web          # writes dist/
 ```
 
 Then start the app and walk the flow: onboarding → today → Circle → *Unlock with Pro* →
-purchase → Circle now shows *Invites are unlocked*. Confirm the Settings tab shows the
-app user ID, the entitlement identifier `pro`, and the project ID.
+purchase → Circle now shows *Unlimited notes are on*. Confirm the Settings tab shows the
+app user ID, the entitlement identifier `collos_pro`, and the project ID.
 
 If the paywall says *Preview… RevenueCat isn't connected*, the key for the platform you
 are running on is missing — which is by design, not a bug. The app degrades to a
@@ -277,8 +280,8 @@ absent is an App Store **2.3.1** rejection.
 ## 11. Definition of done
 
 - [ ] `npm run typecheck` and `npm run build:web` both pass, and the web build renders
-- [ ] RevenueCat has an entitlement `pro`, a **default** offering, and monthly + annual packages
-- [ ] A free trial or promo code is attached, so reviewers can reach Pro
+- [ ] RevenueCat has an entitlement `collos_pro`, a **default** offering, and monthly + annual packages
+- [ ] A free trial or promo code is attached if one is promised anywhere in the listing copy — never claim one before it exists
 - [ ] All five `EXPO_PUBLIC_REVENUECAT_*` values are set locally, in EAS, and on Vercel
 - [ ] A purchase, a cancellation, and a restore each behave correctly on a real build
 - [ ] The Circle screen visibly unlocks when Pro activates
@@ -295,6 +298,6 @@ absent is an App Store **2.3.1** rejection.
 | Paywall shows *Preview* in a build that has keys locally | EAS does not read `.env`. Set the variables with `eas env:create` and rebuild. |
 | Paywall shows *Preview* on the live web app | `EXPO_PUBLIC_REVENUECAT_WEB_KEY` is unset in Vercel, or the variable was added without a rebuild. |
 | Plans never load but the store key is set | No **default** offering, or packages missing from it. |
-| Purchase succeeds, Pro stays off | The entitlement identifier does not match. It must be exactly `pro` unless `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT` says otherwise. |
+| Purchase succeeds, Pro stays off | The entitlement identifier does not match. It must be exactly `collos_pro` unless `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT` says otherwise. |
 | Store rejects the upload as a duplicate version | `autoIncrement` bumped `app.json` and the change was not committed. |
 | Blank white page on web | A floated Expo dependency. See §10. |

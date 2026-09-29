@@ -42,8 +42,9 @@ export const PRO_ENTITLEMENT =
   readEnv(process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT) ?? "collos_pro";
 
 /**
- * RevenueCat project ID (`prj_...`). Required by the Shipaton submission form,
- * and surfaced in Settings so it is easy to copy into Devpost.
+ * RevenueCat project ID (`proj...`, as shown in the dashboard URL), surfaced in
+ * Settings so it can be held next to the dashboard while the store connection is
+ * being checked.
  */
 export const REVENUECAT_PROJECT_ID =
   readEnv(process.env.EXPO_PUBLIC_REVENUECAT_PROJECT_ID) ?? "";

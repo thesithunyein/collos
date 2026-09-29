@@ -5,49 +5,62 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { CareRecipient } from "../data/mockCare";
 import { colors, insets, shape } from "../theme";
 
+/**
+ * Who is actually in the plan.
+ *
+ * This screen used to list invented helpers ("Aisha", "Marcus") alongside the
+ * real recipients, which made a device-local app look like it had a live care
+ * circle behind it. Everyone shown here comes from stored state: you, and the
+ * people you are caring for. Helpers appear when the shared circle ships, and
+ * the note under the list says so rather than implying otherwise.
+ */
 type Member = {
   id: string;
   name: string;
   role: string;
   initials: string;
-  /** "mine" people are the recipients you care for. */
-  kind: "you" | "recipient" | "helper";
+  kind: "you" | "recipient";
   confirmedToday: boolean;
 };
 
-function buildMembers(recipients: CareRecipient[]): Member[] {
-  // Named deliberately so they cannot collide with `mockRecipients`, which is the
-  // people being cared for rather than the people doing the caring.
-  const helpers: Member[] = [
-    { id: "aisha", name: "Aisha", role: "Sister · evening check-ins", initials: "A", kind: "helper", confirmedToday: true },
-    { id: "marcus", name: "Marcus", role: "Cousin · weekends", initials: "M", kind: "helper", confirmedToday: false },
-  ];
+function buildMembers(
+  recipients: CareRecipient[],
+  confirmedTodayByRecipientId: Record<string, boolean>,
+): Member[] {
   return [
-    { id: "you", name: "Sithu", role: "You · care organiser", initials: "S", kind: "you", confirmedToday: true },
+    { id: "you", name: "You", role: "Care organiser", initials: "S", kind: "you", confirmedToday: true },
     ...recipients.map((recipient) => ({
       id: recipient.id,
       name: recipient.name,
       role: recipient.relationship,
       initials: recipient.initials,
       kind: "recipient" as const,
-      confirmedToday: recipient.tasks.some((task) => task.status === "confirmed"),
+      confirmedToday: Boolean(confirmedTodayByRecipientId[recipient.id]),
     })),
-    ...helpers,
   ];
 }
 
 export function CircleScreen({
   recipients,
+  confirmedTodayByRecipientId,
+  notesToday,
+  notesTotal,
   pro,
+  onOpenNotes,
   onUnlock,
-  onInvite,
 }: {
   recipients: CareRecipient[];
+  confirmedTodayByRecipientId: Record<string, boolean>;
+  /** Notes written in the last day, across everyone in the plan. */
+  notesToday: number;
+  /** Every note kept on this device. */
+  notesTotal: number;
   pro: boolean;
+  onOpenNotes: () => void;
   onUnlock: () => void;
-  onInvite: () => void;
 }) {
-  const members = buildMembers(recipients);
+  const members = buildMembers(recipients, confirmedTodayByRecipientId);
+  const checkedIn = members.filter((member) => member.confirmedToday).length;
 
   return (
     <View style={styles.screen}>
@@ -56,23 +69,29 @@ export function CircleScreen({
         <Text style={styles.eyebrow}>CARE CIRCLE</Text>
         <Text style={styles.title}>Everyone helping out</Text>
         <Text style={styles.subtitle}>
-          One place to see who is checking in, and who still needs a hand this week.
+          One place to see who is checking in, and what has been done for the people you care for.
         </Text>
 
         <View style={styles.statRow}>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{members.length}</Text>
-            <Text style={styles.statLabel}>people</Text>
+            <Text style={styles.statLabel}>in the plan</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{members.filter((m) => m.confirmedToday).length}</Text>
+            <Text style={styles.statValue}>{checkedIn}</Text>
             <Text style={styles.statLabel}>checked in</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{pro ? "∞" : "1"}</Text>
-            <Text style={styles.statLabel}>shared notes</Text>
+            <Text style={styles.statValue}>{notesToday}</Text>
+            <Text style={styles.statLabel}>notes today</Text>
           </View>
         </View>
+        {!pro ? (
+          <Text style={styles.memberHint}>
+            Notes are what the free plan caps: one a day for each person. Collos Pro keeps as many
+            as your circle needs.
+          </Text>
+        ) : null}
 
         <Text style={styles.sectionLabel}>MEMBERS</Text>
         <View style={styles.memberList}>
@@ -82,13 +101,12 @@ export function CircleScreen({
                 style={[
                   styles.memberAvatar,
                   member.kind === "you" && styles.memberAvatarYou,
-                  member.kind === "helper" && styles.memberAvatarHelper,
                 ]}
               >
                 <Text
                   style={[
                     styles.memberInitials,
-                    (member.kind === "you" || member.kind === "helper") && styles.memberInitialsInverted,
+                    member.kind === "you" && styles.memberInitialsInverted,
                   ]}
                 >
                   {member.initials}
@@ -111,24 +129,29 @@ export function CircleScreen({
             </View>
           ))}
         </View>
+        <Text style={styles.memberHint}>
+          The plan lives on this device. A circle shared between phones is the next thing we are
+          building.
+        </Text>
 
         {pro ? (
           <View style={styles.unlockedCard}>
             <View style={styles.unlockedHeader}>
-              <Ionicons name="people" size={19} color={colors.blue} />
-              <Text style={styles.unlockedTitle}>Invites are unlocked</Text>
+              <Ionicons name="chatbubble-ellipses" size={19} color={colors.blue} />
+              <Text style={styles.unlockedTitle}>Unlimited notes are on</Text>
             </View>
             <Text style={styles.unlockedText}>
-              Add anyone you trust to {recipients[0]?.name ?? "your circle"}. They will only see the
-              plan items you share with them.
+              {notesTotal === 0
+                ? "Leave as many notes as you like for the next person who picks up the plan."
+                : `${notesTotal} note${notesTotal === 1 ? "" : "s"} kept on this device so far. Add as many as you like.`}
             </Text>
             <Pressable
               accessibilityRole="button"
-              onPress={onInvite}
+              onPress={onOpenNotes}
               style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
             >
-              <Ionicons name="person-add" size={17} color={colors.white} />
-              <Text style={styles.primaryButtonText}>Invite someone</Text>
+              <Ionicons name="add" size={17} color={colors.white} />
+              <Text style={styles.primaryButtonText}>Open shared notes</Text>
             </Pressable>
           </View>
         ) : (
@@ -139,10 +162,10 @@ export function CircleScreen({
               </View>
               <Text style={styles.lockedBadge}>PRO</Text>
             </View>
-            <Text style={styles.lockedTitle}>Invite more people</Text>
+            <Text style={styles.lockedTitle}>Unlimited shared notes</Text>
             <Text style={styles.lockedText}>
-              Inviting more than one helper is part of Collos Pro. Pro adds unlimited invites and
-              shared notes for everyone in your circle.
+              The free plan keeps one note a day for each person you care for. Pro keeps as many as
+              your circle needs.
             </Text>
             <Pressable
               accessibilityRole="button"
@@ -168,7 +191,7 @@ const styles = StyleSheet.create({
   statRow: { flexDirection: "row", gap: 10, marginTop: 20 },
   statCard: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: "rgba(255,255,255,0.9)",
     borderRadius: shape.md,
     borderWidth: 1,
     borderColor: colors.border,
@@ -190,7 +213,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 11,
-    backgroundColor: colors.white,
+    backgroundColor: "rgba(255,255,255,0.9)",
     borderRadius: shape.md,
     borderWidth: 1,
     borderColor: colors.border,
@@ -199,13 +222,12 @@ const styles = StyleSheet.create({
   memberAvatar: {
     width: 40,
     height: 40,
-    borderRadius: 14,
+    borderRadius: shape.sm,
     backgroundColor: colors.blueWash,
     alignItems: "center",
     justifyContent: "center",
   },
   memberAvatarYou: { backgroundColor: colors.blue },
-  memberAvatarHelper: { backgroundColor: colors.lilacWash },
   memberInitials: { color: colors.blue, fontSize: 15, fontWeight: "800" },
   memberInitialsInverted: { color: colors.white },
   memberCopy: { flex: 1 },
@@ -223,9 +245,10 @@ const styles = StyleSheet.create({
   donePillText: { color: colors.mint, fontSize: 10, fontWeight: "800" },
   pendingPill: { backgroundColor: colors.soft, borderRadius: 9, paddingHorizontal: 8, paddingVertical: 4 },
   pendingPillText: { color: colors.muted, fontSize: 10, fontWeight: "800" },
+  memberHint: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 10, paddingHorizontal: 2 },
   unlockedCard: {
-    backgroundColor: colors.white,
-    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: shape.xl,
     borderWidth: 1.5,
     borderColor: colors.blue,
     padding: 16,
@@ -236,7 +259,7 @@ const styles = StyleSheet.create({
   unlockedText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 8 },
   lockedCard: {
     backgroundColor: colors.blueWash,
-    borderRadius: 20,
+    borderRadius: shape.xl,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     padding: 16,
@@ -256,7 +279,7 @@ const styles = StyleSheet.create({
   lockedText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 6 },
   primaryButton: {
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: shape.sm,
     backgroundColor: colors.blue,
     flexDirection: "row",
     alignItems: "center",

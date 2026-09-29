@@ -18,13 +18,15 @@ Collos is a mobile-first care coordination experience built with Expo and React 
 
 Collos is for the person in a family who has quietly become the organiser. Care work is invisible and easy to drop: one sibling does the morning call, another does the shopping, and nobody is sure what has actually been done. Collos turns that into a short, shared daily plan.
 
-**Functional now:** onboarding, care-circle recipient switching, daily care-plan cards, confirmed/not-confirmed/skipped task states, loading/empty/error UI states, a real RevenueCat purchase flow (offerings, purchase, restore, entitlement gating), an add-a-moment flow, device-local persistence, and three working tabs — Today, Circle, and Settings.
+**Functional now:** onboarding, care-circle recipient switching, daily care-plan cards, confirmed/not-confirmed/skipped task states, loading and empty states, shared notes, **a real RevenueCat purchase flow** (offerings, purchase, restore, entitlement gating), an add-a-moment flow, device-local persistence, and three working tabs — Today, Circle, and Settings.
+
+**What Pro actually sells:** one thing, enforced in code. The free plan keeps **one shared note a day per person** (`FREE_NOTES_PER_DAY` in `src/storage/careStore.ts`); Pro removes the cap. Every line on the paywall maps to a behaviour you can test on the paywall screen itself — nothing is listed that the app cannot do. Notes are written to the same device-local store as the plan, so a note survives a restart exactly like a confirmed moment does.
 
 **Persistence:** the care plan survives restarts. Every confirmation, added moment, and recipient preference is written to device-local storage the moment it happens — `localStorage` on web, `expo-file-system` on native (`src/storage/`). No account, no backend, nothing leaves the device, which is exactly what the privacy policy and store listing claim. Settings has a reset that clears it.
 
 **Still to build:** a backend so a care circle is shared *between* phones (the current store is per-device), scheduled reminders. The release path is in place: `eas.json` defines the build profiles, and `RELEASE.md` is the runbook from an empty RevenueCat project to a submitted store listing.
 
-**Deliberately not advertised:** reminders. The paywall and three screens used to sell "gentle reminders" with no notification code behind it. Every mention was removed rather than left as a promise — a feature listed but absent is an App Store rejection, and it is the same drift that once left a stale dashboard mockup on the landing page. Re-add the copy in the same change that ships delivery.
+**Deliberately not advertised:** reminders and care-circle invites. The paywall and three screens used to sell "gentle reminders" with no notification code behind it, and invites stayed on the paywall after the shared circle was deferred to a backend. Every mention is now gone rather than left as a promise — a feature listed but absent is an App Store rejection, and it is the same drift that once left a stale dashboard mockup on the landing page. Re-add each line in the same change that ships the feature it names.
 
 ## Run locally
 
@@ -61,7 +63,7 @@ Copy `.env.example` to `.env` and fill in the public SDK keys from your RevenueC
 | `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` | Google Play purchases |
 | `EXPO_PUBLIC_REVENUECAT_WEB_KEY` | Web purchases, billed through RevenueCat Billing (Stripe). Separate from the native keys. |
 | `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT` | Entitlement identifier that unlocks Pro. Must match the dashboard; the Collos project uses `collos_pro`, which is also the built-in fallback. |
-| `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` | `prj_…` from the dashboard. Shown in the app's Settings screen. |
+| `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` | The project id, `proj…`, from the dashboard URL. Shown in the app's Settings screen. |
 
 In the dashboard you need: a project, a product per store, an entitlement named to match `EXPO_PUBLIC_REVENUECAT_ENTITLEMENT`, and a **default** offering holding a monthly and an annual package.
 
@@ -89,14 +91,14 @@ src/storage/fileStore*.ts      storage primitive per platform (localStorage / ex
 src/purchases/config.ts        platform key resolution, entitlement id, preview detection
 src/purchases/revenuecat.ts    SDK wrapper: init, offerings, purchase, restore, error mapping
 src/purchases/usePro.ts        the hook the UI consumes
-src/components/                NavItem, TaskCard, PaywallModal, AddMomentSheet
+src/components/                NavItem, TaskCard, PaywallModal, AddMomentSheet, NotesSheet
 src/screens/                   Onboarding, Today, Circle, Settings
 src/data/mockCare.ts           the built-in moment templates and recipients
 ```
 
-- `src/data/mockCare.ts` now provides the *built-in* moment templates. User-added moments and every status change live in `src/storage/careStore.ts`, on the device. A future backend replaces the storage module, not the UI.
+- `src/data/mockCare.ts` now provides the *built-in* moment templates. User-added moments, shared notes and every status change live in `src/storage/careStore.ts`, on the device. A future backend replaces the storage module, not the UI.
 - `src/purchases/` is the only place that imports the RevenueCat SDK, so the rest of the UI only ever sees plans and a `pro` boolean.
-- The Pro entitlement gates real UI: care-circle invites and shared notes are locked until it is active. Settings exposes the app user ID, entitlement identifier, and project ID, which is what a reviewer needs to verify the integration.
+- The Pro entitlement gates real UI: the shared-notes cap is lifted when it is active, and both the Today strip and the Circle screen read the live count from storage. Settings exposes the app user ID, entitlement identifier, and project ID, which is what a reviewer needs to verify the integration.
 - `.env.example` documents every environment variable. No secrets are committed.
 
 ## Deploy the Expo web app
@@ -110,7 +112,7 @@ npm run build:web
 
 The repository-root `vercel.json` builds the web app into `dist/`. In Vercel, import this repository with the **Root Directory** set to `.` and the `Other` framework preset. The intended app domain is `https://app.collos.sithunyein.com`; add it under **Project Settings → Domains** and create the DNS record Vercel provides. If the custom domain is not attached yet, use the exact Vercel deployment URL shown in the project dashboard instead.
 
-Web mode runs the full interaction flow. Web purchases bill through RevenueCat Billing, so a configured `EXPO_PUBLIC_REVENUECAT_WEB_KEY` makes the browser build take real subscriptions. Without that key the build stays in preview mode. Supabase shared persistence is not implemented yet.
+Web mode runs the full interaction flow. Web purchases bill through RevenueCat Billing, so a configured `EXPO_PUBLIC_REVENUECAT_WEB_KEY` makes the browser build take real subscriptions. Without that key the build stays in preview mode. Restore purchases is unavailable on the web and the app says so instead of failing silently.
 
 ## Public landing page
 
@@ -121,7 +123,7 @@ The two phone previews are real captures of the running app (`landing/app-onboar
 npm run screenshots
 ```
 
-The script launches a local Chrome or Edge headless, drives the web app over the DevTools protocol, and rewrites both PNGs in `landing/`. It has no npm dependencies and needs no secrets. Point it at a local build with `--base-url http://localhost:8081`, or set `CHROME_PATH` if Chrome is not installed in the usual location.
+The script launches a local Chrome or Edge headless, drives the web app over the DevTools protocol, and rewrites both PNGs in `landing/`. It has no npm dependencies and needs no secrets. Point it at a local build with `--base-url http://localhost:8081`, or set `CHROME_PATH` if Chrome is not installed in the usual location. `--only 04-paywall` runs the tour as far as the screenshots you name and writes only those, which is how the paywall shot is taken against the deployed app — the real RevenueCat offering loads there, and stopping before *Continue with Pro* keeps the tour out of a live checkout.
 
 ## Submission assets
 
@@ -140,7 +142,7 @@ npm run screenshots:playstore  # 1080x1920 -> store/screenshots/playstore/
 
 App Store Connect rejects a set that skips the largest supported display, which is why 1179×2556 is not accepted there, and Google Play refuses any screenshot whose longest side exceeds twice its shortest, which rules out both 1179×2556 and 1320×2868. See `store/listing.md` §5.
 
-`SHIPATON.md` holds the Shipaton 2026 submission pack: the eligibility gates, what is still missing, the two-minute demo video script, and paste-ready Devpost copy.
+`SHIPATON.md` is the working pack for the Shipaton 2026 entry: the eligibility notes, what is still missing, the two-minute demo video script, and the submission copy.
 
 The site also carries the `privacy` and `terms` pages that both app stores require; they are linked from the footer of every page. `landing/vercel.json` sets `cleanUrls`, so they resolve without the `.html` suffix.
 

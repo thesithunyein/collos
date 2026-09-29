@@ -11,8 +11,8 @@ import { colors, nativeAnimDriver } from "../theme";
  * selected tab.
  *
  * Built only on the built-in `Animated` API — the native driver animates on
- * the UI thread, so the tab keeps its snap even on a busy frame from the demo
- * screen-recording. No new dependencies, by project policy.
+ * the UI thread, so the tab keeps its snap even on a busy frame. No new
+ * dependencies, by project policy.
  */
 export function NavItem({
   icon,

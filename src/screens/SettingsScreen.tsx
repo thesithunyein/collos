@@ -80,7 +80,7 @@ export function SettingsScreen({
                   ? pro.expiresAt
                     ? `Current period ends ${formatDate(pro.expiresAt)}.`
                     : "You have access to every Pro feature."
-                  : "Shared notes, unlimited invites, and one plan for everyone."}
+                  : "One shared note a day. Pro keeps as many as your circle needs."}
               </Text>
             </View>
             <View style={[styles.pill, pro.pro ? styles.pillOn : styles.pillOff]}>
