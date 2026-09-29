@@ -305,6 +305,18 @@ export default function App() {
           }}
           pro={pro}
         />
+
+        {/* On the wide viewport the app is drawn inside a device frame, so it
+            also gets the two hardware marks a real phone has: the Dynamic
+            Island and the home indicator. Decorative only. On an actual phone
+            the hardware provides both, so they render exclusively in the
+            browser/desktop presentation. */}
+        {isWide ? (
+          <>
+            <View style={styles.island} pointerEvents="none" />
+            <View style={styles.homeIndicator} pointerEvents="none" />
+          </>
+        ) : null}
       </View>
     </View>
   );
@@ -380,4 +392,28 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   noticeText: { flex: 1, color: colors.ink, fontSize: 12, lineHeight: 17 },
+  /** Decorative Dynamic Island inside the desktop device frame. */
+  island: {
+    position: "absolute",
+    top: 12,
+    left: "50%",
+    marginLeft: -62,
+    width: 124,
+    height: 32,
+    borderRadius: 18,
+    backgroundColor: colors.ink,
+    zIndex: 40,
+  },
+  /** Decorative home indicator inside the desktop device frame. */
+  homeIndicator: {
+    position: "absolute",
+    bottom: 9,
+    left: "50%",
+    marginLeft: -70,
+    width: 140,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "rgba(24,52,104,0.9)",
+    zIndex: 40,
+  },
 });
