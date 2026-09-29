@@ -5,19 +5,19 @@ import { LaunchScreen } from "./src/components/LaunchScreen";
 import { NavItem } from "./src/components/NavItem";
 import { PaywallModal } from "./src/components/PaywallModal";
 import { AddMomentSheet } from "./src/components/AddMomentSheet";
+import { AddPersonSheet } from "./src/components/AddPersonSheet";
 import { NotesSheet } from "./src/components/NotesSheet";
-import type { CareRecipient } from "./src/data/mockCare";
-import { mockRecipients } from "./src/data/mockCare";
+import type { CareRecipient, TaskTemplate } from "./src/data/mockCare";
 import type { TaskStatus } from "./src/data/mockCare";
 import { CircleScreen } from "./src/screens/CircleScreen";
-import { OnboardingScreen } from "./src/screens/OnboardingScreen";
+import { NewPerson, OnboardingScreen } from "./src/screens/OnboardingScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { TodayScreen } from "./src/screens/TodayScreen";
 import { colors, insets, nativeAnimDriver, shape } from "./src/theme";
 import { usePro } from "./src/purchases/usePro";
 import {
   StoredState,
-  StoredTask,
+  careRecipients,
   clearStoredState,
   emptyStoredState,
   loadStoredState,
@@ -29,8 +29,10 @@ import {
   todayKey,
   withActiveRecipient,
   withAddedNote,
-  withCustomMoment,
+  withAddedRecipient,
+  withMoment,
   withResetDay,
+  withStarterMoments,
   withTaskStatus,
 } from "./src/storage/careStore";
 
@@ -49,6 +51,7 @@ export default function App() {
   const [isLoading, setLoading] = useState(false);
   const [notice, setNotice] = useState("");
   const [isAddingMoment, setAddingMoment] = useState(false);
+  const [isAddingPerson, setAddingPerson] = useState(false);
   const [isNotesOpen, setNotesOpen] = useState(false);
 
   /**
@@ -99,7 +102,10 @@ export default function App() {
       if (cancelled) return;
       if (restored) {
         setStored(restored);
-        if (restored.seenOnboarding) setStage("app");
+        // `seenOnboarding` on its own is not enough: an install from before
+        // recipients were stored reads as "done" with nobody in the plan, and
+        // the app has no screen for a circle of zero. Setup runs again instead.
+        if (restored.seenOnboarding && restored.recipients.length > 0) setStage("app");
       }
       setHydrated(true);
     })();
@@ -108,31 +114,43 @@ export default function App() {
     };
   }, []);
 
+  // The people in the plan are the user's, so they are read from stored state
+  // rather than from a constant. Setup guarantees at least one exists before
+  // the app stage can be reached.
+  const recipients = useMemo(() => careRecipients(stored), [stored]);
   const recipient = useMemo(
-    () =>
-      mockRecipients.find((item) => item.id === stored.activeRecipientId) ?? mockRecipients[0],
-    [stored.activeRecipientId],
+    () => recipients.find((item) => item.id === stored.activeRecipientId) ?? recipients[0],
+    [recipients, stored.activeRecipientId],
   );
+  /**
+   * `null` until setup finishes. Every derivation below is a hook, so they all
+   * run while the setup screens are on screen — on a fresh install the plan
+   * belongs to nobody, and reading it has to return nothing rather than throw.
+   */
+  const recipientId = recipient?.id ?? null;
   // Tasks are derived, not owned: the stored statuses are the source of truth,
   // so there is exactly one place to persist and no state that can drift.
-  const tasks = useMemo(() => tasksForRecipient(stored, recipient), [stored, recipient]);
+  const tasks = useMemo(() => tasksForRecipient(stored, recipientId), [stored, recipientId]);
   const completedCount = tasks.filter((task) => task.status === "confirmed").length;
   const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
 
   // Notes are real, persisted state — the one paid feature, so the whole circle
   // screen and the Today strip read from it rather than from sample numbers.
-  const recipientNotes = useMemo(() => notesForRecipient(stored, recipient.id), [stored, recipient]);
+  const recipientNotes = useMemo(
+    () => notesForRecipient(stored, recipientId),
+    [stored, recipientId],
+  );
   const notesToday = useMemo(() => {
     const today = todayKey();
     return stored.notes.filter((note) => note.day === today).length;
   }, [stored.notes]);
   const confirmedTodayByRecipientId = useMemo(() => {
     const result: Record<string, boolean> = {};
-    for (const item of mockRecipients) {
-      result[item.id] = tasksForRecipient(stored, item).some((task) => task.status === "confirmed");
+    for (const item of recipients) {
+      result[item.id] = tasksForRecipient(stored, item.id).some((task) => task.status === "confirmed");
     }
     return result;
-  }, [stored]);
+  }, [stored, recipients]);
 
   const showNotice = (message: string) => {
     setNotice(message);
@@ -160,12 +178,12 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [pro.pro, isPaywallOpen]);
 
-  const enterApp = () => {
+  const enterApp = (person: NewPerson) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setStage("app");
-      mutate(withActiveRecipient(storedRef.current, mockRecipients[0].id));
+      mutate(withAddedRecipient(storedRef.current, person));
     }, 350);
   };
 
@@ -177,11 +195,33 @@ export default function App() {
     mutate(withTaskStatus(storedRef.current, recipient.id, taskId, status));
   };
 
-  const addMoment = (moment: Omit<StoredTask, "id">) => {
-    const task: StoredTask = { ...moment, id: newMomentId() };
-    mutate(withCustomMoment(storedRef.current, recipient.id, task));
+  const addMoment = (moment: Omit<TaskTemplate, "id">) => {
+    const task: TaskTemplate = { ...moment, id: newMomentId() };
+    mutate(withMoment(storedRef.current, recipient.id, task));
     setAddingMoment(false);
     showNotice(`“${moment.title}” added to ${recipient.name}’s plan.`);
+  };
+
+  /**
+   * Adding someone later is the same operation setup performs, including the
+   * switch to their (empty) plan — the reason to add a person is to start
+   * planning for them, and the empty screen is where that happens.
+   */
+  const addPerson = (person: NewPerson) => {
+    mutate(withAddedRecipient(storedRef.current, person));
+    setAddingPerson(false);
+    setTab("today");
+    showNotice(`${person.name} is in your care circle — their plan is ready to fill in.`);
+  };
+
+  /**
+   * The four everyday moments, for someone who would rather edit a plan than
+   * start from a blank one. Offered on the empty screen and nowhere else, so a
+   * plan filled with these is always a plan the user asked for.
+   */
+  const useStarterPlan = () => {
+    mutate(withStarterMoments(storedRef.current, recipient.id));
+    showNotice(`${recipient.name}’s plan now has four moments — all open.`);
   };
 
   const resetDay = () => {
@@ -212,7 +252,9 @@ export default function App() {
       </View>
     );
   }
-  if (stage === "onboarding") {
+  // A state that says setup is done but holds nobody is not something the app
+  // screens can render, so setup runs instead of a screen with no subject.
+  if (stage === "onboarding" || !recipient) {
     return (
       <View style={[styles.viewport, isWide && styles.viewportWide]}>
         <View style={[styles.frame, isWide && styles.frameWide]}>
@@ -227,7 +269,7 @@ export default function App() {
       <View style={[styles.frame, isWide && styles.frameWide]}>
         {tab === "today" ? (
           <TodayScreen
-            recipients={mockRecipients}
+            recipients={recipients}
             recipient={recipient}
             tasks={tasks}
             completedCount={completedCount}
@@ -238,17 +280,19 @@ export default function App() {
             onSelectRecipient={selectRecipient}
             onUpdateTask={updateTask}
             onAddMoment={() => setAddingMoment(true)}
+            onUseStarterPlan={useStarterPlan}
             onOpenPaywall={() => setPaywallOpen(true)}
             onOpenNotes={openNotes}
             onOpenAccount={() => changeTab("settings")}
           />
         ) : tab === "circle" ? (
           <CircleScreen
-            recipients={mockRecipients}
+            recipients={recipients}
             confirmedTodayByRecipientId={confirmedTodayByRecipientId}
             notesToday={notesToday}
             notesTotal={stored.notes.length}
             pro={pro.pro}
+            onAddPerson={() => setAddingPerson(true)}
             onOpenNotes={openNotes}
             onUnlock={() => setPaywallOpen(true)}
           />
@@ -296,6 +340,12 @@ export default function App() {
           visible={isAddingMoment}
           onClose={() => setAddingMoment(false)}
           onSubmit={addMoment}
+        />
+
+        <AddPersonSheet
+          visible={isAddingPerson}
+          onClose={() => setAddingPerson(false)}
+          onSubmit={addPerson}
         />
 
         <NotesSheet

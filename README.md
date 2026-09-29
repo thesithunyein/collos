@@ -91,12 +91,13 @@ src/storage/fileStore*.ts      storage primitive per platform (localStorage / ex
 src/purchases/config.ts        platform key resolution, entitlement id, preview detection
 src/purchases/revenuecat.ts    SDK wrapper: init, offerings, purchase, restore, error mapping
 src/purchases/usePro.ts        the hook the UI consumes
-src/components/                NavItem, TaskCard, PaywallModal, AddMomentSheet, NotesSheet
+src/components/                NavItem, TaskCard, PaywallModal, AddMomentSheet, AddPersonSheet, NotesSheet
 src/screens/                   Onboarding, Today, Circle, Settings
-src/data/mockCare.ts           the built-in moment templates and recipients
+src/data/mockCare.ts           moment templates, portraits and the signed-in user
 ```
 
-- `src/data/mockCare.ts` now provides the *built-in* moment templates. User-added moments, shared notes and every status change live in `src/storage/careStore.ts`, on the device. A future backend replaces the storage module, not the UI.
+- `src/data/mockCare.ts` provides *templates*: the four starter moments, the portraits offered when someone is created, and the person holding the phone. It holds no plan. The people you care for, their moments, shared notes and every status change live in `src/storage/careStore.ts`, on the device. A future backend replaces the storage module, not the UI.
+- **Nothing in the app is sample data.** Setup creates the first person and their plan starts empty; a fresh install used to open on two invented people and a day that was already 25% done, one moment pre-confirmed by the build rather than by the user. The only populated state is one the user asked for — by hand, or through the one-tap starter plan offered on the empty screen.
 - `src/purchases/` is the only place that imports the RevenueCat SDK, so the rest of the UI only ever sees plans and a `pro` boolean.
 - The Pro entitlement gates real UI: the shared-notes cap is lifted when it is active, and both the Today strip and the Circle screen read the live count from storage. Settings exposes the app user ID, entitlement identifier, and project ID, which is what a reviewer needs to verify the integration.
 - `.env.example` documents every environment variable. No secrets are committed.
@@ -145,7 +146,7 @@ The index and the docs page are the two halves of the pitch, and each section ha
 | `docs.html` | The architecture, the environment variables and the troubleshooting table must stay true to this README and to `RELEASE.md`. |
 
 `docs.html` is the written half of the product: what the app is not, where the data lives, what Pro changes in code, how to run it locally, and the traps this project has already fallen into. `vercel.json` sets `cleanUrls`, so it is reachable at `/docs`, and the landing nav links there. The FAQ is also published as `FAQPage` structured data in `index.html`, which is why those two files have to be edited together.
-The two phone previews are real captures of the running app (`landing/app-onboarding.png` and `landing/app-dashboard.png`), not hand-built CSS mockups. The cat logo at the top of this README is the source of truth for every icon: `python assets/make-icons.py` regenerates the App Store icon, the Android adaptive foreground, both favicons, and the splash mark from it. The site therefore cannot advertise a dashboard the app does not render: an earlier mockup kept claiming "50%" and "2 of 4 confirmed" months after the app showed 25% and 1 of 4. Re-capture them after any UI change so the two stay in sync:
+The two phone previews are real captures of the running app (`landing/app-onboarding.png` and `landing/app-dashboard.png`), taken by the same capture script that walks setup the way a person does — name, relationship, starter plan, confirm — so the populated plan in the image is one the tour actually created, not one the build shipped with. The cat logo at the top of this README is the source of truth for every icon: `python assets/make-icons.py` regenerates the App Store icon, the Android adaptive foreground, both favicons, and the splash mark from it. The site therefore cannot advertise a dashboard the app does not render: an earlier mockup kept claiming "50%" and "2 of 4 confirmed" months after the app showed a quarter of a different day. Re-capture them after any UI change so the two stay in sync:
 
 ```bash
 npm run screenshots

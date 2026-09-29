@@ -174,6 +174,8 @@ export type TodayScreenProps = {
   onSelectRecipient: (recipient: CareRecipient) => void;
   onUpdateTask: (taskId: string, status: TaskStatus) => void;
   onAddMoment: () => void;
+  /** Puts the four everyday moments on this person's plan, all open. */
+  onUseStarterPlan: () => void;
   onOpenPaywall: () => void;
   onOpenNotes: () => void;
   /** The avatar is the way into your account and settings. */
@@ -192,6 +194,7 @@ export function TodayScreen({
   onSelectRecipient,
   onUpdateTask,
   onAddMoment,
+  onUseStarterPlan,
   onOpenPaywall,
   onOpenNotes,
   onOpenAccount,
@@ -248,7 +251,7 @@ export function TodayScreen({
                   ]}
                 >
                   <Avatar
-                    source={item.avatar}
+                    source={item.portrait}
                     initials={item.initials}
                     size={34}
                     onBrand={isSelected}
@@ -291,7 +294,11 @@ export function TodayScreen({
               <View>
                 <Text style={styles.sectionTitle}>Today’s moments</Text>
                 <Text style={styles.sectionMeta}>
-                  {completedCount} of {tasks.length} confirmed
+                  {/* "0 of 0 confirmed" is a fraction nobody can improve, and it
+                      is the first thing a new plan would say. */}
+                  {tasks.length === 0
+                    ? "Nothing planned yet"
+                    : `${completedCount} of ${tasks.length} confirmed`}
                 </Text>
               </View>
               <View style={styles.sectionActions}>
@@ -323,11 +330,29 @@ export function TodayScreen({
                 </Text>
                 <Pressable
                   accessibilityRole="button"
+                  accessibilityLabel="Add a moment"
                   onPress={onAddMoment}
                   style={styles.secondaryButton}
                 >
                   <Text style={styles.secondaryButtonText}>Add a moment</Text>
                 </Pressable>
+                {/* The way out of an empty plan that costs one tap instead of
+                    four. It lives here rather than somewhere in Settings
+                    because this is the only screen where the blank page is
+                    actually in front of someone. */}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Start from a template"
+                  onPress={onUseStarterPlan}
+                  style={({ pressed }) => [styles.templateButton, pressed && styles.pressed]}
+                >
+                  <Ionicons name="layers-outline" size={15} color={colors.blue} />
+                  <Text style={styles.templateButtonText}>Start from a template</Text>
+                </Pressable>
+                <Text style={styles.emptyHint}>
+                  Adds four everyday moments — a morning check-in, a water break, fresh air and an
+                  evening note. All open, so you only tick what you actually did.
+                </Text>
               </View>
             ) : (
               <View style={styles.taskList}>
@@ -704,4 +729,21 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   secondaryButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
+  templateButton: {
+    minHeight: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    marginTop: 6,
+  },
+  templateButtonText: { color: colors.blue, fontSize: 13, fontWeight: "600" },
+  emptyHint: {
+    color: colors.muted,
+    textAlign: "center",
+    fontSize: 11.5,
+    lineHeight: 16,
+    marginTop: 2,
+    maxWidth: 280,
+  },
 });

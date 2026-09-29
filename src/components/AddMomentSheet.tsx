@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import type { StoredTask } from "../storage/careStore";
+import type { TaskTemplate } from "../data/mockCare";
 import type { CareTask } from "../data/mockCare";
 import { colors, insets, shape } from "../theme";
 
@@ -23,7 +23,7 @@ import { colors, insets, shape } from "../theme";
  */
 
 const KINDS: Array<{
-  key: StoredTask["icon"];
+  key: TaskTemplate["icon"];
   tone: CareTask["tone"];
   label: string;
   detailPlaceholder: string;
@@ -63,7 +63,7 @@ export function AddMomentSheet({
 }: {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (moment: Omit<StoredTask, "id">) => void;
+  onSubmit: (moment: Omit<TaskTemplate, "id">) => void;
 }) {
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");

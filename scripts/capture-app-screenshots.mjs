@@ -92,13 +92,28 @@ const PORT = Number(arg("port", String(PORTS[SET])));
  * Each step presses something, waits for the app to react, then captures.
  * `expect` is matched against the document text to prove the app actually moved.
  */
+/**
+ * The setup steps a person performs, as presses and one typed field.
+ *
+ * Setup used to be a single press: the plan was waiting behind it, fully formed
+ * for two people the user had never met. It now asks who they are caring for,
+ * so the tour answers — which means every screenshot of a populated plan was
+ * earned on camera rather than inherited from the build.
+ */
+const SETUP_PRESSES = [
+  "Set up my care circle",
+  { type: { label: "Their name", value: "Margaret" } },
+  "Mum",
+  "Start my plan",
+];
+
 const FLOWS = {
   landing: [
     { file: "app-onboarding.png", label: "onboarding" },
     {
       file: "app-dashboard.png",
       label: "dashboard",
-      press: "Set up my care circle",
+      presses: [...SETUP_PRESSES, "Start from a template", "Confirm"],
       expect: "Today.s moments",
     },
   ],
@@ -113,7 +128,7 @@ const APP_TOUR = [
   {
     file: "02-today.png",
     label: "today",
-    press: "Set up my care circle",
+    presses: [...SETUP_PRESSES, "Start from a template", "Confirm"],
     expect: "Today.s moments",
   },
   {
@@ -239,7 +254,59 @@ class Cdp {
     throw new Error(`Timed out waiting for ${label}`);
   }
 
+  /**
+   * Back to the top of every scrollable region.
+   *
+   * Presses scroll their target into view, and React Native Web scrolls a
+   * `ScrollView` by moving its own div rather than the window — so without this
+   * a step that pressed something low on the screen ("Confirm", on the first
+   * plan row) would capture the page wherever that press left it, with the
+   * header of the screen missing from the screenshot.
+   */
+  async resetScroll() {
+    await this.evaluate(`(() => {
+      window.scrollTo(0, 0);
+      for (const el of document.querySelectorAll('div')) {
+        if (el.scrollTop && el.scrollHeight > el.clientHeight) el.scrollTop = 0;
+      }
+      for (const el of document.querySelectorAll('div')) {
+        if (el.scrollLeft && el.scrollWidth > el.clientWidth) el.scrollLeft = 0;
+      }
+      return true;
+    })()`);
+    await sleep(250);
+  }
+
+  /**
+   * Type into a text field the way React notices.
+   *
+   * Assigning `input.value` goes through React's value tracker, which updates
+   * the tracker's copy of the value at the same time — so the `input` event that
+   * follows looks like no change and React discards it. Writing through the
+   * prototype's own setter is what bypasses the tracker and makes the edit real.
+   */
+  async typeText(pattern, value) {
+    const filled = await this.evaluate(`(() => {
+      const re = new RegExp(${JSON.stringify(pattern)}, "i");
+      const fields = [...document.querySelectorAll('input, textarea')];
+      const el =
+        fields.find((n) => re.test((n.getAttribute('aria-label') || n.placeholder || '').trim())) ||
+        fields[0];
+      if (!el) return "";
+      el.focus();
+      const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement : HTMLInputElement;
+      Object.getOwnPropertyDescriptor(proto.prototype, 'value').set.call(el, ${JSON.stringify(value)});
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      return el.value;
+    })()`);
+    if (!filled) throw new Error(`Could not type into a field matching ${JSON.stringify(pattern)}`);
+    console.log(`  typed "${value}" into ${JSON.stringify(pattern)}`);
+    await sleep(300);
+  }
+
   async shoot(file) {
+    await this.resetScroll();
     const { data } = await this.send("Page.captureScreenshot", {
       format: "png",
       fromSurface: true,
@@ -439,20 +506,39 @@ try {
     ? flow.reduce((last, step, index) => (isSelected(step.file) ? index : last), -1)
     : flow.length - 1;
 
+  // A step either does nothing (it only captures what is on screen) or runs a
+  // list of actions. Only the last one is verified against `expect`: the ones
+  // before it are the setup for it, and a wrong answer there surfaces as the
+  // last action failing to arrive.
+  const actionsOf = (step) =>
+    step.presses ?? (step.press ? [step.press] : []);
+
   for (const [index, step] of flow.entries()) {
     if (index > lastWanted) break;
-    if (step.press) {
-      if (!(await cdp.scrollTo(step.press))) {
-        throw new Error(`Could not find a control matching ${JSON.stringify(step.press)}`);
+    const actions = actionsOf(step);
+    if (actions.length === 0) {
+      console.log(`  ${step.label}`);
+      await sleep(400);
+    }
+    for (const [position, action] of actions.entries()) {
+      if (typeof action !== "string") {
+        await cdp.typeText(action.type.label, action.type.value);
+        continue;
       }
-      const point = await cdp.locate(step.press);
-      if (!point) throw new Error(`Could not measure a control matching ${JSON.stringify(step.press)}`);
+      if (!(await cdp.scrollTo(action))) {
+        throw new Error(`Could not find a control matching ${JSON.stringify(action)}`);
+      }
+      const point = await cdp.locate(action);
+      if (!point) throw new Error(`Could not measure a control matching ${JSON.stringify(action)}`);
+      const isLast = position === actions.length - 1;
       // The app renders a curly apostrophe in "Today’s moments", so expect
       // patterns stay loose and are matched case-insensitively.
       const reacted = await cdp.press(
         point.x,
         point.y,
-        `new RegExp(${JSON.stringify(step.expect)}, "i").test(document.body.innerText)`,
+        isLast
+          ? `new RegExp(${JSON.stringify(step.expect)}, "i").test(document.body.innerText)`
+          : `true`,
         step.label,
       );
       if (!reacted) {
@@ -461,10 +547,7 @@ try {
         );
         throw new Error(`Never reached ${step.label}. Screen read: ${JSON.stringify(seen)}`);
       }
-      await sleep(step.settleMs ?? 900);
-    } else {
-      console.log(`  ${step.label}`);
-      await sleep(400);
+      await sleep(isLast ? (step.settleMs ?? 900) : 500);
     }
     if (isSelected(step.file)) await cdp.shoot(step.file);
   }

@@ -21,7 +21,7 @@ type Member = {
   name: string;
   role: string;
   initials: string;
-  avatar: CareRecipient["avatar"];
+  avatar: CareRecipient["portrait"];
   kind: "you" | "recipient";
   confirmedToday: boolean;
 };
@@ -45,7 +45,7 @@ function buildMembers(
       name: recipient.name,
       role: recipient.relationship,
       initials: recipient.initials,
-      avatar: recipient.avatar,
+      avatar: recipient.portrait,
       kind: "recipient" as const,
       confirmedToday: Boolean(confirmedTodayByRecipientId[recipient.id]),
     })),
@@ -58,6 +58,7 @@ export function CircleScreen({
   notesToday,
   notesTotal,
   pro,
+  onAddPerson,
   onOpenNotes,
   onUnlock,
 }: {
@@ -68,6 +69,8 @@ export function CircleScreen({
   /** Every note kept on this device. */
   notesTotal: number;
   pro: boolean;
+  /** Opens the sheet that adds another person to the plan. */
+  onAddPerson: () => void;
   onOpenNotes: () => void;
   onUnlock: () => void;
 }) {
@@ -105,7 +108,20 @@ export function CircleScreen({
           </Text>
         ) : null}
 
-        <Text style={styles.sectionLabel}>Members</Text>
+        {/* The list is the whole circle, so the one action that changes it
+            belongs on its header rather than behind a floating button. */}
+        <View style={styles.sectionRow}>
+          <Text style={styles.sectionLabel}>Members</Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Add someone to your care circle"
+            onPress={onAddPerson}
+            style={({ pressed }) => [styles.addButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="add" size={14} color={colors.blue} />
+            <Text style={styles.addButtonText}>Add someone</Text>
+          </Pressable>
+        </View>
         <View style={styles.memberList}>
           {members.map((member) => (
             <View key={member.id} style={styles.memberRow}>
@@ -209,9 +225,28 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "600",
     letterSpacing: 0.2,
+  },
+  // The label's spacing lives on the row now: left on the label it would add
+  // itself to the row's height and centre the button against nothing.
+  sectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 26,
     marginBottom: 10,
   },
+  addButton: {
+    minHeight: 34,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 12,
+    borderRadius: 99,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  addButtonText: { color: colors.blue, fontSize: 12.5, fontWeight: "600" },
   memberList: { gap: 9 },
   memberRow: {
     flexDirection: "row",

@@ -122,7 +122,9 @@ First release.
 Collos is a care-coordination app. No account or login is required to review it.
 
 To reach the subscription:
-1. Launch the app and tap "Set up my care circle".
+1. Launch the app and tap "Set up my care circle", then enter any name and pick
+   any relationship and tap "Start my plan". The first plan is deliberately
+   empty; "Start from a template" fills it with four moments in one tap.
 2. Tap "Circle" in the bottom navigation.
 3. Tap "Unlock with Pro" to open the paywall. It loads live packages from the
    default RevenueCat offering, so the StoreKit price sheet is real.
