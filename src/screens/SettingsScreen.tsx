@@ -15,26 +15,50 @@ import { deviceRows } from "../platform/device";
 import {
   PRO_ENTITLEMENT,
   REVENUECAT_PROJECT_ID,
-  activePlatform,
   isPaymentsConfigured,
+  storeDisplayName,
 } from "../purchases/config";
 import type { ProController } from "../purchases/usePro";
 import { colors, elevation, insets, shape } from "../theme";
+
+/**
+ * The live figures for the "Your data" card.
+ *
+ * They are passed in rather than read here because they all come from stored
+ * state, which only `App` owns. Nothing on the card is a written label: every
+ * value is a count of what this device is holding at the moment it is drawn.
+ */
+export type SettingsData = {
+  /** People in the care circle. */
+  people: number;
+  /** Moments on the active person's plan. */
+  moments: number;
+  /** Of those, how many are confirmed today. */
+  confirmed: number;
+  /** Notes saved for the active person. */
+  notes: number;
+  /** Size of the stored payload, in bytes. */
+  bytes: number;
+};
 
 export function SettingsScreen({
   pro,
   onResetData,
   onResetDay,
+  data,
 }: {
   pro: ProController;
   onResetData: () => void | Promise<void>;
   /** Clears today's confirmations. Moved here from Today, where it sat as a
    *  peer of Add — a device-state control next to the one button people press. */
   onResetDay: () => void;
+  data: SettingsData;
 }) {
-  const platform = activePlatform() ?? "unknown";
   const configured = isPaymentsConfigured();
   const [confirmingReset, setConfirmingReset] = useState(false);
+  // The identifiers are real, but they are support-badge material, not settings.
+  // They live behind a tap so the card opens on two rows a person can read.
+  const [showSupport, setShowSupport] = useState(false);
 
   const confirmReset = () => {
     // Alert is unavailable on web in RN 0.74, so the web gets an inline
@@ -63,7 +87,8 @@ export function SettingsScreen({
         <Text style={styles.eyebrow}>Settings</Text>
         <Text style={styles.title}>Your account</Text>
         <Text style={styles.subtitle}>
-          Manage Collos Pro, restore a purchase, and check that the store connection is healthy.
+          Your Collos Pro plan, what this device is holding, and the connection behind your
+          purchase.
         </Text>
 
         <View style={[styles.statusCard, pro.pro ? styles.statusCardPro : null]}>
@@ -144,25 +169,62 @@ export function SettingsScreen({
         <Text style={styles.sectionLabel}>Store connection</Text>
         <View style={styles.detailCard}>
           <DetailRow label="Status" value={configured ? "Connected" : "Preview mode"} />
-          <DetailRow label="Platform" value={platform} />
-          <DetailRow label="Entitlement" value={PRO_ENTITLEMENT} />
-          <DetailRow label="App user ID" value={pro.appUserId ?? "Not assigned yet"} mono />
-          <DetailRow
-            label="RevenueCat project"
-            value={REVENUECAT_PROJECT_ID || "Not set in this build"}
-            mono
-          />
+          {/* Who bills the card if Pro is bought here: App Store and Google Play
+              on a device, RevenueCat Billing in the browser export. */}
+          <DetailRow label="Billing" value={storeDisplayName()} />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showSupport }}
+            accessibilityLabel={
+              showSupport ? "Hide support details" : "Show support details"
+            }
+            onPress={() => setShowSupport((open) => !open)}
+            style={({ pressed }) => [styles.detailRow, pressed && styles.pressed]}
+          >
+            <Text style={styles.detailLabel}>Support details</Text>
+            <View style={styles.disclosureValue}>
+              <Text style={styles.disclosureText}>{showSupport ? "Hide" : "Show"}</Text>
+              <Ionicons
+                name={showSupport ? "chevron-up" : "chevron-down"}
+                size={15}
+                color={colors.blue}
+              />
+            </View>
+          </Pressable>
+          {showSupport ? (
+            <>
+              <DetailRow label="Entitlement" value={PRO_ENTITLEMENT} mono />
+              <DetailRow label="App user ID" value={pro.appUserId ?? "Not assigned yet"} mono />
+              <DetailRow
+                label="RevenueCat project"
+                value={REVENUECAT_PROJECT_ID || "Not set in this build"}
+                mono
+              />
+            </>
+          ) : null}
         </View>
         <Text style={styles.detailHint}>
-          The project ID and entitlement identifier identify the store connection for this app. If
-          you contact support, include the app user ID so your purchase record can be found.
+          Pro is unlocked by an entitlement checked against RevenueCat every time the app opens. If
+          a purchase ever goes missing, restore it from the card at the top; the support details are
+          the identifiers to quote if that does not work.
         </Text>
 
         <Text style={styles.sectionLabel}>Your data</Text>
         <View style={styles.detailCard}>
-          <DetailRow label="Storage" value="On this device only" />
-          <DetailRow label="Accounts" value="None — no sign-up" />
+          <DetailRow label="People" value={countLabel(data.people, "person", "people")} />
+          <DetailRow label="This plan" value={countLabel(data.moments, "moment", "moments")} />
+          <DetailRow
+            label="Confirmed today"
+            value={data.moments === 0 ? "Nothing planned" : `${data.confirmed} of ${data.moments}`}
+          />
+          <DetailRow label="Notes" value={data.notes === 1 ? "1 saved" : `${data.notes} saved`} />
+          {/* The pixel figure is the real payload the store writes, not an estimate. */}
+          <DetailRow label="Storage" value={`${formatBytes(data.bytes)} on this device`} />
         </View>
+        <Text style={styles.detailHint}>
+          These are the figures this device is holding right now. There is no account and no server
+          copy — the care data on this screen is the whole of it, and Reset all data removes it.
+        </Text>
         {/*
          * Both resets live here, one above the other, because both are
          * device-state operations and the difference between them is only
@@ -220,12 +282,6 @@ export function SettingsScreen({
           Web export — same codebase, second target.
         </Text>
 
-        <Text style={styles.sectionLabel}>About</Text>
-        <View style={styles.detailCard}>
-          <DetailRow label="Payments" value="RevenueCat" />
-          <DetailRow label="Privacy" value="Care data stays in your circle" />
-        </View>
-
         <View style={styles.safetyNote}>
           <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
           <Text style={styles.safetyText}>
@@ -253,6 +309,17 @@ function DetailRow({ label, value, mono }: { label: string; value: string; mono?
   );
 }
 
+/** `1 person` / `3 people`, so no row ever reads `1 people`. */
+function countLabel(count: number, one: string, many: string): string {
+  return `${count} ${count === 1 ? one : many}`;
+}
+
+/** `812 B` / `1.4 KB` — how a file manager reports the same number. */
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  return `${(bytes / 1024).toFixed(1)} KB`;
+}
+
 function formatDate(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
@@ -261,7 +328,7 @@ function formatDate(iso: string): string {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
-  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 130 },
+  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 180 },
   eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
   title: { color: colors.ink, fontSize: 25, fontWeight: "700", letterSpacing: -0.6, marginTop: 6 },
   subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },
@@ -366,6 +433,8 @@ const styles = StyleSheet.create({
   /** Slightly tighter so more of an identifier survives the truncation. */
   detailValueMono: { letterSpacing: -0.3, fontSize: 11 },
   detailHint: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 9, paddingHorizontal: 2 },
+  disclosureValue: { flexDirection: "row", alignItems: "center", gap: 4 },
+  disclosureText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
   safetyNote: { flexDirection: "row", gap: 7, alignItems: "flex-start", marginTop: 22, paddingHorizontal: 2 },
   safetyText: { color: colors.muted, fontSize: 11, lineHeight: 17, flex: 1 },
   resetButton: {

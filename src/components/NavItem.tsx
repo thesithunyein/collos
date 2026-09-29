@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef } from "react";
-import { Animated, Pressable, StyleSheet, Text } from "react-native";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, nativeAnimDriver } from "../theme";
 
 /**
@@ -51,12 +51,20 @@ export function NavItem({
       onPress={onPress}
       style={({ pressed }) => [styles.navItem, pressed && styles.navItemPressed]}
     >
-      {/* The luma-style wash capsule behind the active tab's icon: it fills in
-          with the same spring that lifts the icon, so the selection reads as
-          held rather than merely tinted, and there is exactly one icon per tab. */}
-      <Animated.View style={[styles.iconWell, { opacity: lift, transform: [{ scale: iconScale }] }]}>
-        <Ionicons name={icon} size={22} color={active ? colors.blue : colors.muted} />
-      </Animated.View>
+      {/* The luma-style wash capsule behind the active tab's icon.
+         
+          The capsule and the icon animate separately on purpose. The capsule
+          fades in with the spring, so the selection reads as held rather than
+          merely tinted. The icon does not fade — it only scales — because
+          fading it is what made the two unselected tabs look like bare labels:
+          at rest the whole icon was at 0% opacity, so the bar showed one icon
+          and two words. All three icons are now drawn all the time. */}
+      <View style={styles.iconWell}>
+        <Animated.View style={[styles.iconWellFill, { opacity: lift }]} />
+        <Animated.View style={{ transform: [{ scale: iconScale }] }}>
+          <Ionicons name={icon} size={22} color={active ? colors.blue : colors.muted} />
+        </Animated.View>
+      </View>
       <Text style={[styles.navLabel, active && styles.navLabelActive]}>{label}</Text>
     </Pressable>
   );
@@ -65,14 +73,22 @@ export function NavItem({
 const styles = StyleSheet.create({
   navItem: { minWidth: 84, minHeight: 52, alignItems: "center", justifyContent: "center", gap: 4 },
   navItemPressed: { opacity: 0.72 },
-  /** The luma-style wash capsule that appears behind the active tab's icon. */
+  /**
+   * The icon's fixed slot. It carries the size, so the bar never reflows as the
+   * capsule appears and disappears; the capsule is the fill behind it.
+   */
   iconWell: {
     width: 62,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.blueWash,
     alignItems: "center",
     justifyContent: "center",
+  },
+  /** The luma-style wash capsule that fades in under the active tab's icon. */
+  iconWellFill: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 18,
+    backgroundColor: colors.blueWash,
   },
   // Luma's tab bar separates its states by weight as well as tint: an inactive
   // label sits back, the active one is genuinely bold. Weight alone would be too

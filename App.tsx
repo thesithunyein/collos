@@ -152,6 +152,20 @@ export default function App() {
     return result;
   }, [stored, recipients]);
 
+  /**
+   * The size of the payload the store writes, for Settings' "Storage" row.
+   *
+   * `JSON.stringify` is the exact serialisation `saveStoredState` persists, so
+   * this is the record's real size on disk rather than an estimate of it.
+   */
+  const storedBytes = useMemo(() => {
+    try {
+      return JSON.stringify(stored).length;
+    } catch {
+      return 0;
+    }
+  }, [stored]);
+
   const showNotice = (message: string) => {
     setNotice(message);
     setTimeout(() => setNotice(""), 2800);
@@ -297,7 +311,18 @@ export default function App() {
             onUnlock={() => setPaywallOpen(true)}
           />
         ) : (
-          <SettingsScreen pro={pro} onResetData={resetAllData} onResetDay={resetDay} />
+          <SettingsScreen
+            pro={pro}
+            onResetData={resetAllData}
+            onResetDay={resetDay}
+            data={{
+              people: recipients.length,
+              moments: tasks.length,
+              confirmed: completedCount,
+              notes: recipientNotes.length,
+              bytes: storedBytes,
+            }}
+          />
         )}
 
         <NavScrim />
@@ -387,17 +412,41 @@ export default function App() {
   );
 }
 
-const NAV_MASK_STEPS = 5;
+/**
+ * The capsule's own box, mirrored from `bottomNav`: a 52pt row plus 8pt of
+ * padding above and below. `bottomNav` declares it as a `minHeight`, and this is
+ * the height the rows actually take.
+ */
+const NAV_HEIGHT = 68;
+/** The capsule's distance from the bottom edge, before the home-indicator inset. */
+const NAV_LIFT = 10;
+/**
+ * Above the capsule the mask keeps fading: sixteen 4px layers at 20% each, which
+ * stack to roughly 97% opaque at the capsule's edge and thin out to a fifth of
+ * that at the top — dense enough to hide a card edge, gradual enough that content
+ * scrolling past does not meet a seam.
+ */
+const NAV_FADE_STEPS = 16;
+const NAV_FADE_STEP = 4;
 
 function NavScrim() {
-  const solid = 10 + insets.bottom;
+  // Opaque to the capsule's top edge rather than to its underside. The 18px
+  // gutters beside a floating bar sit level with the capsule, and the old mask
+  // stopped below them, so a card's edge showed through beside the menu.
+  const solid = NAV_LIFT + insets.bottom + NAV_HEIGHT;
   return (
-    <View pointerEvents="none" style={[styles.navScrim, { height: solid + 48 }]}>
+    <View
+      pointerEvents="none"
+      style={[styles.navScrim, { height: solid + NAV_FADE_STEPS * NAV_FADE_STEP }]}
+    >
       <View style={[styles.navScrimSolid, { height: solid }]} />
-      {Array.from({ length: NAV_MASK_STEPS }, (_, index) => (
+      {Array.from({ length: NAV_FADE_STEPS }, (_, index) => (
         <View
           key={index}
-          style={[styles.navScrimFade, { bottom: solid, height: 10 * (index + 1), opacity: 0.2 }]}
+          style={[
+            styles.navScrimFade,
+            { bottom: solid, height: NAV_FADE_STEP * (index + 1), opacity: 0.2 },
+          ]}
         />
       ))}
     </View>
@@ -472,11 +521,12 @@ const styles = StyleSheet.create({
    * Covers the band of live content that used to show below the nav capsule.
    *
    * The capsule floats above the bottom edge on purpose, but with no blur behind
-   * it the 34px strip underneath was scrolling content cut off mid-card — the
-   * menu looked like it was hiding the page rather than floating over it. The
-   * mask is the screen's own background, so all it removes is the accident. The
-   * fade above it stops the two 18px gutters beside the capsule from meeting the
-   * mask on a hard horizontal cut.
+   * it the strip underneath was scrolling content cut off mid-card — the menu
+   * looked like it was hiding the page rather than floating over it. The mask is
+   * the screen's own background and reaches the capsule's top edge, so all it
+   * removes is the accident: the card edges beside and behind the bar. Screens
+   * give their content at least this much bottom padding so the last card can
+   * still be scrolled clear of it.
    */
   navScrim: {
     position: "absolute",

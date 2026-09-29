@@ -203,7 +203,7 @@ export function CircleScreen({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
-  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 130 },
+  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 180 },
   eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
   title: { color: colors.ink, fontSize: 25, fontWeight: "700", letterSpacing: -0.6, marginTop: 6 },
   subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },

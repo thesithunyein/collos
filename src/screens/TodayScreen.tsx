@@ -476,7 +476,7 @@ function SharedNotesStrip({
 
 const styles = StyleSheet.create({
   app: { flex: 1, backgroundColor: colors.soft },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 130 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 180 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
