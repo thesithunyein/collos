@@ -33,7 +33,7 @@ Google developer account, and no App Store or Google Play release is required.*"
 | Path | Needs | Reachable in 2 days? |
 | --- | --- | --- |
 | **Main competition** (Grand Prize, Design, Peace, HAMM, BuildInPublic, …) | A live, publicly downloadable store listing + RevenueCat SDK powering a real purchase | **No.** Store review is the blocker, not code. |
-| **Next Gen Award** (students 13+, $20k 1st) | A demo video showing the app working, a **public open-source repo**, an open-source licence file, and a clear description. **No store listing, no paid developer account, no real purchase required.** | **Yes** — if your academic email passes the checker. |
+| **Next Gen Award** (students 13+, $20k 1st) | A demo video showing the app working, a **public open-source repo**, an open-source licence file, and a clear description. **No store listing, no paid developer account, no real purchase required.** | **Yes** — student status was verified and confirmed by the organisers on 29 Sep 2026. |
 
 Two things from the official walkthrough video change how this repo should be judged:
 
@@ -64,6 +64,17 @@ if yours does not, the page has a contact for a manual check so you are still fl
 for judging. Minors — and teams containing a minor — may compete only for Next Gen,
 and need a parent or guardian's name, email and confirmation of consent.
 
+**Student verification: confirmed 29 Sep 2026** by the organisers (RevenueCat,
+Perttu Lähteenlahti) after review of the uploaded supporting documents:
+
+> Your confirmed email address is `sithunyein@my.uopeople.edu`.
+> Please enter `sithunyein@my.uopeople.edu` in the **student email field of your
+> Devpost submission** for the Next Gen Award.
+
+So the eligibility gate is cleared and the address is known. The remaining action is
+typing it into the submission's student-email field at submit time — it is a
+submission field, not necessarily the Devpost account's own login email.
+
 ## 2. Eligibility gates
 
 Gates marked **[main]** apply to the main competition only — the Next Gen Award does
@@ -82,9 +93,10 @@ not require them. Verified against the category page and the walkthrough video.
 | 9 | ≥1 screenshot at **1179×2556**, no device frame | ✅ `submission/screenshots/`, plus store-sized sets in `store/screenshots/` |
 | 10 **[main]** | Free trial or promo code for judges | ➖ Not required for Next Gen — judges tap through the sandbox paywall |
 
-For **Next Gen**, the only open items are §6 (record it), the student-email check, and
-the Devpost form. For the **main competition**, gates 4–6 and 10 remain open and store
-review remains unreachable before the deadline.
+For **Next Gen**, student verification is now **confirmed**; the only open items are
+§6 (record it) and the Devpost form itself — paste the confirmed address into the
+student-email field when you fill it in. For the **main competition**, gates 4–6 and 10
+remain open and store review remains unreachable before the deadline.
 
 ## 3. What this commit changed
 
@@ -134,13 +146,16 @@ Ordered by what unblocks the most.
    from their own apps.
 5. **Copy the project ID** (`prj_…`) into `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` so it
    shows up in Settings.
-6. **Decide the path**: Next Gen (student, this week) or a proper store launch later.
-7. **Record the demo video** (§6) and upload it to YouTube **public**. The Official
+6. ~~Decide the path~~ **Done:** Next Gen.
+7. ~~Student verification~~ **Done 29 Sep** — confirmed by the organisers; the address
+   `sithunyein@my.uopeople.edu` goes in the Devpost submission's student email field.
+8. **Record the demo video** (§6) and upload it to YouTube **public**. The Official
    Rules say the video must be "publicly visible" on YouTube or Vimeo; RevenueCat's
    submission walkthrough says unlisted is fine and private is not, so unlisted is
    the fallback — but public costs nothing and removes the argument.
-8. **Fill in the Devpost form** using §7.
-9. Add a **7-day free trial** or a promo code to the default offering so judges can
+9. **Fill in the Devpost form** using §7 — including the confirmed student email in
+   the student email field.
+10. Add a **7-day free trial** or a promo code to the default offering so judges can
    reach premium features.
 
 Setting the four environment variables is a one-line change in Vercel
@@ -176,7 +191,7 @@ summaries. Where the marketing page and the rules differ, the rules govern (thei
 | Requirement | Collos |
 | --- | --- |
 | Text description explaining features and functionality | ✅ §7, paste-ready |
-| Qualifying academic email (Next Gen gate) | ✅ Pre-checked 28 Sep: `my.uopeople.edu` is recognised on shipaton.com/next-gen. **Still required:** that same email must be on the Devpost account itself — check Devpost → Settings before submitting |
+| Qualifying academic email (Next Gen gate) | ✅ **Confirmed 29 Sep 2026** by the organisers: "Your student verification is confirmed for Shipaton 2026." Confirmed address: `sithunyein@my.uopeople.edu`. **At submit time:** paste it into the Devpost submission's **student email field** |
 | Demo video, <2 min, **publicly visible on YouTube or Vimeo**, showing the app functioning **on the device for which it was built** | ❌ Not recorded — the device clause matters: film it on a real phone via **Expo Go** or the iOS Simulator, not only the browser. Script in §6. Upload **public** (rules say "publicly visible"; RevenueCat's walkthrough accepts unlisted — treat public as the safe default). |
 | Public repo URL, open-source-licensed, **licence detectable and visible in the About section** | ✅ MIT `LICENSE` at the root — GitHub shows it in About automatically; confirm it says "MIT license" on the repo page before submitting |
 | 1024×1024 app icon | ✅ `assets/icon.png` (verified 1024×1024) |
@@ -187,10 +202,13 @@ summaries. Where the marketing page and the rules differ, the rules govern (thei
 
 Two rules-side facts that are easy to miss:
 
-- **The qualifying academic email must be on the Devpost account itself** — "use a
-  qualifying student or academic email address on Devpost. Email-domain eligibility
-  may be verified using JetBrains/swot." The checker on shipaton.com/next-gen is a
-  pre-check, not the verification. Update the Devpost account email first if needed.
+- **The student email goes in the submission, and it is already confirmed.** The
+  rules say "use a qualifying student or academic email address on Devpost. Email-domain
+  eligibility may be verified using JetBrains/swot" — the checker on
+  shipaton.com/next-gen is only a pre-check. Verification is now done: submitted
+  documents were reviewed and accepted, and the organisers named the exact field to use
+  (the Devpost submission's student email field) with the exact address
+  `sithunyein@my.uopeople.edu`. Nothing to chase here — just don't mistype it.
 - **Minors:** an entrant under the age of majority may enter Next Gen only, and the
   parent/guardian consent form (<https://forms.gle/Gx2Cr4X8WPk9V1q77>) must be
   completed **before the Submission Period ends** — the rules removed the
@@ -204,11 +222,11 @@ Two rules-side facts that are easy to miss:
 
 ### Order of operations
 
-1. **Put the academic email on the Devpost account and check it** at
-   <https://www.shipaton.com/next-gen>. The one gate no code can clear. If the checker
-   rejects a real academic domain, use the contact there for a manual check today —
-   the rules point to JetBrains/swot for domain verification, and unlisted domains are
-   resolved manually.
+1. ~~Student verification~~ **Done 29 Sep 2026** — documents reviewed and accepted,
+   confirmed address `sithunyein@my.uopeople.edu`. At submit time, enter that address in
+   the **student email field of the Devpost submission**. If the form also asks for the
+   account email, make sure the account still resolves to an address you can receive mail
+   at (notifications about judging go there).
 2. **If under the age of majority: complete the guardian consent form now** (link
    above) — it is a deadline, not a formality.
 3. **Create the RevenueCat project** (§4, steps 1–5). The rules' Project Requirements
@@ -304,6 +322,21 @@ project, public repository, MIT licensed. RevenueCat Design Award — the intera
 detail is in the shared plan, the progress ring, and the paywall's plan comparison.
 RevenueCat Peace Prize — the people who benefit are family carers, and specifically the
 one person who ends up carrying the mental load alone.
+
+### The form fields, ready to paste
+
+| Devpost field | Value |
+| --- | --- |
+| Project name | Collos |
+| Tagline | Share the small moments that help someone you love feel supported. |
+| Repo URL | <https://github.com/thesithunyein/collos> — public, MIT (`LICENSE` shows in About) |
+| Demo video | Public YouTube/Vimeo link, once recorded (§6) |
+| Built with | React Native, Expo, TypeScript, RevenueCat |
+| **Student email** | `sithunyein@my.uopeople.edu` — **confirmed by the organisers 29 Sep**, and the address they explicitly told you to enter in this field |
+| RevenueCat project ID | `prj_…` — the value set as `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` in Vercel; the app's **Settings** screen displays it |
+| Screenshot | Any file from `submission/screenshots/` (1179×2556, no device frame) |
+| Icon | `assets/icon.png` (1024×1024) |
+| Category | **Next Gen Award** — plus Design Award and Peace Prize only if you can evidence them (§8) |
 
 ## 8. Category notes
 
