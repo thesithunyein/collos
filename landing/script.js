@@ -8,8 +8,14 @@ document.querySelectorAll('a[href^="#"]').forEach(function (link) {
     var target = document.querySelector(link.getAttribute("href"));
     if (!target) return;
     event.preventDefault();
-    target.scrollIntoView({ behavior: smoothOrInstant() });
-    closeMenu();
+    // The mobile overlay locks page scrolling while it is open, so it has to be
+    // dismissed before the scroll is asked for — hence the next frame.
+    var wasOpen = closeMenu();
+    var scroll = function () {
+      target.scrollIntoView({ behavior: smoothOrInstant() });
+    };
+    if (wasOpen) requestAnimationFrame(scroll);
+    else scroll();
   });
 });
 
@@ -17,49 +23,40 @@ function smoothOrInstant() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 }
 
-// The frosted nav is translucent, which reads beautifully over white and badly
-// over the dark product-tour band. Firm it up as soon as the page moves.
-var navBar = document.querySelector(".glass-nav");
-if (navBar) {
-  var syncNav = function () {
-    navBar.classList.toggle("is-scrolled", window.scrollY > 24);
-  };
-  syncNav();
-  window.addEventListener("scroll", syncNav, { passive: true });
-}
-
-// Mobile navigation: the pill nav cannot hold four links on a phone, so they
-// live in a disclosure panel under it.
-var toggle = document.querySelector(".nav-toggle");
-var menu = document.getElementById("nav-links");
+// Mobile navigation: the bar cannot hold four links on a phone, so they move
+// into a full-screen overlay behind a hamburger. Returns whether it was open.
+var burger = document.getElementById("hamburger");
+var overlay = document.getElementById("mobile-nav");
 
 function closeMenu() {
-  if (!toggle || !menu) return;
-  menu.classList.remove("is-open");
-  toggle.setAttribute("aria-expanded", "false");
+  if (!burger || !overlay) return false;
+  var wasOpen = overlay.classList.contains("open");
+  overlay.classList.remove("open");
+  burger.classList.remove("active");
+  burger.setAttribute("aria-expanded", "false");
+  burger.setAttribute("aria-label", "Open menu");
+  document.body.classList.remove("nav-open");
+  return wasOpen;
 }
 
-if (toggle && menu) {
-  toggle.addEventListener("click", function () {
-    var open = toggle.getAttribute("aria-expanded") === "true";
-    menu.classList.toggle("is-open", !open);
-    toggle.setAttribute("aria-expanded", String(!open));
-  });
-
-  document.addEventListener("click", function (event) {
-    if (!menu.classList.contains("is-open")) return;
-    if (menu.contains(event.target) || toggle.contains(event.target)) return;
-    closeMenu();
+if (burger && overlay) {
+  burger.addEventListener("click", function () {
+    var open = burger.getAttribute("aria-expanded") === "true";
+    overlay.classList.toggle("open", !open);
+    burger.classList.toggle("active", !open);
+    burger.setAttribute("aria-expanded", String(!open));
+    burger.setAttribute("aria-label", open ? "Open menu" : "Close menu");
+    document.body.classList.toggle("nav-open", !open);
   });
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") closeMenu();
   });
 
-  // A resize past the breakpoint restores the desktop nav; drop the state so
-  // the panel cannot reappear already-open.
+  // A resize past the breakpoint restores the desktop bar; drop the state so
+  // the overlay cannot reappear already-open.
   window.addEventListener("resize", function () {
-    if (window.innerWidth > 780) closeMenu();
+    if (window.innerWidth > 768) closeMenu();
   });
 }
 

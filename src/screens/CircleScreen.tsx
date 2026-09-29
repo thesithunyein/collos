@@ -2,8 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Avatar } from "../components/Avatar";
 import type { CareRecipient } from "../data/mockCare";
-import { colors, insets, shape } from "../theme";
+import { currentUser } from "../data/mockCare";
+import { colors, elevation, insets, shape } from "../theme";
 
 /**
  * Who is actually in the plan.
@@ -19,6 +21,7 @@ type Member = {
   name: string;
   role: string;
   initials: string;
+  avatar: CareRecipient["avatar"];
   kind: "you" | "recipient";
   confirmedToday: boolean;
 };
@@ -28,12 +31,21 @@ function buildMembers(
   confirmedTodayByRecipientId: Record<string, boolean>,
 ): Member[] {
   return [
-    { id: "you", name: "You", role: "Care organiser", initials: "S", kind: "you", confirmedToday: true },
+    {
+      id: "you",
+      name: "You",
+      role: "Care organiser",
+      initials: currentUser.initials,
+      avatar: currentUser.avatar,
+      kind: "you",
+      confirmedToday: true,
+    },
     ...recipients.map((recipient) => ({
       id: recipient.id,
       name: recipient.name,
       role: recipient.relationship,
       initials: recipient.initials,
+      avatar: recipient.avatar,
       kind: "recipient" as const,
       confirmedToday: Boolean(confirmedTodayByRecipientId[recipient.id]),
     })),
@@ -97,21 +109,12 @@ export function CircleScreen({
         <View style={styles.memberList}>
           {members.map((member) => (
             <View key={member.id} style={styles.memberRow}>
-              <View
-                style={[
-                  styles.memberAvatar,
-                  member.kind === "you" && styles.memberAvatarYou,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.memberInitials,
-                    member.kind === "you" && styles.memberInitialsInverted,
-                  ]}
-                >
-                  {member.initials}
-                </Text>
-              </View>
+              <Avatar
+                source={member.avatar}
+                initials={member.initials}
+                size={40}
+                onBrand={member.kind === "you"}
+              />
               <View style={styles.memberCopy}>
                 <Text style={styles.memberName}>{member.name}</Text>
                 <Text style={styles.memberRole}>{member.role}</Text>
@@ -191,12 +194,13 @@ const styles = StyleSheet.create({
   statRow: { flexDirection: "row", gap: 10, marginTop: 20 },
   statCard: {
     flex: 1,
-    backgroundColor: "rgba(255,255,255,0.9)",
+    backgroundColor: colors.white,
     borderRadius: shape.md,
     borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: 14,
     alignItems: "center",
+    ...elevation.card,
   },
   statValue: { color: colors.ink, fontSize: 20, fontWeight: "800" },
   statLabel: { color: colors.muted, fontSize: 10, fontWeight: "700", marginTop: 3, letterSpacing: 0.3 },
@@ -213,23 +217,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 11,
-    backgroundColor: "rgba(255,255,255,0.9)",
+    backgroundColor: colors.white,
     borderRadius: shape.md,
     borderWidth: 1,
     borderColor: colors.border,
     padding: 12,
+    ...elevation.card,
   },
-  memberAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: shape.sm,
-    backgroundColor: colors.blueWash,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  memberAvatarYou: { backgroundColor: colors.blue },
-  memberInitials: { color: colors.blue, fontSize: 15, fontWeight: "800" },
-  memberInitialsInverted: { color: colors.white },
   memberCopy: { flex: 1 },
   memberName: { color: colors.ink, fontSize: 14, fontWeight: "800" },
   memberRole: { color: colors.muted, fontSize: 11, marginTop: 2 },
@@ -267,9 +261,9 @@ const styles = StyleSheet.create({
   },
   lockedHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
   lockIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: colors.white,
     alignItems: "center",
     justifyContent: "center",

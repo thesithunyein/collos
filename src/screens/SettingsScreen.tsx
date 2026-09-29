@@ -19,7 +19,7 @@ import {
   isPaymentsConfigured,
 } from "../purchases/config";
 import type { ProController } from "../purchases/usePro";
-import { colors, insets, shape } from "../theme";
+import { colors, elevation, insets, shape } from "../theme";
 
 export function SettingsScreen({
   pro,
@@ -247,13 +247,14 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: 16,
     marginTop: 20,
+    ...elevation.card,
   },
   statusCardPro: { borderColor: colors.blue, borderWidth: 1.5 },
   statusHeader: { flexDirection: "row", alignItems: "center", gap: 11 },
   statusIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 13,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: colors.blueWash,
     alignItems: "center",
     justifyContent: "center",
@@ -305,6 +306,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: 14,
+    ...elevation.card,
   },
   detailRow: {
     flexDirection: "row",

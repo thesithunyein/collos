@@ -1,3 +1,5 @@
+import type { ImageSourcePropType } from "react-native";
+
 export type TaskStatus = "confirmed" | "not-confirmed" | "skipped";
 
 export type CareTask = {
@@ -14,9 +16,31 @@ export type CareRecipient = {
   id: string;
   name: string;
   relationship: string;
+  /** Only shown if `avatar` is missing — see `components/Avatar.tsx`. */
   initials: string;
+  avatar: ImageSourcePropType;
   tasks: CareTask[];
 };
+
+/**
+ * The person holding the phone.
+ *
+ * Portraits are hand-drawn line art (Notionists by Zoish, CC0 1.0) rather than
+ * photographs, which keeps them consistent with the hand-drawn cat in the logo
+ * and avoids putting a real stranger's face on a fictional care recipient in a
+ * public repository. Bundled as files rather than fetched, so the app has no
+ * runtime network dependency and still works offline.
+ */
+export const currentUser = {
+  name: "Sithu",
+  initials: "S",
+  avatar: require("../../assets/avatars/sithu.png") as ImageSourcePropType,
+};
+
+const AVATARS = {
+  margaret: require("../../assets/avatars/margaret.png") as ImageSourcePropType,
+  daniel: require("../../assets/avatars/daniel.png") as ImageSourcePropType,
+} as const;
 
 export const mockRecipients: CareRecipient[] = [
   {
@@ -24,6 +48,7 @@ export const mockRecipients: CareRecipient[] = [
     name: "Margaret",
     relationship: "Mum",
     initials: "M",
+    avatar: AVATARS.margaret,
     tasks: [
       {
         id: "morning-check-in",
@@ -68,6 +93,7 @@ export const mockRecipients: CareRecipient[] = [
     name: "Daniel",
     relationship: "Dad",
     initials: "D",
+    avatar: AVATARS.daniel,
     tasks: [
       {
         id: "daniel-check-in",

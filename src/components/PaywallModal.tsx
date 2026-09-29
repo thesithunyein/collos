@@ -13,7 +13,7 @@ import {
 import { storeNote } from "../purchases/revenuecat";
 import type { PlanOption } from "../purchases/revenuecat";
 import type { ProController } from "../purchases/usePro";
-import { colors, insets, shape } from "../theme";
+import { colors, elevation, insets, shape } from "../theme";
 
 /**
  * Only list what the entitlement actually unlocks, and only what is shipped.
@@ -281,18 +281,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   closeButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: colors.soft,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "flex-end",
   },
   modalIcon: {
-    width: 55,
-    height: 55,
-    borderRadius: 18,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: colors.blueWash,
     alignItems: "center",
     justifyContent: "center",
@@ -315,8 +315,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 14,
     backgroundColor: colors.white,
+    ...elevation.card,
   },
-  planRowSelected: { borderColor: colors.blue, backgroundColor: colors.blueWash },
+  /* The selected plan is the one card in this list that is meant to be looked
+     at, so it takes the raised shadow as well as the blue edge. */
+  planRowSelected: { borderColor: colors.blue, backgroundColor: colors.blueWash, ...elevation.lifted },
   radio: {
     width: 21,
     height: 21,

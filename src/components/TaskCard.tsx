@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import type { CareTask, TaskStatus } from "../data/mockCare";
-import { colors, nativeAnimDriver, shape } from "../theme";
+import { colors, elevation, nativeAnimDriver, shape } from "../theme";
 
 // Tone keys are stored with each saved moment, so they keep their old names even
 // though the colours behind them now come from the logo's palette.
@@ -146,13 +146,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderWidth: 1,
     borderColor: colors.border,
+    ...elevation.card,
   },
   taskCardConfirmed: { borderColor: colors.borderSoft, backgroundColor: colors.soft },
   taskCardSkipped: { borderColor: colors.border, backgroundColor: colors.soft },
+  /**
+   * Round, not a rounded square.
+   *
+   * The icon well is the app's version of the same shape the landing site uses
+   * for a card's icon, and it is the shape a person is drawn in too — so the
+   * leading tile and every face in the header now share one form.
+   */
   taskIcon: {
-    width: 43,
-    height: 43,
-    borderRadius: shape.sm,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -160,10 +168,10 @@ const styles = StyleSheet.create({
   /** A small mark on the tile: confirmed reads blue, skipped reads blush. */
   statusBadge: {
     position: "absolute",
-    right: -4,
-    bottom: -4,
-    width: 19,
-    height: 19,
+    right: -5,
+    bottom: -5,
+    width: 20,
+    height: 20,
     borderRadius: 10,
     backgroundColor: colors.blue,
     alignItems: "center",

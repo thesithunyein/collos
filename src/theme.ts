@@ -59,6 +59,35 @@ export const shape = {
 } as const;
 
 /**
+ * The paper material: a card is white, edged with a hairline, and lifted by a
+ * shadow you have to look for.
+ *
+ * These exist as tokens rather than per-component numbers because the landing
+ * site draws the same two shadows, and a card in the app has to match the card
+ * on the page that shows it. `elevation` is Android's own shadow; it is a hard
+ * edge rather than a blur, so the value stays at 1 where the reference is
+ * barely-there, and both keys are always set together.
+ */
+export const elevation = {
+  /** A resting surface: 2px offset, 12px blur, 5% ink. */
+  card: {
+    shadowColor: colors.ink,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 1,
+  },
+  /** The same surface raised: hover, focus, the one card that matters. */
+  lifted: {
+    shadowColor: colors.ink,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 28,
+    elevation: 4,
+  },
+} as const;
+
+/**
  * Platform-safe vertical metrics, estimated without a native dependency.
  *
  * `react-native-safe-area-context` would report exact values, but adding it now

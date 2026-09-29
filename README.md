@@ -116,9 +116,26 @@ Web mode runs the full interaction flow. Web purchases bill through RevenueCat B
 
 ## Public landing page
 
-The static marketing site lives in `landing/` so it can deploy independently without changing the Expo app. It uses the existing Collos brand direction and has no runtime dependencies.
+The static marketing site lives in `landing/` so it can deploy independently without changing the Expo app. It has no npm dependencies, no build step and needs no secrets: `index.html`, `docs.html`, `404.html` and the two legal pages are hand-written HTML against one stylesheet. Its only runtime requests are two Google Fonts stylesheets.
 
-The page is one file plus a docs page, and each section has a rule about what it may say:
+The site and the app share one visual system, which is what lets a capture of the running app sit inside the page that describes it without either looking borrowed:
+
+| Rule | Where it is written down |
+| --- | --- |
+| One type family, DM Sans, at every weight, with display type on `clamp()` | `--display` / `--body` in `landing/styles.css` |
+| Icons are Material Symbols Rounded — never an emoji or a typed glyph | `.material-symbols-rounded` in `landing/styles.css` |
+| A surface is white paper: 1px hairline, `0 2px 12px` ink at 5%, lifting 3px on hover | `--hairline`, `--card-shadow`, `.card` in `landing/styles.css`; `elevation` in `src/theme.ts` |
+| The action is a dark pill with a white circular chevron on the **left** | `.nav-cta`, `.button-glass` in `landing/styles.css` |
+| Chrome is divided by a dashed rule, not a solid one | `.site-nav::after`, `.site-header`, `.site-footer` |
+| Decoration moves: a 10px rise with a 3° tilt | `@keyframes floatSlow` |
+
+The palette is deliberately *not* the reference's near-black. Text stays Collos navy (`#183468`) and the accent stays brand blue (`#2F63D6`), because the app, these captures, this README and the store listing all have to read as one product.
+
+People are drawn as faces, not letters. `src/components/Avatar.tsx` renders a bundled portrait and falls back to initials only when there is no picture; `landing/avatars/` holds the site's copies of the three portraits. The lettered square it replaced was the one detail that made a finished screen read as a wireframe — a person does not have an initial for a face.
+
+`landing/404.html` is self-contained on purpose: its own `<style>`, no `styles.css`, 100vh with no scrolling, and the same navbar as every other page. Vercel serves it for any unmatched path, which is why every asset and link inside it is root-absolute (`/docs`, `/logo-mark.png`) rather than relative — the file renders at whatever URL was missed, so `docs.html` would resolve to `/whatever/docs.html` and 404 all over again. Its decorations are the app's own cat (`pets`) and heart, not borrowed art.
+
+The index and the docs page are the two halves of the pitch, and each section has a rule about what it may say:
 
 | Surface | What it must match |
 | --- | --- |

@@ -1,10 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Animated,
+  Easing,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
+import { Avatar } from "../components/Avatar";
 import { TaskCard } from "../components/TaskCard";
 import type { CareRecipient, CareTask, TaskStatus } from "../data/mockCare";
-import { colors, insets, shape } from "../theme";
+import { currentUser } from "../data/mockCare";
+import { colors, elevation, insets, shape } from "../theme";
 
 /**
  * The hero's progress number eases from its previous value to each new one, so
@@ -59,6 +70,57 @@ function useCountUp(target: number, duration = 400): Animated.Value {
  * always looks intact beats an exact one that looks broken at two moments.
  */
 const RING_SEGMENTS = 4;
+
+/**
+ * A pool of soft light, drawn as concentric discs of a low, equal alpha.
+ *
+ * A radial gradient would be a single node; RN has none without
+ * `react-native-svg`, and adding an unpinned native module this late is the
+ * risk the `expo-font` incident already warned about. So the falloff is
+ * stepped: discs sharing one centre accumulate linearly toward the middle,
+ * which is exactly the ramp a glow wants. *Eight* steps and not three, because
+ * three left the disc edges visible as arcs behind the hero card — at ~4%
+ * alpha each, the steps read as light instead of as rings. The launch screen
+ * and the onboarding halo use the same trick, so the lighting language is
+ * identical everywhere in the app.
+ */
+const GLOW_STEPS = 8;
+const GLOW_ALPHA = 0.042;
+
+function Glow({
+  color,
+  size,
+  style,
+}: {
+  /** `"r,g,b"`, so the alpha can be layered per disc. */
+  color: string;
+  size: number;
+  /** Position only — `Glow` owns the box it fills. */
+  style: ViewStyle;
+}) {
+  return (
+    <View pointerEvents="none" style={[{ position: "absolute", width: size, height: size }, style]}>
+      {Array.from({ length: GLOW_STEPS }, (_, index) => {
+        const disc = size * ((index + 1) / GLOW_STEPS);
+        const inset = (size - disc) / 2;
+        return (
+          <View
+            key={index}
+            style={{
+              position: "absolute",
+              top: inset,
+              left: inset,
+              width: disc,
+              height: disc,
+              borderRadius: disc / 2,
+              backgroundColor: `rgba(${color},${GLOW_ALPHA})`,
+            }}
+          />
+        );
+      })}
+    </View>
+  );
+}
 
 /**
  * Four separate 90° arcs, lit from the top clockwise.
@@ -146,15 +208,17 @@ export function TodayScreen({
         <View style={styles.header}>
           <View>
             <Text style={styles.eyebrow}>{dateLine().toUpperCase()}</Text>
-            <Text style={styles.greeting}>{greeting()}, Sithu</Text>
+            <Text style={styles.greeting}>
+              {greeting()}, {currentUser.name}
+            </Text>
           </View>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Open your account and settings"
             onPress={onOpenAccount}
-            style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}
+            style={({ pressed }) => [styles.avatarWrap, pressed && styles.pressed]}
           >
-            <Text style={styles.avatarText}>S</Text>
+            <Avatar source={currentUser.avatar} initials={currentUser.initials} size={44} />
             {pro ? (
               <View style={styles.proDot}>
                 <Ionicons name="sparkles" size={9} color={colors.white} />
@@ -185,11 +249,12 @@ export function TodayScreen({
                     pressed && styles.pressed,
                   ]}
                 >
-                  <View style={[styles.smallAvatar, isSelected && styles.smallAvatarSelected]}>
-                    <Text style={[styles.smallAvatarText, isSelected && styles.smallAvatarTextSelected]}>
-                      {item.initials}
-                    </Text>
-                  </View>
+                  <Avatar
+                    source={item.avatar}
+                    initials={item.initials}
+                    size={34}
+                    onBrand={isSelected}
+                  />
                   <View>
                     <Text style={[styles.chipName, isSelected && styles.chipNameSelected]}>{item.name}</Text>
                     <Text style={[styles.chipRelationship, isSelected && styles.chipRelationshipSelected]}>
@@ -209,21 +274,9 @@ export function TodayScreen({
             <View style={styles.skeleton} />
           </View>
         ) : (
-          <>
-            <View style={styles.heroGlowWrap}>
-              {/* The glow behind the hero, as nested translucent discs.
-                  A single flat circle read as a sticker pasted behind the card
-                  because its edge was a hard arc; stacking three concentric
-                  discs of the same low alpha gives a stepped falloff that reads
-                  as light. RN has no blur without `expo-blur`, and adding an
-                  unpinned native module this late is the risk we already
-                  decided against — the launch screen and onboarding halo use
-                  the identical trick, so the lighting language matches. */}
-              <View style={styles.heroGlowLargeOuter} aria-hidden />
-              <View style={styles.heroGlowLargeMid} aria-hidden />
-              <View style={styles.heroGlowLargeCore} aria-hidden />
-              <View style={styles.heroGlowSmallOuter} aria-hidden />
-              <View style={styles.heroGlowSmallCore} aria-hidden />
+          <>              <View style={styles.heroGlowWrap}>
+              <Glow color="154,191,243" size={210} style={styles.heroGlowLarge} />
+              <Glow color="96,177,255" size={170} style={styles.heroGlowSmall} />
             <View style={styles.heroCard}>
               <View style={styles.heroContent}>
                 <Text style={styles.heroKicker}>TODAY’S CARE PLAN</Text>
@@ -417,15 +470,8 @@ const styles = StyleSheet.create({
     letterSpacing: -0.7,
     marginTop: 6,
   },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 16,
-    backgroundColor: colors.blueWash,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: { color: colors.blue, fontSize: 17, fontWeight: "800" },
+  /** No fill or radius here: `Avatar` draws the portrait and the fallback. */
+  avatarWrap: { width: 44, height: 44 },
   proDot: {
     position: "absolute",
     right: -4,
@@ -470,70 +516,16 @@ const styles = StyleSheet.create({
     gap: 9,
     borderWidth: 1,
     borderColor: colors.border,
+    ...elevation.card,
   },
-  recipientChipSelected: { backgroundColor: colors.blue, borderColor: colors.blue },
-  smallAvatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 12,
-    backgroundColor: colors.blueWash,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  smallAvatarSelected: { backgroundColor: "rgba(255,255,255,0.22)" },
-  smallAvatarText: { color: colors.blue, fontWeight: "800" },
-  smallAvatarTextSelected: { color: colors.white },
+  recipientChipSelected: { backgroundColor: colors.blue, borderColor: colors.blue, ...elevation.lifted },
   chipName: { color: colors.ink, fontSize: 14, fontWeight: "800" },
   chipNameSelected: { color: colors.white },
   chipRelationship: { color: colors.muted, fontSize: 11, marginTop: 2 },
   chipRelationshipSelected: { color: colors.blueTint },
-  /* Concentric with one another by construction: each pair below shares the
-     centre of the 210px / 170px disc, so the falloff stays round. */
-  heroGlowLargeOuter: {
-    position: "absolute",
-    top: -34,
-    left: -30,
-    width: 210,
-    height: 210,
-    borderRadius: 105,
-    backgroundColor: "rgba(154,191,243,0.15)",
-  },
-  heroGlowLargeMid: {
-    position: "absolute",
-    top: -16,
-    left: -12,
-    width: 174,
-    height: 174,
-    borderRadius: 87,
-    backgroundColor: "rgba(154,191,243,0.15)",
-  },
-  heroGlowLargeCore: {
-    position: "absolute",
-    top: 1,
-    left: 5,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(154,191,243,0.15)",
-  },
-  heroGlowSmallOuter: {
-    position: "absolute",
-    bottom: -40,
-    right: -22,
-    width: 170,
-    height: 170,
-    borderRadius: 85,
-    backgroundColor: "rgba(96,177,255,0.17)",
-  },
-  heroGlowSmallCore: {
-    position: "absolute",
-    bottom: -18,
-    right: 0,
-    width: 126,
-    height: 126,
-    borderRadius: 63,
-    backgroundColor: "rgba(96,177,255,0.17)",
-  },
+  /** Anchors only: `Glow` draws the discs inside whatever box this describes. */
+  heroGlowLarge: { top: -34, left: -30 },
+  heroGlowSmall: { bottom: -40, right: -22 },
   heroCard: {
     backgroundColor: colors.blue,
     borderRadius: shape.xl,
@@ -606,8 +598,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,
+    ...elevation.card,
   },
-  pillButtonQuiet: { backgroundColor: "transparent", borderWidth: 0 },
+  /* Quiet means quiet: no edge and no shadow either, or it still reads as a
+     button sitting next to the one that is. */
+  pillButtonQuiet: { backgroundColor: "transparent", borderWidth: 0, shadowOpacity: 0, elevation: 0 },
   pillButtonPressed: { opacity: 0.6 },
   pillButtonText: { color: colors.blue, fontSize: 12, fontWeight: "800" },
   pillButtonTextQuiet: { color: colors.muted, fontSize: 12, fontWeight: "700" },
@@ -622,11 +617,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: 14,
     marginTop: 18,
+    ...elevation.card,
   },
   notesIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: colors.blueWash,
     alignItems: "center",
     justifyContent: "center",
@@ -658,9 +654,9 @@ const styles = StyleSheet.create({
     gap: 11,
   },
   proIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 13,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: colors.blue,
     alignItems: "center",
     justifyContent: "center",
@@ -683,6 +679,7 @@ const styles = StyleSheet.create({
     padding: 26,
     borderWidth: 1,
     borderColor: colors.border,
+    ...elevation.card,
   },
   emptyTitle: { color: colors.ink, fontSize: 16, fontWeight: "800", marginTop: 10 },
   emptyText: {
