@@ -24,9 +24,13 @@ import { colors, elevation, insets, shape } from "../theme";
 export function SettingsScreen({
   pro,
   onResetData,
+  onResetDay,
 }: {
   pro: ProController;
   onResetData: () => void | Promise<void>;
+  /** Clears today's confirmations. Moved here from Today, where it sat as a
+   *  peer of Add — a device-state control next to the one button people press. */
+  onResetDay: () => void;
 }) {
   const platform = activePlatform() ?? "unknown";
   const configured = isPaymentsConfigured();
@@ -159,6 +163,27 @@ export function SettingsScreen({
           <DetailRow label="Storage" value="On this device only" />
           <DetailRow label="Accounts" value="None — no sign-up" />
         </View>
+        {/*
+         * Both resets live here, one above the other, because both are
+         * device-state operations and the difference between them is only
+         * visible side by side: this one is reversible and reads as a normal
+         * action, the one below deletes and reads as a warning. On Today the
+         * reversible one sat as a peer of *Add* instead — a control that wipes
+         * the day, one slip away from the button people actually press.
+         */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Reset today's moments to not confirmed"
+          onPress={onResetDay}
+          style={({ pressed }) => [styles.actionButton, styles.actionButtonSpaced, pressed && styles.pressed]}
+        >
+          <Ionicons name="refresh" size={16} color={colors.blue} />
+          <Text style={styles.actionButtonText}>Reset today's plan</Text>
+        </Pressable>
+        <Text style={styles.detailHint}>
+          Clears today's confirmations and skips so the day can be run again. Nothing is deleted —
+          the moments, the notes and your preferences all stay.
+        </Text>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={confirmingReset ? "Tap again to confirm reset" : "Reset all app data"}
@@ -183,7 +208,7 @@ export function SettingsScreen({
           purchase is untouched — Restore purchases brings Pro back.
         </Text>
 
-        <Text style={styles.sectionLabel}>THIS DEVICE</Text>
+        <Text style={styles.sectionLabel}>This device</Text>
         <View style={styles.detailCard}>
           {deviceRows().map((row) => (
             <DetailRow key={row.label} label={row.label} value={row.value} mono={row.mono} />
@@ -195,7 +220,7 @@ export function SettingsScreen({
           Web export — same codebase, second target.
         </Text>
 
-        <Text style={styles.sectionLabel}>ABOUT</Text>
+        <Text style={styles.sectionLabel}>About</Text>
         <View style={styles.detailCard}>
           <DetailRow label="Payments" value="RevenueCat" />
           <DetailRow label="Privacy" value="Care data stays in your circle" />
@@ -279,6 +304,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
+  /** Same button, but standing on its own below a card rather than in a stack. */
+  actionButtonSpaced: { marginTop: 10 },
   actionButtonText: { color: colors.blue, fontSize: 13, fontWeight: "600" },
   messageRow: {
     flexDirection: "row",

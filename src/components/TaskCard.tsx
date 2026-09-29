@@ -116,21 +116,31 @@ export function TaskCard({
               {isConfirmed ? "Confirmed" : "Confirm"}
             </Text>
           </Pressable>
+          {/*
+           * Skip is an icon, not a second button.
+           *
+           * Two bordered buttons side by side turned every row into a control
+           * panel: with eight of them down the screen the eye read "two
+           * choices" instead of "this moment, and the option to pass". The
+           * action is unchanged, and a screen reader still gets "Skip Morning
+           * check-in" — it is the chrome around it that went away.
+           */}
           <Pressable
             accessibilityRole="button"
             accessibilityState={{ selected: isSkipped }}
             accessibilityLabel={`${isSkipped ? "Unskip" : "Skip"} ${task.title}`}
             onPress={() => onUpdate(task.id, isSkipped ? "not-confirmed" : "skipped")}
-            style={({ pressed: isPressed }) => [styles.skipButton, isSkipped && styles.skippedButton, isPressed && styles.pressed]}
+            style={({ pressed: isPressed }) => [
+              styles.skipButton,
+              isSkipped && styles.skipButtonOn,
+              isPressed && styles.pressed,
+            ]}
           >
             <Ionicons
               name={isSkipped ? "arrow-undo" : "arrow-forward"}
-              size={13}
+              size={17}
               color={isSkipped ? colors.blush : colors.muted}
             />
-            <Text style={[styles.skipButtonText, isSkipped && styles.skippedButtonText]}>
-              {isSkipped ? "Skipped" : "Skip"}
-            </Text>
           </Pressable>
         </View>
       </View>
@@ -210,17 +220,17 @@ const styles = StyleSheet.create({
   confirmButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
   confirmedButtonText: { color: colors.white },
   skipButton: {
-    minHeight: 36,
-    paddingHorizontal: 11,
-    borderRadius: 11,
-    borderWidth: 1,
-    borderColor: "transparent",
-    flexDirection: "row",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: "center",
-    gap: 5,
+    justifyContent: "center",
+    // Pinned to the card's trailing edge rather than trailing the button: with
+    // "Confirm" and "Confirmed" being different widths, hanging the icon off the
+    // button put it at a different x on every row, which read as drift.
+    marginLeft: "auto",
   },
-  skippedButton: { borderColor: colors.borderSoft, backgroundColor: colors.white },
-  skipButtonText: { color: colors.muted, fontSize: 12, fontWeight: "700" },
-  skippedButtonText: { color: colors.blush },
+  /** A skip keeps a wash, so the row still reads as settled without a label. */
+  skipButtonOn: { backgroundColor: colors.blushWash },
   pressed: { opacity: 0.72 },
 });

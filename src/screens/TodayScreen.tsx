@@ -173,7 +173,6 @@ export type TodayScreenProps = {
   noteCount: number;
   onSelectRecipient: (recipient: CareRecipient) => void;
   onUpdateTask: (taskId: string, status: TaskStatus) => void;
-  onEditPlan: () => void;
   onAddMoment: () => void;
   onOpenPaywall: () => void;
   onOpenNotes: () => void;
@@ -192,7 +191,6 @@ export function TodayScreen({
   noteCount,
   onSelectRecipient,
   onUpdateTask,
-  onEditPlan,
   onAddMoment,
   onOpenPaywall,
   onOpenNotes,
@@ -306,15 +304,13 @@ export function TodayScreen({
                   <Ionicons name="add" size={16} color={colors.blue} />
                   <Text style={styles.pillButtonText}>Add</Text>
                 </Pressable>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Reset today's moments to not confirmed"
-                  onPress={onEditPlan}
-                  style={({ pressed }) => [styles.pillButton, styles.pillButtonQuiet, pressed && styles.pillButtonPressed]}
-                >
-                  <Ionicons name="refresh" size={14} color={colors.muted} />
-                  <Text style={styles.pillButtonTextQuiet}>Reset day</Text>
-                </Pressable>
+                {/* "Reset day" used to sit here, as a peer of Add.
+
+                    It cleared every confirmation, which is a *device* action,
+                    not a plan action, and it sat beside the one button a
+                    person actually presses on this screen — a destructive-adjacent
+                    control one slip away from the useful one. It lives in
+                    Settings now, next to the other state controls. */}
               </View>
             </View>
 
@@ -348,6 +344,14 @@ export function TodayScreen({
               onOpen={onOpenNotes}
             />
 
+            {/* The notes row and the Pro row were two cards 18px apart, so they
+                read as one block: a person scanning past them saw a single
+                monetisation stack rather than "what was written" and then
+                "the paid tier". The dashed rule is the same device the site
+                uses to divide chrome, and it says the two belong to different
+                thoughts. */}
+            <View style={styles.planDivider} />
+
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Open Collos Pro"
@@ -373,13 +377,6 @@ export function TodayScreen({
               <Ionicons name="chevron-forward" size={20} color={colors.blue} />
             </Pressable>
 
-            <View style={styles.safetyNote}>
-              <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
-              <Text style={styles.safetyText}>
-                Collos helps coordinate care. It does not provide medical advice or replace a care
-                professional.
-              </Text>
-            </View>
           </>
         )}
       </ScrollView>
@@ -600,13 +597,24 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     ...elevation.card,
   },
-  /* Quiet means quiet: no edge and no shadow either, or it still reads as a
-     button sitting next to the one that is. */
-  pillButtonQuiet: { backgroundColor: "transparent", borderWidth: 0, shadowOpacity: 0, elevation: 0 },
   pillButtonPressed: { opacity: 0.6 },
   pillButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
-  pillButtonTextQuiet: { color: colors.muted, fontSize: 12, fontWeight: "700" },
   taskList: { gap: 10 },
+  /**
+   * Divides the plan's own rows from the Pro row.
+   *
+   * The two were cards 18px apart and read as one block, so a person scanning
+   * past saw a single monetisation stack rather than "what was written" and
+   * then "the paid tier". A dashed rule is the same divider the landing page
+   * uses between chrome, and it costs one pixel instead of a section heading.
+   */
+  planDivider: {
+    height: 1,
+    marginTop: 24,
+    borderTopWidth: 1,
+    borderStyle: "dashed",
+    borderTopColor: colors.borderSoft,
+  },
   notesCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -666,8 +674,6 @@ const styles = StyleSheet.create({
   proTitle: { color: colors.ink, fontSize: 14, fontWeight: "600" },
   proBadge: { color: colors.blue, fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
   proText: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 3 },
-  safetyNote: { flexDirection: "row", gap: 7, alignItems: "flex-start", marginTop: 19, paddingHorizontal: 2 },
-  safetyText: { color: colors.muted, fontSize: 11, lineHeight: 17, flex: 1 },
   pressed: { opacity: 0.72 },
   skeletonStack: { gap: 12 },
   skeleton: { height: 112, borderRadius: 22, backgroundColor: colors.skeleton },

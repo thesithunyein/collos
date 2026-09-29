@@ -175,10 +175,21 @@ it. The uppercase labels became sentence case (`Care circle`, `Members`, `Store 
 was tuned for capitals removed, and the oversized display sizes came down with them — screen titles 27 to 25, section
 titles 20 to 18, the hero card title 22 to 19.
 
-The other half of "this looks generated" is **density**, which is a product decision rather than a styling one: Today
-carries a greeting, a recipient switcher, a hero card, a section header with two actions, four moment cards each with two
-buttons, a notes row and a Pro row. Changing weights makes that quieter; only removing elements makes it sparse. Nothing
-was cut here, so this is worth revisiting if the screen still feels busy.
+The other half of "this looks generated" is **density**, which is a product decision rather than a styling one. Today
+carried a greeting, a switcher, a hero card, a section header with two actions, four moment cards each with *two* bordered
+buttons, a notes row, a Pro row and a medical disclaimer — eight buttons on one screen, plus a control that wipes the day
+sitting as a peer of the one button people actually press. Four things moved or went:
+
+| Was on Today | Where it is now |
+| --- | --- |
+| A second bordered button, `Skip`, on every moment card | An icon-only control pinned to the card's trailing edge. The action is unchanged and still announced to a screen reader; only the chrome went |
+| `Reset day`, beside `Add` | Settings, under "Your data", directly above the destructive reset — the reversible one and the destructive one are only distinguishable side by side |
+| The medical disclaimer | Settings, where the same sentence already runs on onboarding, the FAQ, the footer and the docs page |
+| A Pro row 18px below the notes row | The same row below a dashed rule, so the plan's own rows stop reading as one monetisation stack |
+
+The trade to be aware of: an icon-only `Skip` is less discoverable than a labelled button, and it is a deliberate bet that
+one primary action per row reads better than two. The landing FAQ still says "confirm and skip on every moment", which
+stays true — the control moved, the feature did not.
 
 Those six frames do not all come from the same build, and the split is deliberate rather than incidental:
 

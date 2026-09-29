@@ -237,7 +237,6 @@ export default function App() {
             noteCount={recipientNotes.length}
             onSelectRecipient={selectRecipient}
             onUpdateTask={updateTask}
-            onEditPlan={resetDay}
             onAddMoment={() => setAddingMoment(true)}
             onOpenPaywall={() => setPaywallOpen(true)}
             onOpenNotes={openNotes}
@@ -254,7 +253,7 @@ export default function App() {
             onUnlock={() => setPaywallOpen(true)}
           />
         ) : (
-          <SettingsScreen pro={pro} onResetData={resetAllData} />
+          <SettingsScreen pro={pro} onResetData={resetAllData} onResetDay={resetDay} />
         )}
 
         <NavScrim />
