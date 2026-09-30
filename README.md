@@ -40,6 +40,16 @@ A short shared daily plan for the person in a family who has quietly become the 
 > of those sentences appear on the marketing site too — nothing in this project
 > describes a feature the code cannot do.
 
+**In one paragraph.** Collos is a React Native app — iOS, Android and a browser
+build from the same codebase — that gives a family carer a short daily plan for
+the person they look after: confirm each moment, skip it, or move it to tomorrow
+in one tap, with the circle showing who checked in and the notes left on the
+device. It matters because caring for a relative is usually *invisible* work: it
+lives in one person's head or a group chat, so nobody can tell what has already
+been done and the same question gets asked three times. Collos writes the small,
+repeating things down so the next person does not have to ask. No account, no
+backend, no medical claims.
+
 ---
 
 ## Contents
