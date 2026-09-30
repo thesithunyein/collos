@@ -2,11 +2,12 @@ name: CI
 
 # What this guarantees, and what it does not.
 #
-# The two commands below are the only automated gate this project has: they catch
-# a type error, a module that no longer resolves, and a bundle that will not
-# build. They are the same two commands run by hand before every commit, which is
-# why they are the ones in CI — a gate nobody runs locally is a gate that fails
-# in CI only.
+# The steps below are the only automated gate this project has: they catch a type
+# error, a module that no longer resolves, a bundle that will not build, and a
+# README whose links, anchors, diagrams or structure tree no longer match the
+# repository. They are the same commands run by hand before every commit, which is
+# why they are the ones in CI — a gate nobody runs locally is a gate that fails in
+# CI only.
 #
 # There are no unit tests, and no coverage badge, because there are no unit
 # tests. See the "Testing and quality" section of the README for what is verified
@@ -51,6 +52,18 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      # The README makes claims about this repository — that every tracked file
+      # appears in its structure tree, that every relative link resolves, that
+      # every contents anchor lands on a heading that exists, that its diagrams
+      # reference nodes they declare, and that its stored-state sample is valid
+      # JSON. A README that large rots silently, and it is the first thing a
+      # reader meets, so the claims are checked here rather than trusted.
+      #
+      # Fast and dependency-free, so it runs before the slow build on purpose:
+      # a broken link should not wait three minutes behind an Expo export.
+      - name: Check the documentation
+        run: npm run docs:check
 
       # The browser build is the target that has no native code behind it, so it
       # is the one that breaks first when a dependency drifts. Building it here

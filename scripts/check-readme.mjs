@@ -222,26 +222,72 @@ try {
 
   let covered = 0;
   for (const path of tracked) {
-    if (readme.includes(path)) {
-      covered += 1;
-      continue;
-    }
-    // Covered by a directory entry, or by a glob entry like `app-*.png`.
-    const parts = path.split("/");
-    const directories = parts.slice(0, -1).map((_, index) => parts.slice(0, index + 1).join("/") + "/");
-    const housekeeping = /\.gitignore$|\.env\.example$|^package-lock\.json$/.test(path);
-    // A tree entry may stand for a family of files, as `app-*.png` does.
-    const extension = `.${path.split(".").pop()}`;
-    const globbed = [...readme.matchAll(/[\w-]*\*\.[\w-]+/g)].some((match) => match[0].endsWith(extension));
-    if (directories.some((directory) => readme.includes(directory)) || housekeeping || globbed.test(readme)) {
-      covered += 1;
-      continue;
-    }
-    note(`not in the structure tree: ${path}`);
+    if (isDocumented(path)) covered += 1;
+    else note(`not in the structure tree: ${path}`);
   }
+
+  function isDocumented(path) {
+    const parts = path.split("/");
+    const file = parts[parts.length - 1];
+    const extension = `.${file.split(".").pop()}`;
+
+    // 1. Written out in full, as the Modules table does for `src/storage/careStore.ts`.
+    if (readme.includes(path)) return true;
+
+    // 2. Named on its own, as the tree does for the portraits on one line.
+    if (readme.includes(file)) return true;
+
+    // 3. Covered by a glob entry, such as `app-*.png` in the landing tree.
+    //
+    //    The glob is matched against the file's *name*, not its extension. The
+    //    obvious shortcut — "does any glob entry end in .png?" — reads as a
+    //    reasonable test and quietly covered every PNG in the repository, so a
+    //    file nobody had listed sailed through. A glob has to mean what it says.
+    for (const match of readme.matchAll(/[\w-]*\*[\w-]*\.[\w-]+/g)) {
+      const pattern = new RegExp(
+        `^${match[0].replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")}$`,
+      );
+      if (pattern.test(file)) return true;
+    }
+
+    // 4. Covered by a *numbered* family entry in the tree, of the form
+    //    `appstore/            6 PNGs at 1320x2868` — a directory that says how
+    //    many files it holds. The number is what makes this safe to accept.
+    //
+    //    The rule is deliberately not "the directory is mentioned somewhere": the
+    //    first version of this check did that, and it passed a file dropped into
+    //    `src/` without a word, because `src/` appears in the README a dozen times.
+    //    A check that cannot fail on the thing it exists to catch is decoration.
+    if (parts.length > 1) {
+      const segment = parts[parts.length - 2];
+      const directory = parts.slice(0, -1).join("/");
+      const family = new RegExp(`^[\\s\u2502\u251c\u2514\u2500]*${segment}/\\s+\\S*(\\d+)`);
+      for (const line of readme.split("\n")) {
+        const match = line.match(family);
+        if (!match) continue;
+        // The number has to be true, or the entry is a guess dressed as a fact:
+        // count what git actually tracks in that directory and make it match.
+        const claimed = Number(match[1]);
+        const present = tracked.filter((other) => other.startsWith(`${directory}/`)).length;
+        if (present === claimed) return true;
+        note(`${directory}/ is listed as ${claimed} file(s) but git tracks ${present}`);
+        return false;
+      }
+    }
+
+    // 5. Repository plumbing that carries no product meaning.
+    return /(^|\/)\.gitignore$|^\.env\.example$|^package-lock\.json$/.test(path);
+  }
+
   console.log(`  tracked files covered:  ${covered}/${tracked.length}`);
 } catch (error) {
-  console.log(`  tracked files:          skipped (${error.message.split("\n")[0]})`);
+  // In CI the checkout is always present, so a failure here means the check would
+  // be skipped rather than passed — a green badge over a structure tree that had
+  // quietly rotted, which is worse than not checking at all. Locally, where `git`
+  // might genuinely be missing, it degrades to a printed note.
+  const message = `the tracked-file check could not run: ${error.message.split("\n")[0]}`;
+  if (process.env.CI) note(message);
+  else console.log(`  tracked files:          skipped (${error.message.split("\n")[0]})`);
 }
 
 /* --- report ---------------------------------------------------------------- */

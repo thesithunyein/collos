@@ -308,7 +308,7 @@ collos/
 │
 ├── .github/
 │   ├── workflows/ci.yml         typecheck + browser export on every push and PR
-│   ├── ISSUE_TEMPLATE/          bug report and feature request forms
+│   ├── ISSUE_TEMPLATE/          bug_report.yml · feature_request.yml
 │   └── pull_request_template.md the checklist a change has to satisfy
 │
 ├── src/
@@ -326,9 +326,11 @@ collos/
 │   ├── platform/
 │   │   ├── device.ts            the device rows Settings prints
 │   │   └── motion.ts            useReduceMotion()
-│   ├── components/              TaskCard, NavItem, Avatar, LaunchScreen, PaywallModal,
-│   │                            AddMomentSheet, AddPersonSheet, NotesSheet, PersonFields
-│   └── screens/                 OnboardingScreen, TodayScreen, CircleScreen, SettingsScreen
+│   ├── components/              TaskCard.tsx · NavItem.tsx · Avatar.tsx · LaunchScreen.tsx
+│   │                            PaywallModal.tsx · AddMomentSheet.tsx · AddPersonSheet.tsx
+│   │                            NotesSheet.tsx · PersonFields.tsx
+│   └── screens/                 OnboardingScreen.tsx · TodayScreen.tsx
+│                                CircleScreen.tsx · SettingsScreen.tsx
 │
 ├── scripts/
 │   ├── capture-app-screenshots.mjs   drives the running app and writes every PNG
@@ -342,7 +344,7 @@ collos/
 │   ├── adaptive-icon.png        Android adaptive foreground, generated
 │   ├── favicon.png              browser tab, generated
 │   ├── splash.png               splash mark, generated
-│   ├── avatars/                 the three bundled portraits
+│   ├── avatars/                 daniel.png · margaret.png · sithu.png — the bundled portraits
 │   ├── make-icons.py            resamples the sources into every icon size
 │   └── make-og-image.py         composes the 1200x630 social preview card
 │
@@ -361,14 +363,16 @@ collos/
 │   ├── logo-mark.png            the mark on its square
 │   ├── favicon.png              the tab icon
 │   ├── .gitignore               ignores .vercel and .env* for the site deploy
-│   └── avatars/                 the site's copies of the three portraits
+│   └── avatars/                 daniel.png · margaret.png · sithu.png — the site's copies
 │
-├── submission/screenshots/      6 PNGs at 1179x2556, the Devpost size
+├── submission/
+│   └── screenshots/            6 PNGs at 1179x2556 — onboarding, today, circle free,
+│                               paywall, circle pro, settings
 └── store/
     ├── listing.md               paste-ready store copy and questionnaires
     └── screenshots/
-        ├── appstore/            6 PNGs at 1320x2868
-        └── playstore/           6 PNGs at 1080x1920
+        ├── appstore/           6 PNGs at 1320x2868
+        └── playstore/          6 PNGs at 1080x1920
 ```
 
 ## Getting started
@@ -480,7 +484,7 @@ all, and the app says so instead of showing a confusing failure.
 - **The plan is written the moment it changes.** Every confirmation, added moment,
   edit, move, deletion and note goes to device-local storage — `localStorage` in
   the browser, `expo-file-system` on a phone — through three functions in
-  `src/storage/fileStore*.ts`.
+  `src/storage/fileStore.ts` and `src/storage/fileStore.web.ts`.
 - **There is no backend.** No account, no sync, no analytics, no crash reporting,
   no third-party SDK other than RevenueCat, and no `fetch` to anywhere in the app.
 - **Deleting the app deletes the data.** There is no copy anywhere else, which is
