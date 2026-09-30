@@ -107,9 +107,11 @@ because that is where the real RevenueCat Billing key is configured.
 > Settings shows "Collos Pro is active · Current period ends Sep 30, 2026".
 > The earlier "Pro reads FREE in production" risk is resolved: a fresh purchase
 > works today, and the video can film it. One caveat for filming: the sandbox
-> entitlement expires the same day it was bought, so the purchase beat should be
-> filmed on the same day it is recorded — or re-run "Restore purchases" first if
-> filming happens the next day.
+> entitlement expires the same day it was bought, so run the purchase on the day
+> you film. Do not rely on "Restore purchases" for this — on web it is
+> deliberately unavailable ("Restore isn't available on the web"), so the
+> next-day path is simply buying again; it takes under a minute and the
+> FREE → paywall → active arc is the stronger story on camera anyway.
 
 ## 2. Eligibility gates
 
