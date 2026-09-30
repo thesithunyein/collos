@@ -289,6 +289,24 @@ violating it risks the whole entry.
 | 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro lifts the shared-notes limit — one a day per person on the free plan, as many as your circle needs on Pro. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
 | 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.74.5, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
 
+#### Two beats the app gained after this script was written
+
+The 0:35–1:00 block is where they fit, and the first one is the better film. Both are
+covered by commits in the repository, so the video and the code agree.
+
+- **Skipping moves a moment instead of losing it.** On a moment, tap *Skip*, then the
+  **Move to tomorrow** that appears on the row. The moment leaves today and a toast
+  says where it went. Say the plain version: *"Not now is not never — skipping moves
+  it, so nothing you meant to do falls off the plan."* It is four seconds and it is
+  the one interaction here a judge has not seen in three other care apps.
+- **A moment can repeat on its own days.** Open a moment with the **⋯**, pick
+  *Weekdays*, and save. Its row grows a **Mon–Fri** chip. Say: *"The bins go out on
+  Tuesdays and the nurse comes on weekdays — a plan that can't say that isn't
+  someone's week."*
+
+The **⋯** also opens rename and delete. Do not spend video time on delete: it is a
+safety control, not a story.
+
 Do not use copyrighted music or any third party's trademarks.
 
 ### Proving it's a native app, on camera
@@ -343,8 +361,12 @@ the one who lives closest, or the only one who remembers.
 **What it does.** Care recipients each get a daily plan of small check-ins. You confirm
 or skip a moment and the plan remembers it — on device, immediately, across restarts.
 Recipients are switched with one tap when you are caring for more than one person, and
-you can add your own moments to any plan. The Circle screen shows who is involved and
-who has checked in today.
+you can add your own moments to any plan. Every moment can be revised: rename it, or
+move it to another day. Skipping is not a dead end — a skipped moment offers to move
+itself to tomorrow, so "not now, later" is something you can actually record. Each
+moment also carries its own repeat rule (every day, weekdays, weekends), so a plan can
+be one person's real week instead of a fixed four. The Circle screen shows who is
+involved and who has checked in today.
 
 **How it makes money.** A free tier covering the full daily plan and one shared note a
 day per person, and Collos Pro — unlimited shared notes — as a monthly or annual
@@ -371,10 +393,10 @@ was fingerprinted before and after and verified unchanged.
 
 **What was built during the hackathon window.** The app went from two mock screens to
 a working product: device-local persistence (every confirmation survives a restart,
-with a settings reset), an add-a-moment flow, a real RevenueCat purchase path with
-sandboxable preview mode, and three full screens. **What's next.** A backend so a care
-circle can actually be shared between phones, scheduled reminders, and store releases
-for iOS and Android.
+with a settings reset), a full moment editor — add, revise, reschedule, delete — per
+moment repeat rules, a real RevenueCat purchase path with sandboxable preview mode,
+and three full screens. **What's next.** A backend so a care circle can actually be
+shared between phones, scheduled reminders, and store releases for iOS and Android.
 
 **Categories targeted.** *(Tick only what you can evidence.)* Next Gen Award — student
 project, public repository, MIT licensed. RevenueCat Design Award — the interaction
