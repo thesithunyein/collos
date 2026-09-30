@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { PersonFields } from "../components/PersonFields";
-import { colors, elevation, shape } from "../theme";
+import { colors, elevation, shape, space, type } from "../theme";
 
 export type NewPerson = {
   name: string;
@@ -202,11 +202,16 @@ export function OnboardingScreen({
 
 const styles = StyleSheet.create({
   onboarding: { flex: 1, backgroundColor: colors.blue },
-  onboardingContent: { flexGrow: 1, paddingHorizontal: 24 },
-  onboardingTop: { flexDirection: "row", alignItems: "center", gap: 10, paddingTop: 18 },
+  onboardingContent: { flexGrow: 1, paddingHorizontal: space.huge },
+  onboardingTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.md,
+    paddingTop: space.xxxl,
+  },
   logoMark: { width: 38, height: 38, borderRadius: 13, overflow: "hidden" },
   logoImage: { width: "100%", height: "100%" },
-  wordmark: { color: colors.white, fontSize: 21, fontWeight: "700", letterSpacing: -0.4 },
+  wordmark: { ...type.title, color: colors.white, letterSpacing: -0.4 },
   backButton: {
     marginLeft: "auto",
     width: 38,
@@ -243,7 +248,17 @@ const styles = StyleSheet.create({
   sparkOne: { top: "30%", left: "22%" },
   sparkTwo: { top: "21%", right: "23%", width: 8, height: 8 },
   sparkThree: { bottom: "28%", right: "20%", width: 16, height: 16, borderRadius: 8 },
-  onboardingCopy: { paddingBottom: 22 },
+  onboardingCopy: { paddingBottom: space.huge },
+  /**
+   * The setup headline is the app's one display size.
+   *
+   * Every screen in the app opens at `type.display` (25pt), because the app is
+   * a tool and its titles should not shout. This screen is the exception it
+   * earns: it is the only full-bleed surface, the only one with nothing else on
+   * it, and the only one a person sees before they have decided to use the
+   * product — so the promise is set at 38/42 and the rest of the screen is
+   * quiet around it.
+   */
   onboardingTitle: {
     color: colors.white,
     fontSize: 38,
@@ -252,31 +267,50 @@ const styles = StyleSheet.create({
     letterSpacing: -1.2,
   },
   onboardingTitleAccent: { color: colors.periwinkle },
+  /** One step above `type.body`, for the same reason as the headline. */
   onboardingSubtitle: {
+    ...type.body,
     color: colors.blueTint,
     fontSize: 16,
     lineHeight: 24,
-    marginTop: 14,
+    marginTop: space.xl,
     maxWidth: 330,
   },
-  trustNote: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 24 },
-  trustText: { color: colors.blueTint, fontSize: 12, lineHeight: 18, flex: 1 },
+  trustNote: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
+    marginTop: space.huge,
+  },
+  trustText: { ...type.caption, color: colors.blueTint, flex: 1 },
   /** Luma's primary action is a full-width pill, not a rounded rectangle. */
   primaryButton: {
     backgroundColor: colors.white,
     minHeight: 58,
     borderRadius: 999,
-    marginTop: 22,
-    paddingHorizontal: 22,
+    marginTop: space.huge,
+    paddingHorizontal: space.huge,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-  primaryButtonText: { color: colors.blue, fontSize: 16, fontWeight: "600" },
-  onboardingFooter: { color: colors.blueMuted, fontSize: 11, textAlign: "center", marginTop: 17 },
+  primaryButtonText: { ...type.subhead, fontSize: 16, color: colors.blue },
+  onboardingFooter: {
+    ...type.micro,
+    fontWeight: "400",
+    color: colors.blueMuted,
+    textAlign: "center",
+    marginTop: space.xxl,
+  },
   pressed: { opacity: 0.72 },
 
-  whoWrap: { flex: 1, justifyContent: "center", paddingTop: 8, paddingBottom: 22 },
+  whoWrap: {
+    flex: 1,
+    justifyContent: "center",
+    paddingTop: space.sm,
+    paddingBottom: space.huge,
+  },
+  /** The second step's question, one size below the first step's promise. */
   whoTitle: {
     color: colors.white,
     fontSize: 30,
@@ -284,27 +318,34 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: -1,
   },
-  whoSubtitle: { color: colors.blueTint, fontSize: 15, lineHeight: 22, marginTop: 10, maxWidth: 330 },
+  whoSubtitle: { ...type.body, color: colors.blueTint, marginTop: space.md, maxWidth: 330 },
   formCard: {
     backgroundColor: colors.white,
     borderRadius: shape.lg,
-    padding: 18,
-    marginTop: 22,
+    padding: space.xxxl,
+    marginTop: space.huge,
     ...elevation.card,
   },
-  primaryButtonSpaced: { marginTop: 16 },
+  primaryButtonSpaced: { marginTop: space.xxl },
   primaryButtonOff: { opacity: 0.55 },
   /** The organiser field sits on the navy hero, so it inverts the card's inputs. */
-  fieldLabelDark: { color: colors.blueTint, fontSize: 13, fontWeight: "600", marginTop: 20 },
+  fieldLabelDark: {
+    ...type.callout,
+    fontWeight: "600",
+    color: colors.blueTint,
+    marginTop: space.xxxl,
+  },
   inputDark: {
-    marginTop: 8,
+    marginTop: space.sm,
     minHeight: 50,
-    borderRadius: 14,
+    borderRadius: shape.sm,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.28)",
     backgroundColor: "rgba(255,255,255,0.1)",
-    paddingHorizontal: 14,
+    paddingHorizontal: space.xl,
     color: colors.white,
+    // 16pt on purpose: anything smaller makes iOS Safari zoom the whole page
+    // in when the field takes focus, and the setup screen would jump.
     fontSize: 16,
     fontWeight: "500",
   },

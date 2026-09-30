@@ -12,14 +12,18 @@
     <meta property="og:title" content="Collos | Care, together." />
     <meta property="og:description" content="Keep the small things that matter in one shared place. Collos helps families coordinate everyday care with less noise and more confidence." />
     <meta property="og:url" content="https://collos.sithunyein.com/" />
-    <meta property="og:image" content="https://collos.sithunyein.com/app-dashboard.png" />
-    <meta property="og:image:width" content="780" />
-    <meta property="og:image:height" content="1688" />
-    <meta property="og:image:alt" content="The Collos care dashboard, showing a daily care plan and its progress." />
+    <!-- 1200x630, because a `summary_large_image` card crops to roughly 2:1 and a
+         780x1688 phone screenshot lands as the middle 40% of a screen with no
+         name on it. `python assets/make-og-image.py` composes the card from the
+         same real capture the page shows. -->
+    <meta property="og:image" content="https://collos.sithunyein.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Collos: care, together. Check-ins, water breaks and shared notes in one calm daily plan, beside the app's dashboard." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Collos | Care, together." />
     <meta name="twitter:description" content="Keep the small things that matter in one shared place." />
-    <meta name="twitter:image" content="https://collos.sithunyein.com/app-dashboard.png" />
+    <meta name="twitter:image" content="https://collos.sithunyein.com/og.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -204,11 +208,13 @@
               <div class="plan-row">
                 <span class="plan-dot plan-dot-blush" aria-hidden="true"></span>
                 <span class="plan-row-copy">Water break <small>10:30 AM</small></span>
+                <span class="plan-repeat" aria-hidden="true">Mon&ndash;Fri</span>
                 <span class="plan-check" aria-hidden="true">&#10003;</span>
               </div>
               <div class="plan-row">
                 <span class="plan-dot plan-dot-mint" aria-hidden="true"></span>
                 <span class="plan-row-copy">Fresh air <small>2:00 PM</small></span>
+                <span class="plan-menu material-symbols-rounded" aria-hidden="true">more_horiz</span>
                 <span class="plan-check plan-check-open" aria-hidden="true">&mdash;</span>
               </div>
               <div class="plan-bar" role="img" aria-label="Half of today's moments confirmed">
@@ -231,7 +237,7 @@
               <img class="circle-logo" src="logo.png" width="40" height="40" alt="" />
               <div>
                 <strong>Care circle</strong>
-                <small>Your people, one shared plan</small>
+                <small>Who is checking in, and what is done</small>
               </div>
             </article>
           </div>
@@ -308,16 +314,31 @@
         </div>
       </section>
 
-      <section class="video-section">
-        <div class="shell video-inner">
-          <div class="video-copy">
-            <p class="eyebrow">SEE IT IN A MOMENT</p>
-            <h2>Care that fits<br /><em>real life.</em></h2>
-            <p>A short walkthrough of the Collos experience — set up a circle, confirm a moment, and watch the plan remember it.</p>
+      <!-- THE REAL APP — two frames of the running product, captured by
+           `npm run screenshots`, in that order a person meets them. These are
+           PNGs from the build, not drawn mockups, so they cannot drift from the
+           app the way the old hand-built hero card did. -->
+      <section class="tour-section" id="the-real-app">
+        <div class="shell tour-inner">
+          <div class="tour-copy">
+            <p class="eyebrow">THE REAL APP</p>
+            <h2>Two screens,<br /><em>in the order you meet them.</em></h2>
+            <p>Setup asks who you are caring for. From there, today&rsquo;s plan carries every confirm, every skip, and the note you leave for whoever picks it up next.</p>
+            <ul class="tour-beats">
+              <li><strong>Setup</strong><span>One person, a few seconds, no account to make.</span></li>
+              <li><strong>Today</strong><span>Confirm a moment, skip it, or move it to tomorrow.</span></li>
+            </ul>
+            <p class="tour-caption">Both frames are captures of the running app, taken by the capture script &mdash; so this page cannot show a screen the product does not have.</p>
           </div>
-          <div class="video-placeholder" role="img" aria-label="Product video coming soon">
-            <div class="play-button material-symbols-rounded" aria-hidden="true">play_arrow</div>
-            <span>PRODUCT TOUR<br /><small>Coming soon</small></span>
+          <div class="tour-frames" role="img" aria-label="Two captures of the Collos app: setup, and today's care plan">
+            <figure class="tour-frame tour-frame-back">
+              <img src="app-onboarding.png" width="780" height="1688" alt="" loading="lazy" decoding="async" />
+              <figcaption>Setup</figcaption>
+            </figure>
+            <figure class="tour-frame tour-frame-front">
+              <img src="app-dashboard.png" width="780" height="1688" alt="" loading="lazy" decoding="async" />
+              <figcaption>Today</figcaption>
+            </figure>
           </div>
         </div>
       </section>

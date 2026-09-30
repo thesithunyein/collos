@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { useReduceMotion } from "../platform/motion";
-import { colors, motion, nativeAnimDriver } from "../theme";
+import { colors, motion, nativeAnimDriver, space, type } from "../theme";
 
 /**
  * A bottom-tab item with a springy active state. The icon springs up a few
@@ -97,7 +97,13 @@ export function NavItem({
 }
 
 const styles = StyleSheet.create({
-  navItem: { minWidth: 84, minHeight: 52, alignItems: "center", justifyContent: "center", gap: 4 },
+  navItem: {
+    minWidth: 84,
+    minHeight: 52,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: space.xxs,
+  },
   navItemPressed: { opacity: 0.72 },
   /**
    * The icon's fixed slot. It carries the size, so the bar never reflows as the
@@ -121,6 +127,6 @@ const styles = StyleSheet.create({
   // subtle at 11pt, so tint and weight move together — and both of them do.
   // They were documented here as moving together but were both set to 600, so
   // the active tab was carried by colour alone.
-  navLabel: { color: colors.muted, fontSize: 11, fontWeight: "600" },
+  navLabel: { ...type.micro, color: colors.muted },
   navLabelActive: { color: colors.blue, fontWeight: "700" },
 });

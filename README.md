@@ -93,10 +93,10 @@ src/purchases/revenuecat.ts    SDK wrapper: init, offerings, purchase, restore, 
 src/purchases/usePro.ts        the hook the UI consumes
 src/components/                NavItem, TaskCard, PaywallModal, AddMomentSheet, AddPersonSheet, NotesSheet
 src/screens/                   Onboarding, Today, Circle, Settings
-src/data/mockCare.ts           moment templates, portraits and the signed-in user
+src/data/care.ts           moment templates, portraits and the signed-in user
 ```
 
-- `src/data/mockCare.ts` provides *templates*: the four starter moments, the portraits offered when someone is created, and the person holding the phone. It holds no plan. The people you care for, their moments, shared notes and every status change live in `src/storage/careStore.ts`, on the device. A future backend replaces the storage module, not the UI.
+- `src/data/care.ts` provides *templates*: the four starter moments, the portraits offered when someone is created, and the person holding the phone. It holds no plan. The people you care for, their moments, shared notes and every status change live in `src/storage/careStore.ts`, on the device. A future backend replaces the storage module, not the UI.
 - **Nothing in the app is sample data.** Setup creates the first person and their plan starts empty; a fresh install used to open on two invented people and a day that was already 25% done, one moment pre-confirmed by the build rather than by the user. The only populated state is one the user asked for — by hand, or through the one-tap starter plan offered on the empty screen.
 - `src/purchases/` is the only place that imports the RevenueCat SDK, so the rest of the UI only ever sees plans and a `pro` boolean.
 - The Pro entitlement gates real UI: the shared-notes cap is lifted when it is active, and both the Today strip and the Circle screen read the live count from storage. Settings exposes the app user ID, entitlement identifier, and project ID, which is what a reviewer needs to verify the integration.
@@ -151,6 +151,8 @@ The two phone previews are real captures of the running app (`landing/app-onboar
 ```bash
 npm run screenshots
 ```
+
+The social preview card is generated from the same run: `python assets/make-og-image.py` composes `landing/og.png` (1200×630, the hero's gradient, the dashboard capture inside the app's navy bezel). It is a separate file because link previews crop to about 2:1, and a portrait phone screenshot served to one arrives as the middle of an unlabelled screen.
 
 The script launches a local Chrome or Edge headless, drives the web app over the DevTools protocol, and rewrites both PNGs in `landing/`. It has no npm dependencies and needs no secrets. Point it at a local build with `--base-url http://localhost:8081`, or set `CHROME_PATH` if Chrome is not installed in the usual location. `--only 04-paywall` runs the tour as far as the screenshots you name and writes only those, which is how the paywall shot is taken against the deployed app — the real RevenueCat offering loads there, and stopping before *Continue with Pro* keeps the tour out of a live checkout.
 

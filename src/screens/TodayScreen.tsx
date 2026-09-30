@@ -13,9 +13,9 @@ import {
 } from "react-native";
 import { Avatar } from "../components/Avatar";
 import { TaskCard } from "../components/TaskCard";
-import type { CareRecipient, CareTask, TaskStatus } from "../data/mockCare";
+import type { CareRecipient, CareTask, TaskStatus } from "../data/care";
 
-import { colors, elevation, insets, numeric, shape } from "../theme";
+import { colors, elevation, insets, motion, numeric, shape, space, type } from "../theme";
 
 /**
  * The hero's progress number eases from its previous value to each new one, so
@@ -30,7 +30,7 @@ import { colors, elevation, insets, numeric, shape } from "../theme";
  * not readable from JS — the label would sit at its initial value forever.
  * The ring itself is unchanged; only this label is animated.
  */
-function useCountUp(target: number, duration = 400): Animated.Value {
+function useCountUp(target: number, duration = motion.duration.hero): Animated.Value {
   const value = useRef(new Animated.Value(target)).current;
   const current = useRef(target);
 
@@ -282,19 +282,20 @@ export function TodayScreen({
             <View style={styles.skeleton} />
           </View>
         ) : (
-          <>              <View style={styles.heroGlowWrap}>
+          <>
+            <View style={styles.heroGlowWrap}>
               <Glow color="154,191,243" size={210} style={styles.heroGlowLarge} />
               <Glow color="96,177,255" size={170} style={styles.heroGlowSmall} />
-            <View style={styles.heroCard}>
-              <View style={styles.heroContent}>
-                <Text style={styles.heroKicker}>Today’s care plan</Text>
-                <Text style={styles.heroTitle}>A little goes a long way.</Text>
-                <Text style={styles.heroText}>
-                  You’re helping {recipient.name} feel remembered and supported.
-                </Text>
+              <View style={styles.heroCard}>
+                <View style={styles.heroContent}>
+                  <Text style={styles.heroKicker}>Today’s care plan</Text>
+                  <Text style={styles.heroTitle}>A little goes a long way.</Text>
+                  <Text style={styles.heroText}>
+                    You’re helping {recipient.name} feel remembered and supported.
+                  </Text>
+                </View>
+                <ProgressRing progress={progress} />
               </View>
-              <ProgressRing progress={progress} />
-            </View>
             </View>
 
             <View style={styles.sectionHeader}>
@@ -506,28 +507,22 @@ function SharedNotesStrip({
 
 const styles = StyleSheet.create({
   app: { flex: 1, backgroundColor: colors.soft },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 180 },
+  scrollContent: { paddingHorizontal: space.xxxl, paddingBottom: 180 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: 20 + insets.top,
-    paddingBottom: 24,
+    paddingTop: space.xxxl + insets.top,
+    paddingBottom: space.huge,
   },
-  eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
-  greeting: {
-    color: colors.ink,
-    fontSize: 25,
-    fontWeight: "700",
-    letterSpacing: -0.6,
-    marginTop: 6,
-  },
+  eyebrow: { ...type.micro, color: colors.muted },
+  greeting: { ...type.display, color: colors.ink, marginTop: space.xs },
   /** No fill or radius here: `Avatar` draws the portrait and the fallback. */
   avatarWrap: { width: 44, height: 44 },
   proDot: {
     position: "absolute",
-    right: -4,
-    bottom: -4,
+    right: -space.xxs,
+    bottom: -space.xxs,
     width: 18,
     height: 18,
     borderRadius: 9,
@@ -547,33 +542,27 @@ const styles = StyleSheet.create({
    * the polish pass is trying to remove. Sibling `zIndex` is the fix that keeps
    * the glow's upward spill, which is what makes the hero look lit.
    */
-  recipientSwitcher: { marginBottom: 20, zIndex: 2 },
+  recipientSwitcher: { marginBottom: space.xxxl, zIndex: 2 },
   heroGlowWrap: { position: "relative", zIndex: 0 },
-  sectionLabel: {
-    color: colors.muted,
-    fontSize: 11,
-    fontWeight: "600",
-    letterSpacing: 0.2,
-    marginBottom: 10,
-  },
-  recipientRow: { gap: 10, paddingRight: 4 },
+  sectionLabel: { ...type.micro, color: colors.muted, marginBottom: space.md },
+  recipientRow: { gap: space.md, paddingRight: space.xxs },
   recipientChip: {
     minWidth: 126,
     minHeight: 60,
     backgroundColor: colors.white,
-    borderRadius: 17,
-    padding: 10,
+    borderRadius: shape.md,
+    padding: space.md,
     flexDirection: "row",
     alignItems: "center",
-    gap: 9,
+    gap: space.sm,
     borderWidth: 1,
     borderColor: colors.border,
     ...elevation.card,
   },
   recipientChipSelected: { backgroundColor: colors.blue, borderColor: colors.blue, ...elevation.lifted },
-  chipName: { color: colors.ink, fontSize: 14, fontWeight: "600" },
+  chipName: { ...type.subhead, color: colors.ink },
   chipNameSelected: { color: colors.white },
-  chipRelationship: { color: colors.muted, fontSize: 11, marginTop: 2 },
+  chipRelationship: { ...type.micro, fontWeight: "400", color: colors.muted, marginTop: 2 },
   chipRelationshipSelected: { color: colors.blueTint },
   /** Anchors only: `Glow` draws the discs inside whatever box this describes. */
   heroGlowLarge: { top: -34, left: -30 },
@@ -581,7 +570,7 @@ const styles = StyleSheet.create({
   heroCard: {
     backgroundColor: colors.blue,
     borderRadius: shape.xl,
-    padding: 21,
+    padding: space.xxxl,
     // Floats above the glow ellipses behind it.
     shadowColor: colors.ink,
     shadowOpacity: 0.18,
@@ -591,19 +580,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     overflow: "hidden",
-    marginBottom: 26,
+    marginBottom: space.huge,
   },
-  heroContent: { flex: 1, paddingRight: 8 },
-  heroKicker: { color: colors.blueTint, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
+  heroContent: { flex: 1, paddingRight: space.sm },
+  heroKicker: { ...type.micro, color: colors.blueTint },
+  /**
+   * The one size in the app that is not on the scale.
+   *
+   * The hero card is a half-width column beside a 72pt ring, so a 21pt `title`
+   * wraps it to three lines and the card grows taller than the ring it is
+   * meant to sit beside. 19/24 is the largest size that keeps the headline on
+   * two lines at 360pt wide, and it keeps its own leading and tracking for the
+   * same reason every token does.
+   */
   heroTitle: {
     color: colors.white,
     fontSize: 19,
     lineHeight: 24,
     fontWeight: "700",
-    marginTop: 10,
+    marginTop: space.md,
     letterSpacing: -0.4,
   },
-  heroText: { color: colors.blueTint, fontSize: 13, lineHeight: 19, marginTop: 8 },
+  heroText: { ...type.callout, color: colors.blueTint, marginTop: space.sm },
   progressRing: {
     width: 72,
     height: 72,
@@ -631,23 +629,23 @@ const styles = StyleSheet.create({
   },
   /** Tabular, because this is the one number in the app that animates: the
    *  count-up would otherwise make every digit to its left shift as it runs. */
-  progressValue: { color: colors.white, fontSize: 15, fontWeight: "700", ...numeric },
-  progressLabel: { color: colors.blueTint, fontSize: 10, marginTop: 1 },
+  progressValue: { ...type.subhead, fontWeight: "700", color: colors.white, ...numeric },
+  progressLabel: { ...type.tag, fontWeight: "600", letterSpacing: 0, color: colors.blueTint, marginTop: 1 },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 13,
+    marginBottom: space.lg,
   },
-  sectionTitle: { color: colors.ink, fontSize: 18, fontWeight: "600", letterSpacing: -0.3 },
-  sectionMeta: { color: colors.muted, fontSize: 12, marginTop: 3 },
-  sectionActions: { flexDirection: "row", alignItems: "center", gap: 8 },
+  sectionTitle: { ...type.heading, color: colors.ink },
+  sectionMeta: { ...type.caption, color: colors.muted, marginTop: space.xxs },
+  sectionActions: { flexDirection: "row", alignItems: "center", gap: space.sm },
   pillButton: {
     minHeight: 34,
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 12,
+    gap: space.xxs,
+    paddingHorizontal: space.lg,
     borderRadius: 99,
     backgroundColor: colors.white,
     borderWidth: 1,
@@ -655,8 +653,8 @@ const styles = StyleSheet.create({
     ...elevation.card,
   },
   pillButtonPressed: { opacity: 0.6 },
-  pillButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
-  taskList: { gap: 10 },
+  pillButtonText: { ...type.caption, fontWeight: "600", color: colors.blue },
+  taskList: { gap: space.md },
   /**
    * Divides the plan's own rows from the Pro row.
    *
@@ -667,7 +665,7 @@ const styles = StyleSheet.create({
    */
   planDivider: {
     height: 1,
-    marginTop: 24,
+    marginTop: space.huge,
     borderTopWidth: 1,
     borderStyle: "dashed",
     borderTopColor: colors.borderSoft,
@@ -675,13 +673,13 @@ const styles = StyleSheet.create({
   notesCard: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 11,
+    gap: space.lg,
     backgroundColor: colors.white,
-    borderRadius: 19,
+    borderRadius: shape.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 14,
-    marginTop: 18,
+    padding: space.xl,
+    marginTop: space.xxxl,
     ...elevation.card,
   },
   notesIcon: {
@@ -705,18 +703,18 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
   },
   notesCopy: { flex: 1 },
-  notesTitleRow: { flexDirection: "row", alignItems: "center", gap: 7 },
-  notesTitle: { color: colors.ink, fontSize: 14, fontWeight: "600" },
-  notesLockBadge: { color: colors.blue, fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
-  notesText: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 3 },
+  notesTitleRow: { flexDirection: "row", alignItems: "center", gap: space.xs },
+  notesTitle: { ...type.subhead, color: colors.ink },
+  notesLockBadge: { ...type.tag, color: colors.blue, letterSpacing: 0.5 },
+  notesText: { ...type.caption, color: colors.muted, marginTop: space.xxs },
   proCard: {
     backgroundColor: colors.blueWash,
-    borderRadius: 19,
-    padding: 14,
-    marginTop: 18,
+    borderRadius: shape.lg,
+    padding: space.xl,
+    marginTop: space.xxxl,
     flexDirection: "row",
     alignItems: "center",
-    gap: 11,
+    gap: space.lg,
   },
   proIcon: {
     width: 40,
@@ -727,54 +725,52 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   proCopy: { flex: 1 },
-  proTitleRow: { flexDirection: "row", alignItems: "center", gap: 7 },
-  proTitle: { color: colors.ink, fontSize: 14, fontWeight: "600" },
-  proBadge: { color: colors.blue, fontSize: 9, fontWeight: "700", letterSpacing: 0.5 },
-  proText: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 3 },
+  proTitleRow: { flexDirection: "row", alignItems: "center", gap: space.xs },
+  proTitle: { ...type.subhead, color: colors.ink },
+  proBadge: { ...type.tag, color: colors.blue, letterSpacing: 0.5 },
+  proText: { ...type.caption, color: colors.muted, marginTop: space.xxs },
   pressed: { opacity: 0.72 },
-  skeletonStack: { gap: 12 },
-  skeleton: { height: 112, borderRadius: 22, backgroundColor: colors.skeleton },
+  skeletonStack: { gap: space.lg },
+  skeleton: { height: 112, borderRadius: shape.xl, backgroundColor: colors.skeleton },
   skeletonHero: { height: 154 },
   emptyCard: {
     backgroundColor: colors.white,
-    borderRadius: 20,
+    borderRadius: shape.lg,
     alignItems: "center",
-    padding: 26,
+    padding: space.huge,
     borderWidth: 1,
     borderColor: colors.border,
     ...elevation.card,
   },
-  emptyTitle: { color: colors.ink, fontSize: 16, fontWeight: "600", marginTop: 10 },
+  emptyTitle: { ...type.heading, color: colors.ink, marginTop: space.md },
   emptyText: {
+    ...type.caption,
     color: colors.muted,
     textAlign: "center",
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 6,
+    marginTop: space.xs,
   },
   secondaryButton: {
-    minHeight: 42,
+    minHeight: 44,
     backgroundColor: colors.blueWash,
-    borderRadius: 12,
+    borderRadius: shape.sm,
     justifyContent: "center",
-    paddingHorizontal: 15,
-    marginTop: 15,
+    paddingHorizontal: space.xxl,
+    marginTop: space.xxl,
   },
-  secondaryButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
+  secondaryButtonText: { ...type.caption, fontWeight: "600", color: colors.blue },
   templateButton: {
     minHeight: 40,
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 10,
-    marginTop: 6,
+    gap: space.xs,
+    paddingHorizontal: space.md,
+    marginTop: space.xs,
   },
-  templateButtonText: { color: colors.blue, fontSize: 13, fontWeight: "600" },
+  templateButtonText: { ...type.callout, fontWeight: "600", color: colors.blue },
   emptyHint: {
+    ...type.caption,
     color: colors.muted,
     textAlign: "center",
-    fontSize: 11.5,
-    lineHeight: 16,
     marginTop: 2,
     maxWidth: 280,
   },

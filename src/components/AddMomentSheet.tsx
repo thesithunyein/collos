@@ -9,8 +9,8 @@ import {
   TextInput,
   View,
 } from "react-native";
-import type { CareTask, RepeatRule, TaskTemplate } from "../data/mockCare";
-import { REPEAT_LABELS, REPEAT_RULES } from "../data/mockCare";
+import type { CareTask, RepeatRule, TaskTemplate } from "../data/care";
+import { REPEAT_LABELS, REPEAT_RULES } from "../data/care";
 import { colors, insets, shape, space, type } from "../theme";
 
 /**
@@ -432,15 +432,15 @@ const styles = StyleSheet.create({
     marginBottom: space.sm,
   },
   input: {
+    ...type.body,
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: shape.sm,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.soft,
     paddingHorizontal: space.xl,
     paddingVertical: space.lg,
     color: colors.ink,
-    fontSize: 14,
   },
   inputMultiline: { minHeight: 68, textAlignVertical: "top" },
   chipRow: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },

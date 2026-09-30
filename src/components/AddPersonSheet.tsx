@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { colors, insets } from "../theme";
+import { colors, insets, shape, space, type } from "../theme";
 import { PersonFields } from "./PersonFields";
 
 /**
@@ -124,9 +124,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 24 + insets.bottom,
+    paddingHorizontal: space.huge,
+    paddingTop: space.lg,
+    paddingBottom: space.huge + insets.bottom,
   },
   handle: {
     width: 40,
@@ -134,31 +134,36 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: colors.border,
     alignSelf: "center",
-    marginBottom: 12,
+    marginBottom: space.lg,
   },
   closeButton: {
     width: 42,
     height: 42,
-    borderRadius: 14,
+    borderRadius: shape.sm,
     backgroundColor: colors.soft,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "flex-end",
   },
-  title: { color: colors.ink, fontSize: 21, fontWeight: "700", letterSpacing: -0.5, marginTop: 4 },
-  subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 7 },
-  fields: { marginTop: 20 },
-  fieldsContent: { paddingBottom: 6 },
+  title: { ...type.title, color: colors.ink, marginTop: space.xxs },
+  subtitle: { ...type.callout, color: colors.muted, marginTop: space.xs },
+  fields: { marginTop: space.xxxl },
+  fieldsContent: { paddingBottom: space.xs },
   primaryButton: {
     minHeight: 52,
-    borderRadius: 16,
+    borderRadius: shape.sm,
     backgroundColor: colors.blue,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
+    marginTop: space.xxxl,
   },
   primaryButtonDisabled: { backgroundColor: colors.blueDisabled },
-  primaryButtonText: { color: colors.white, fontSize: 15, fontWeight: "600" },
-  hint: { color: colors.muted, fontSize: 11, lineHeight: 16, textAlign: "center", marginTop: 12 },
+  primaryButtonText: { ...type.subhead, color: colors.white },
+  hint: {
+    ...type.caption,
+    color: colors.muted,
+    textAlign: "center",
+    marginTop: space.lg,
+  },
   pressed: { opacity: 0.72 },
 });

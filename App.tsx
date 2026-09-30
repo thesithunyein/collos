@@ -7,13 +7,13 @@ import { PaywallModal } from "./src/components/PaywallModal";
 import { AddMomentSheet } from "./src/components/AddMomentSheet";
 import { AddPersonSheet } from "./src/components/AddPersonSheet";
 import { NotesSheet } from "./src/components/NotesSheet";
-import type { CareRecipient, CareTask, TaskTemplate } from "./src/data/mockCare";
-import type { TaskStatus } from "./src/data/mockCare";
+import type { CareRecipient, CareTask, TaskTemplate } from "./src/data/care";
+import type { TaskStatus } from "./src/data/care";
 import { CircleScreen } from "./src/screens/CircleScreen";
 import { NewPerson, OnboardingScreen } from "./src/screens/OnboardingScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { TodayScreen } from "./src/screens/TodayScreen";
-import { colors, insets, nativeAnimDriver, shape } from "./src/theme";
+import { colors, insets, motion, nativeAnimDriver, shape, space, type } from "./src/theme";
 import { usePro } from "./src/purchases/usePro";
 import {
   StoredState,
@@ -91,7 +91,7 @@ export default function App() {
       setNoticeShown(true);
       Animated.timing(noticeRise, {
         toValue: 1,
-        duration: 240,
+        duration: motion.duration.base,
         useNativeDriver: nativeAnimDriver,
       }).start();
     } else {
@@ -505,9 +505,9 @@ export default function App() {
 }
 
 /**
- * The capsule's own box, mirrored from `bottomNav`: a 52pt row plus 8pt of
- * padding above and below. `bottomNav` declares it as a `minHeight`, and this is
- * the height the rows actually take.
+ * The capsule's own box: a 52pt row plus 8pt of padding above and below.
+ * `bottomNav` reads both of these, and `NavScrim` uses them to decide where the
+ * mask has to become opaque, so the number exists once.
  */
 const NAV_HEIGHT = 68;
 /** The capsule's distance from the bottom edge, before the home-indicator inset. */
@@ -553,7 +553,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
   },
-  viewportWide: { paddingVertical: 34, paddingHorizontal: 24, justifyContent: "center" },
+  viewportWide: {
+    paddingVertical: space.giant,
+    paddingHorizontal: space.huge,
+    justifyContent: "center",
+  },
   frame: {
     flex: 1,
     width: "100%",
@@ -592,10 +596,10 @@ const styles = StyleSheet.create({
     right: 18,
     // Above `NavScrim`, which masks the strip this float leaves below it.
     zIndex: 2,
-    bottom: 10 + insets.bottom,
-    minHeight: 68,
-    paddingTop: 8,
-    paddingBottom: 8,
+    bottom: NAV_LIFT + insets.bottom,
+    minHeight: NAV_HEIGHT,
+    paddingTop: space.sm,
+    paddingBottom: space.sm,
     borderRadius: 34,
     backgroundColor: colors.white,
     borderWidth: 1,
@@ -642,25 +646,25 @@ const styles = StyleSheet.create({
   },
   notice: {
     position: "absolute",
-    left: 20,
-    right: 20,
+    left: space.xxxl,
+    right: space.xxxl,
     bottom: 96 + insets.bottom,
     minHeight: 48,
     borderRadius: shape.md,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: 14,
+    paddingHorizontal: space.xl,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: space.sm,
     shadowColor: colors.ink,
     shadowOpacity: 0.12,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
-  noticeText: { flex: 1, color: colors.ink, fontSize: 12, lineHeight: 17 },
+  noticeText: { ...type.caption, flex: 1, color: colors.ink },
   /** Decorative Dynamic Island inside the desktop device frame. */
   island: {
     position: "absolute",

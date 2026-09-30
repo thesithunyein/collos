@@ -19,7 +19,9 @@
       content="Where the data lives, what Pro unlocks, and how to run Collos yourself."
     />
     <meta property="og:url" content="https://collos.sithunyein.com/docs" />
-    <meta property="og:image" content="https://collos.sithunyein.com/app-dashboard.png" />
+    <meta property="og:image" content="https://collos.sithunyein.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -303,9 +305,17 @@ src/theme.ts                colour, radius scale, safe-area insets</code></pre>
           <section id="assets">
             <h2>Screenshots and assets</h2>
             <p>
-              The phone previews on the product page are real captures of the running app rather than
-              hand-built mockups, and the capture script writes them at the exact sizes the stores
-              require:
+              Every phone frame on the product page is a capture of the running app, taken by the
+              script below rather than drawn by hand, and it writes them at the exact sizes the
+              stores require:
+            </p>
+            <p>
+              The one composed surface is the hero: its floating rows are laid out by hand, and the
+              values on them &mdash; the person, the 10:30 water break and its
+              <code>Mon&ndash;Fri</code> rule, the edit affordance, the <code>1 of 2</code> &mdash;
+              are read off a real screen. That composition is the reason the hero card is the part
+              most likely to drift, which is why the numbers on it are checked against the app
+              rather than remembered.
             </p>
             <pre><code>npm run screenshots          # the two previews used on the landing page
 npm run screenshots:devpost   # 1179x2556, the submission size
@@ -315,6 +325,13 @@ npm run screenshots:playstore # 1080x1920</code></pre>
               Every icon and favicon is generated from one source image by
               <code>python assets/make-icons.py</code>, so the app icon, the Android adaptive
               foreground, both favicons and the splash mark cannot drift apart.
+            </p>
+            <p>
+              The social preview card is built the same way, by
+              <code>python assets/make-og-image.py</code>: 1200x630, the hero's own gradient,
+              and the same dashboard capture inside the app's navy bezel. It exists because a
+              link preview crops to about 2:1, and a portrait phone screenshot served to one
+              arrives as an unlabelled middle slice of a screen.
             </p>
           </section>
 

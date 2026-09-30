@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, Image, StyleSheet, Text, View } from "react-native";
-import { colors, nativeAnimDriver } from "../theme";
+import { useReduceMotion } from "../platform/motion";
+import { colors, motion, nativeAnimDriver, space, type } from "../theme";
 
 /**
  * The cold-start screen.
@@ -20,15 +21,22 @@ import { colors, nativeAnimDriver } from "../theme";
  */
 export function LaunchScreen() {
   const enter = useRef(new Animated.Value(0)).current;
+  const reduceMotion = useReduceMotion();
 
   useEffect(() => {
+    // With reduce motion on the mark is simply there, fully opaque and at rest:
+    // the screen still looks like Collos, it just does not perform arriving.
+    if (reduceMotion) {
+      enter.setValue(1);
+      return;
+    }
     Animated.timing(enter, {
       toValue: 1,
-      duration: 380,
+      duration: motion.duration.slow,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: nativeAnimDriver,
     }).start();
-  }, [enter]);
+  }, [enter, reduceMotion]);
 
   const scale = enter.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] });
 
@@ -84,10 +92,10 @@ const styles = StyleSheet.create({
   },
   badgeImage: { width: "100%", height: "100%" },
   wordmark: {
-    color: colors.ink,
+    ...type.display,
     fontSize: 24,
-    fontWeight: "700",
+    color: colors.ink,
     letterSpacing: -0.8,
-    marginTop: 26,
+    marginTop: space.huge,
   },
 });

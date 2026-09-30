@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { PORTRAITS, RELATIONSHIPS } from "../data/mockCare";
-import { colors } from "../theme";
+import { PORTRAITS, RELATIONSHIPS } from "../data/care";
+import { colors, shape, space, type } from "../theme";
 import { Avatar } from "./Avatar";
 
 /**
@@ -104,24 +104,30 @@ export function PersonFields({
 }
 
 const styles = StyleSheet.create({
-  fieldLabel: { color: colors.ink, fontSize: 13, fontWeight: "600" },
-  fieldLabelSpaced: { marginTop: 20 },
+  fieldLabel: { ...type.callout, fontWeight: "600", color: colors.ink },
+  fieldLabelSpaced: { marginTop: space.xxxl },
   input: {
-    marginTop: 8,
+    marginTop: space.sm,
     minHeight: 50,
-    borderRadius: 14,
+    borderRadius: shape.sm,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.soft,
-    paddingHorizontal: 14,
+    paddingHorizontal: space.xl,
     color: colors.ink,
+    // 16pt so the browser does not zoom the page when the field takes focus.
     fontSize: 16,
     fontWeight: "500",
   },
-  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: space.sm,
+    marginTop: space.md,
+  },
   chip: {
     minHeight: 38,
-    paddingHorizontal: 14,
+    paddingHorizontal: space.xl,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.border,
@@ -131,11 +137,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   chipOn: { backgroundColor: colors.blue, borderColor: colors.blue },
-  chipText: { color: colors.ink, fontSize: 14, fontWeight: "600" },
+  chipText: { ...type.subhead, color: colors.ink },
   chipTextOn: { color: colors.white },
-  portraitRow: { flexDirection: "row", gap: 10, marginTop: 10 },
+  portraitRow: { flexDirection: "row", gap: space.md, marginTop: space.md },
   portraitPick: { padding: 3, borderRadius: 999, borderWidth: 2, borderColor: "transparent" },
   portraitPickOn: { borderColor: colors.blue },
-  fieldHint: { color: colors.muted, fontSize: 11.5, lineHeight: 16, marginTop: 10 },
+  fieldHint: { ...type.caption, color: colors.muted, marginTop: space.md },
   pressed: { opacity: 0.72 },
 });

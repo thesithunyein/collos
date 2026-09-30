@@ -60,6 +60,21 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; }
 /* The one anchored offset in the site: every jump target clears the sticky bar. */
 section[id], footer[id] { scroll-margin-top: 104px; }
 
+/* ---- the two details every page owes a keyboard ---------------------------- */
+/* One ring, drawn the same way on every interactive thing: links, buttons, the
+   FAQ disclosures and the below-fold anchors. `:focus-visible` rather than
+   `:focus`, so a mouse never sees it. */
+a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 10px;
+}
+/* On the navy bands the brand blue sits too close to the background, so the ring
+   inverts there rather than being invisible. */
+.tour-section :focus-visible, .cta-card :focus-visible, .site-footer :focus-visible { outline-color: var(--white); }
+::selection { background: var(--periwinkle-deep); color: var(--ink); }
+/* Every image is a real capture at a known size, so none of them may overflow a
+   narrow column or stretch out of proportion. */
+img { max-width: 100%; }
+
 /* Material Symbols is loaded for one weight and one fill; anything else falls
    back to the ligature name in plain text. */
 .material-symbols-rounded {
@@ -299,6 +314,11 @@ h2 em, h1 em { color: var(--blue); font-style: normal; }
 .plan-dot-mint { background: var(--mint); }
 .plan-check { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 50%; color: var(--white); background: var(--blue); font-size: 11px; }
 .plan-check-open { color: var(--muted); background: var(--periwinkle-wash); }
+/* The two affordances the app now carries on a row, shown at hero scale so the
+   card cannot promise a screen the product does not have: a repeat rule, and
+   the way in to renaming or moving the moment. */
+.plan-repeat { flex: 0 0 auto; padding: 3px 7px; border-radius: 7px; color: var(--blue); background: var(--periwinkle-wash); font-size: 9px; font-weight: 700; letter-spacing: 0.3px; }
+.plan-menu { flex: 0 0 auto; color: #a3b2cc; font-size: 15px; }
 .plan-bar { height: 7px; margin-top: 13px; border-radius: 99px; background: var(--periwinkle-deep); overflow: hidden; }
 .plan-bar-fill { display: block; width: 50%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--blue), #60b1ff); }
 /* Overlapping circles, the way a real avatar stack reads. */
@@ -328,19 +348,13 @@ h2 { margin-top: 0; font-weight: 600; }
    the widest because the headline is the only thing here that can break badly. */
 .section-intro { display: grid; grid-template-columns: 0.6fr 1.35fr 1fr; align-items: end; gap: 45px; }
 .section-intro .eyebrow { align-self: start; }
-.section-intro h2, .showcase h2, .video-copy h2, .cta h2 { margin: 0; font-size: clamp(32px, 4vw, 50px); line-height: 1.06; letter-spacing: -2px; }
+.section-intro h2, .showcase h2, .tour-copy h2, .cta h2 { margin: 0; font-size: clamp(32px, 4vw, 50px); line-height: 1.06; letter-spacing: -2px; }
 .section-intro h2 { font-size: clamp(30px, 3.4vw, 42px); letter-spacing: -1.8px; }
-.section-intro > p:last-child, .showcase-copy > p:not(.eyebrow), .video-copy > p:last-child { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
-.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 64px; }
+.section-intro > p:last-child, .showcase-copy > p:not(.eyebrow) { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
 .feature-icon { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 50%; margin-bottom: 26px; font-size: 22px; }
 .feature-sky { color: var(--blue); background: var(--periwinkle-wash); }
 .feature-blush { color: var(--blush); background: var(--blush-wash); }
 .feature-mint { color: var(--mint); background: var(--mint-wash); }
-.feature-card { position: relative; min-height: 247px; padding: 25px; }
-.feature-card-lift { transform: translateY(-18px); background: rgba(234, 241, 254, 0.75); border-color: var(--periwinkle-deep); }
-.feature-number { position: absolute; top: 25px; right: 25px; color: #aeb9cc; font-size: 11px; font-weight: 800; }
-.feature-card h3 { margin-bottom: 9px; font-size: 17px; letter-spacing: -0.4px; font-weight: 600; }
-.feature-card p { max-width: 250px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
 .showcase { display: grid; grid-template-columns: 0.8fr 1fr; gap: 90px; align-items: center; padding: 115px 0; }
 .showcase-copy > p:not(.eyebrow) { margin: 21px 0 30px; max-width: 390px; }
 .check-list { display: grid; gap: 18px; margin: 0; padding: 0; list-style: none; }
@@ -351,14 +365,35 @@ h2 { margin-top: 0; font-weight: 600; }
 .check-list small { color: var(--muted); font-size: 11px; }
 .dashboard-frame { width: min(100%, 300px); margin: auto; overflow: hidden; border: 8px solid var(--ink); border-radius: 34px; background: var(--cloud); box-shadow: 18px 25px 50px rgba(24, 52, 104, 0.12); }
 .dashboard-frame img { display: block; width: 100%; height: auto; }
-.video-section { padding: 110px 0; color: var(--white); background: var(--ink); }
-.video-inner { display: grid; grid-template-columns: 1fr 1.12fr; align-items: center; gap: 90px; }
-.video-section .eyebrow { color: var(--periwinkle); }
-.video-section h2 em { color: var(--periwinkle); }
-.video-copy > p:last-child { max-width: 390px; color: #aeb9cc; margin-top: 22px; }
-.video-placeholder { min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; border: 1px dashed #33507e; border-radius: 22px; background: rgba(255, 255, 255, 0.03); color: #aec2e8; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-align: center; }
-.video-placeholder small { display: inline-block; margin-top: 5px; color: #8fa6ce; font-size: 9px; letter-spacing: 0; }
-.play-button { display: grid; width: 60px; height: 60px; padding-left: 4px; place-items: center; border-radius: 50%; color: var(--blue); background: var(--white); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18); font-size: 17px; }
+/* ------------------------------------------------------- the real app */
+/* The dark band in the middle of the page, and the one place the site shows
+   the product itself at full size rather than describing it. Navy, because the
+   app's own frame and hero card are navy, and the captures inside the bezels
+   are the app's blue at the same value. */
+.tour-section { padding: 110px 0; color: var(--white); background: var(--ink); }
+.tour-inner { display: grid; grid-template-columns: 1fr 1.06fr; align-items: center; gap: 80px; }
+.tour-section .eyebrow { color: var(--periwinkle); }
+.tour-section h2 em { color: var(--periwinkle); }
+.tour-copy > p:not(.eyebrow):not(.tour-caption) { max-width: 400px; margin: 22px 0 0; color: #aeb9cc; font-size: 15px; line-height: 1.7; }
+/* The two beats, as a list rather than a paragraph: this band is the section a
+   reader skims, so each line carries one fact. */
+.tour-beats { display: grid; gap: 14px; margin: 30px 0 0; padding: 0; list-style: none; }
+.tour-beats li { display: flex; align-items: baseline; gap: 12px; }
+.tour-beats strong { flex: 0 0 74px; color: var(--white); font-family: var(--display); font-size: 13.5px; font-weight: 600; letter-spacing: -0.2px; }
+.tour-beats span { color: #aeb9cc; font-size: 13px; line-height: 1.55; }
+/* Deliberately quiet: it is a statement of provenance, not a selling point. */
+.tour-caption { max-width: 400px; margin: 30px 0 0; padding-top: 20px; border-top: 1px dashed #33507e; color: #8fa6ce; font-size: 11.5px; line-height: 1.7; }
+/* Two frames, the second one stepped up and forward. The overlap is the whole
+   composition: it says "in order" without an arrow, and it keeps the pair the
+   height of one phone instead of two. */
+.tour-frames { position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 0; }
+.tour-frame { margin: 0; width: 40%; max-width: 220px; }
+.tour-frame img { display: block; width: 100%; height: auto; border: 7px solid #0f2450; border-radius: 30px; background: var(--blue); box-shadow: 0 26px 60px rgba(0, 0, 0, 0.45); }
+.tour-frame figcaption { margin-top: 16px; color: var(--periwinkle); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; text-align: center; }
+.tour-frame-back { transform: translateY(34px) rotate(-3deg); }
+.tour-frame-back img { opacity: 0.92; }
+.tour-frame-front { position: relative; z-index: 2; width: 46%; max-width: 250px; margin-left: -26px; }
+.tour-frame-front figcaption { color: var(--white); }
 .cta { padding: 105px 0; }
 .cta-card { display: grid; grid-template-columns: 1fr 0.75fr; gap: 50px; align-items: end; padding: 56px; border-radius: 22px; color: var(--white); background: linear-gradient(135deg, #24427f, #183468); border-color: transparent; }
 .cta-card:hover { transform: none; box-shadow: var(--card-shadow-lift); }
@@ -409,11 +444,8 @@ h2 { margin-top: 0; font-weight: 600; }
 .legal-body a { color: var(--blue); font-weight: 600; }
 .legal-body a:hover { text-decoration: underline; }
 .legal-back { margin-top: 48px; }
-/* The two legal pages keep the old two-element header; give it the same
-   hairline rule the main nav uses so the site still reads as one surface. */
-.site-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 0 20px; border-bottom: 1px dashed rgba(24, 52, 104, 0.18); }
-.header-link { color: var(--muted); font-size: 13px; font-weight: 500; }
-.header-link:hover { color: var(--blue); }
+/* The two legal pages keep the old two-element header; it is styled inline on
+   those pages, so nothing here duplicates it. */
 
 /* --------------------------------------------------- how it works steps */
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 64px; }
@@ -444,8 +476,8 @@ h2 { margin-top: 0; font-weight: 600; }
 .plan-badge { position: absolute; top: 22px; right: 22px; margin: 0; padding: 5px 10px; border-radius: 99px; color: var(--white); background: var(--blue); font-size: 9.5px; font-weight: 700; letter-spacing: 1px; }
 .plan-name { margin: 0; color: var(--muted); font-family: var(--display); font-size: 14px; font-weight: 600; letter-spacing: 0.2px; }
 .plan-price { display: flex; align-items: baseline; gap: 9px; margin: 12px 0 0; }
-.plan-amount { font-family: var(--display); font-size: 44px; font-weight: 600; letter-spacing: -1.8px; }
-.plan-period { color: var(--muted); font-size: 12.5px; font-weight: 500; }
+.plan-amount { font-family: var(--display); font-size: 44px; font-weight: 600; letter-spacing: -1.8px; font-variant-numeric: tabular-nums; }
+.plan-period { color: var(--muted); font-size: 12.5px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .plan-note { margin: 12px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .plan-alt { margin: 10px 0 0; color: var(--muted); font-size: 12.5px; }
 .plan-alt strong { color: var(--ink); }
@@ -573,19 +605,23 @@ code { padding: 1px 5px; border-radius: 6px; color: var(--ink); background: var(
   .section { padding: 85px 0; }
   .section-intro { display: block; text-align: center; }
   .section-intro > p:last-child { margin: 20px auto 0; max-width: 390px; }
-  .feature-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 38px; }
-  .feature-card, .feature-card-lift { min-height: 205px; transform: none; text-align: center; }
+  .step-card, .step-card-lift { min-height: 205px; transform: none; text-align: center; }
   .feature-icon { margin: 0 auto 22px; }
-  .feature-card p { margin: auto; }
+  .step-card p { margin: 0 auto; }
   .showcase { display: flex; flex-direction: column; gap: 49px; padding: 85px 0; }
   .showcase-copy { text-align: center; }
   .showcase-copy > p:not(.eyebrow) { margin: 18px auto 27px; }
   .check-list { text-align: left; max-width: 330px; margin: auto; }
   .dashboard-frame { width: min(100%, 370px); }
-  .video-section { padding: 85px 0; }
-  .video-inner { display: flex; flex-direction: column; align-items: stretch; gap: 37px; text-align: center; }
-  .video-copy > p:last-child { margin: 18px auto 0; }
-  .video-placeholder { min-height: 225px; }
+  .tour-section { padding: 85px 0; }
+  .tour-inner { display: flex; flex-direction: column; align-items: stretch; gap: 46px; text-align: center; }
+  .tour-copy > p:not(.eyebrow):not(.tour-caption) { margin: 18px auto 0; }
+  .tour-beats { max-width: 330px; margin: 26px auto 0; text-align: left; }
+  .tour-caption { max-width: 330px; margin: 26px auto 0; }
+  .tour-frames { padding-left: 0; }
+  .tour-frame { width: 44%; max-width: 190px; }
+  .tour-frame img { border-width: 5px; border-radius: 24px; }
+  .tour-frame-front { width: 50%; max-width: 210px; margin-left: -16px; }
   .cta { padding: 75px 0; }
   .cta-card { display: block; padding: 37px 28px; text-align: center; }
   .cta-card > div:last-child > p { margin: 23px auto 20px; }
@@ -617,7 +653,7 @@ code { padding: 1px 5px; border-radius: 6px; color: var(--ink); background: var(
   .hero-actions { flex-direction: column; gap: 16px; }
   .button-glass { width: 100%; justify-content: center; }
   .mobile-note { align-items: flex-start; text-align: left; }
-  .section-intro h2, .showcase h2, .video-copy h2, .cta h2, .faq-intro h2 { letter-spacing: -1.2px; }
+  .section-intro h2, .showcase h2, .tour-copy h2, .cta h2, .faq-intro h2 { letter-spacing: -1.2px; }
   .plan-amount { font-size: 38px; }
   .stack-strip ul { gap: 14px; }
   .stack-strip li { font-size: 13px; }

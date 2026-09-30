@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
-import type { CareTask, TaskStatus } from "../data/mockCare";
-import { REPEAT_LABELS } from "../data/mockCare";
+import type { CareTask, TaskStatus } from "../data/care";
+import { REPEAT_LABELS } from "../data/care";
 import { useReduceMotion } from "../platform/motion";
 import { colors, elevation, motion, nativeAnimDriver, numeric, shape, space, type } from "../theme";
 
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   taskCard: {
     backgroundColor: colors.white,
     borderRadius: shape.lg,
-    padding: 15,
+    padding: space.xl,
     flexDirection: "row",
     borderWidth: 1,
     borderColor: colors.border,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
   taskTitle: { ...type.subhead, color: colors.ink, flex: 1 },
   taskTitleDone: { color: colors.muted, textDecorationLine: "line-through" },
-  taskTimeRow: { flexDirection: "row", alignItems: "center", gap: 3 },
+  taskTimeRow: { flexDirection: "row", alignItems: "center", gap: space.xxs },
   /** Tabular: the time sits above a row whose state changes, and proportional
    *  digits would let the label shuffle as the plan updates around it. */
   taskTime: { ...type.micro, color: colors.muted, fontWeight: "700", ...numeric },
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blueWash,
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: space.xxs,
   },
   confirmedButton: { backgroundColor: colors.blue, borderColor: colors.blue },
   confirmButtonText: { ...type.caption, color: colors.blue },

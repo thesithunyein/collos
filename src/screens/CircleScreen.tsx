@@ -3,8 +3,8 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Avatar } from "../components/Avatar";
-import type { CareRecipient } from "../data/mockCare";
-import { colors, elevation, insets, numeric, shape } from "../theme";
+import type { CareRecipient } from "../data/care";
+import { colors, elevation, insets, numeric, shape, space, type } from "../theme";
 
 /**
  * Who is actually in the plan.
@@ -163,16 +163,16 @@ export function CircleScreen({
                 <Text style={styles.memberRole}>{member.role}</Text>
               </View>
               {member.confirmedToday === null ? (
-                <View style={styles.ownerPill}>
+                <View style={[styles.pill, styles.ownerPill]}>
                   <Text style={styles.ownerPillText}>Owner</Text>
                 </View>
               ) : member.confirmedToday ? (
-                <View style={styles.donePill}>
+                <View style={[styles.pill, styles.donePill]}>
                   <Ionicons name="checkmark" size={12} color={colors.mint} />
                   <Text style={styles.donePillText}>Today</Text>
                 </View>
               ) : (
-                <View style={styles.pendingPill}>
+                <View style={[styles.pill, styles.pendingPill]}>
                   <Text style={styles.pendingPillText}>Not yet</Text>
                 </View>
               )}
@@ -234,108 +234,110 @@ export function CircleScreen({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.soft },
-  content: { paddingHorizontal: 20, paddingTop: 24 + insets.top, paddingBottom: 180 },
-  eyebrow: { color: colors.muted, fontSize: 11, fontWeight: "600", letterSpacing: 0.2 },
-  title: { color: colors.ink, fontSize: 25, fontWeight: "700", letterSpacing: -0.6, marginTop: 6 },
-  subtitle: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 8 },
-  statRow: { flexDirection: "row", gap: 10, marginTop: 20 },
+  content: {
+    paddingHorizontal: space.xxxl,
+    paddingTop: space.huge + insets.top,
+    paddingBottom: 180,
+  },
+  eyebrow: { ...type.micro, color: colors.muted },
+  title: { ...type.display, color: colors.ink, marginTop: space.xs },
+  subtitle: { ...type.callout, color: colors.muted, marginTop: space.sm },
+  statRow: { flexDirection: "row", gap: space.md, marginTop: space.xxxl },
   statCard: {
     flex: 1,
     backgroundColor: colors.white,
     borderRadius: shape.md,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingVertical: 14,
+    paddingVertical: space.xl,
     alignItems: "center",
     ...elevation.card,
   },
   /** Tabular: these three figures change as the day is filled in, and the row
    *  is a third of the screen wide — proportional digits visibly reflow it. */
-  statValue: { color: colors.ink, fontSize: 19, fontWeight: "700", ...numeric },
-  statLabel: { color: colors.muted, fontSize: 10, fontWeight: "700", marginTop: 3, letterSpacing: 0.3 },
-  sectionLabel: {
-    color: colors.muted,
-    fontSize: 11,
-    fontWeight: "600",
-    letterSpacing: 0.2,
-  },
+  statValue: { ...type.title, color: colors.ink, ...numeric },
+  statLabel: { ...type.tag, color: colors.muted, marginTop: 3 },
+  sectionLabel: { ...type.micro, color: colors.muted },
   // The label's spacing lives on the row now: left on the label it would add
   // itself to the row's height and centre the button against nothing.
   sectionRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 26,
-    marginBottom: 10,
+    marginTop: space.huge,
+    marginBottom: space.md,
   },
   addButton: {
     minHeight: 34,
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 12,
+    gap: space.xxs,
+    paddingHorizontal: space.lg,
     borderRadius: 99,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  addButtonText: { color: colors.blue, fontSize: 12.5, fontWeight: "600" },
-  memberList: { gap: 9 },
+  addButtonText: { ...type.caption, fontWeight: "600", color: colors.blue },
+  memberList: { gap: space.md },
   memberRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 11,
+    gap: space.lg,
     backgroundColor: colors.white,
     borderRadius: shape.md,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 12,
+    padding: space.lg,
     ...elevation.card,
   },
   memberCopy: { flex: 1 },
-  memberName: { color: colors.ink, fontSize: 14, fontWeight: "600" },
-  memberRole: { color: colors.muted, fontSize: 11, marginTop: 2 },
-  donePill: {
+  memberName: { ...type.subhead, color: colors.ink },
+  memberRole: { ...type.micro, fontWeight: "400", color: colors.muted, marginTop: 2 },
+  /**
+   * The four state pills on a member row, all one shape.
+   *
+   * They used to be three different heights and two different label weights,
+   * because `Today` and `Not yet` and `Owner` were written on different days.
+   * One pill with one label style is the difference between a status and a
+   * collection of stickers.
+   */
+  pill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 3,
-    backgroundColor: colors.mintWash,
+    gap: space.xxs,
     borderRadius: 9,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xxs,
   },
-  donePillText: { color: colors.mint, fontSize: 10, fontWeight: "600" },
-  pendingPill: { backgroundColor: colors.soft, borderRadius: 9, paddingHorizontal: 8, paddingVertical: 4 },
-  pendingPillText: { color: colors.muted, fontSize: 10, fontWeight: "600" },
+  donePill: { backgroundColor: colors.mintWash },
+  donePillText: { ...type.tag, color: colors.mint },
+  pendingPill: { backgroundColor: colors.soft },
+  pendingPillText: { ...type.tag, color: colors.muted },
   /** The organiser's own pill: a role, not a state, so it never claims a check-in. */
-  ownerPill: {
-    backgroundColor: colors.blueWash,
-    borderRadius: 9,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  ownerPillText: { color: colors.blue, fontSize: 10, fontWeight: "600" },
-  memberHint: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 10, paddingHorizontal: 2 },
+  ownerPill: { backgroundColor: colors.blueWash },
+  ownerPillText: { ...type.tag, color: colors.blue },
+  memberHint: { ...type.caption, color: colors.muted, marginTop: space.md, paddingHorizontal: 2 },
   unlockedCard: {
     backgroundColor: "rgba(255,255,255,0.9)",
     borderRadius: shape.xl,
     borderWidth: 1.5,
     borderColor: colors.blue,
-    padding: 16,
-    marginTop: 22,
+    padding: space.xxl,
+    marginTop: space.huge,
   },
-  unlockedHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
-  unlockedTitle: { color: colors.ink, fontSize: 15, fontWeight: "600" },
-  unlockedText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 8 },
+  unlockedHeader: { flexDirection: "row", alignItems: "center", gap: space.sm },
+  unlockedTitle: { ...type.subhead, color: colors.ink },
+  unlockedText: { ...type.caption, color: colors.muted, marginTop: space.sm },
   lockedCard: {
     backgroundColor: colors.blueWash,
     borderRadius: shape.xl,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    padding: 16,
-    marginTop: 22,
+    padding: space.xxl,
+    marginTop: space.huge,
   },
-  lockedHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
+  lockedHeader: { flexDirection: "row", alignItems: "center", gap: space.sm },
   lockIcon: {
     width: 32,
     height: 32,
@@ -344,9 +346,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  lockedBadge: { color: colors.blue, fontSize: 10, fontWeight: "700", letterSpacing: 0.6 },
-  lockedTitle: { color: colors.ink, fontSize: 15, fontWeight: "600", marginTop: 10 },
-  lockedText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 6 },
+  lockedBadge: { ...type.tag, color: colors.blue, letterSpacing: 0.6 },
+  lockedTitle: { ...type.subhead, color: colors.ink, marginTop: space.md },
+  lockedText: { ...type.caption, color: colors.muted, marginTop: space.xs },
   primaryButton: {
     minHeight: 48,
     borderRadius: shape.sm,
@@ -354,9 +356,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    marginTop: 15,
+    gap: space.sm,
+    marginTop: space.xxl,
   },
-  primaryButtonText: { color: colors.white, fontSize: 14, fontWeight: "600" },
+  primaryButtonText: { ...type.subhead, color: colors.white },
   pressed: { opacity: 0.72 },
 });
