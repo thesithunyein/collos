@@ -446,6 +446,36 @@ Two traps: never let the browser be the first thing on screen, and don't leave E
 in the take. Expo Go is honest and expected for Next Gen (no store release is required), but the
 video should show *the app*, not the tooling that launched it.
 
+#### What may and may not appear on screen
+
+Nothing forbids a terminal, an editor or the repository — it is your own material,
+and the rules only require that the app also appear, functioning, on its own device.
+But at sixty seconds the file is the thing that matters, and developer tooling spends
+it badly:
+
+- **It spends the one budget the criteria actually score.** Criterion two is *"the
+  core functionality clear from the video and code repository"* — the video's job is
+  the app behaving, and every second in a terminal is a second not doing that.
+- **A laptop is off-message.** This is a mobile category. Footage of a shell prompt
+  works against the platform impression the rest of the video is building.
+- **It reads as a project, not a product.** Criterion four asks for *"product thinking
+  and care"*. A scroll of build output signals coursework; a calm screen that survives
+  being closed and reopened signals a product.
+- **It is evidence the judge already has.** The repository is judged by *reading* it,
+  not by watching you drive it. Time spent on terminal output duplicates what the
+  reviewer will open anyway.
+
+The inverse is the useful rule. What makes footage hard to fake is **consequence**:
+state that outlives the app, a dialog that comes from the operating system, an
+entitlement that survives a reload, a device held in a hand. Those prove a working app
+far more cheaply than any log does.
+
+If you can afford the seconds — which means the 1:30 cut, not the 60-second one —
+one terminal shot earns its place: `npm test` printing **29 passing**. It is the
+single frame that speaks to *"thoughtful technical choices"*, and it is real. Cap it
+at three seconds, with a caption, and keep the repo page itself out of the take so no
+third-party logo crosses the frame.
+
 ## 7. Devpost description (paste-ready)
 
 **Tagline** — Share the small moments that help someone you love feel supported.
