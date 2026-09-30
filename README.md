@@ -85,6 +85,7 @@ A care circle around one person, and a plan for today that is short on purpose.
 | **Setup** | Name the person you care for, pick a relationship and a face. About ten seconds, no account, no email address, no password. |
 | **A plan for today** | Four starter moments — a check-in, a water break, fresh air, an evening note — or add your own. Short enough that a day is finishable. |
 | **Confirm, skip, or move it to tomorrow** | Every moment is one tap to confirm. Skipping it is not the end of it: a skipped moment offers **Move to tomorrow** in one tap, and the deferred day is remembered. |
+| **A skip you can see** | The plan header counts what left the day — *"1 moment moved to tomorrow."* — and on the day it moved to, the moment returns wearing a **Moved here** chip. Both halves are on screen, so *later* never reads as *lost*. |
 | **Recurring moments** | Any moment can be set to every day, weekdays, or weekends, and today's plan filters on the rule. |
 | **Revise anything** | The **⋯** on every row opens an editor: rename it, change the time, change the rule, move it, or delete it (behind a two-tap arm). |
 | **A circle that tells the truth** | Who is checked in today, and every note kept on this device — with the organiser's own row marked as the owner rather than counted as a check-in, so the number never flatters itself. |
@@ -200,7 +201,7 @@ stateDiagram-v2
   Deferred --> [*] : that day passes, and it is an ordinary moment again
 ```
 
-Three details behind that diagram, all of them in `src/storage/careStore.ts`:
+Four details behind that diagram, all of them in `src/storage/careStore.ts`:
 
 - **A move resets the status to open.** A moment that has been moved has not been
   done, and carrying a `confirmed` across a move would let someone tick a future
@@ -209,6 +210,10 @@ Three details behind that diagram, all of them in `src/storage/careStore.ts`:
   in a map, not a deletion, so it is reversible with the same function.
 - **A day that has passed un-defers the moment** rather than losing it. The plan
   filters on the date string, so it reappears on its ordinary rule.
+- **A moment whose day arrives says where it came from.** When the deferred day is
+  today, the row carries a **Moved here** chip, and the header counts what left the
+  current day. The store always kept the fact; until the app showed it, a skip and a
+  deletion looked identical on screen.
 
 ### The purchase path
 
@@ -262,16 +267,16 @@ One JSON object per version, written on every change. There is no server-side co
   "seenOnboarding": true,
   "organiserName": "Sithu",
   "activeRecipientId": "person-…",
-  "people": [{ "id": "person-…", "name": "Margaret", "relationship": "Mum", "portraitId": "margaret" }],
+  "recipients": [{ "id": "person-…", "name": "Margaret", "relationship": "Mum", "portraitId": "margaret" }],
   "moments": {
     "person-…": [
-      { "id": "morning-check-in", "title": "Morning check-in", "time": "8:00 AM", "tone": "sky" },
-      { "id": "water-break", "title": "Water break", "time": "10:30 AM", "tone": "blush", "repeat": "weekdays" }
+      { "id": "morning-check-in", "title": "Morning check-in", "time": "8:00 AM", "tone": "blue" },
+      { "id": "water-break", "title": "Water break", "time": "10:30 AM", "tone": "orange", "repeat": "weekdays" }
     ]
   },
   "statuses": { "person-…": { "morning-check-in": "confirmed", "water-break": "skipped" } },
   "deferred": { "person-…": { "water-break": "2026-10-01" } },
-  "notes": { "person-…": [{ "id": "note-…", "day": "2026-09-30", "text": "She slept badly." }] }
+  "notes": [{ "id": "note-…", "recipientId": "person-…", "day": "2026-09-30", "text": "She slept badly.", "createdAt": "2026-09-30T19:04:00.000Z" }]
 }
 ```
 
@@ -290,11 +295,10 @@ collos/
 ├── App.tsx                      the whole shell: stage, tabs, nav, persistence wiring
 ├── app.json                     Expo config: name, scheme, icons, bundle id com.collos.app
 ├── eas.json                     build profiles: preview (internal) and production (stores)
-├── package.json                 scripts, ten runtime dependencies, three dev dependencies
-├── tsconfig.json                TypeScript, strict
+├── package.json                 scripts, ten runtime dependencies, two dev dependencies
+├── tsconfig.json                TypeScript config, strict, no emit
 ├── babel.config.js              the Expo preset, unchanged
 ├── vercel.json                  builds the browser bundle into dist/ for the app domain
-├── tsconfig.json                TypeScript config, strict, no emit
 ├── package-lock.json            the locked dependency tree CI installs from
 ├── .env.example                 every environment variable, with empty values
 ├── .gitignore                   node_modules, dist, .expo, .env*, .vercel
@@ -609,9 +613,9 @@ as no state, a failed write never throws. What *is* verified beyond it, and how:
 | Server state | Settings → Store connection | A production build prints `Connected`, `collos_pro`, `projaa1359ce` and a server-assigned `$RCAnonymousID`, none of which can be produced by a mock. |
 | Persistence | Manual | Confirm a moment, close the tab, reopen it: the confirm is still there, because the payload is written on change. |
 
-The typecheck, the behaviour suite and the export are the CI job
-([`.github/workflows/ci.yml`](.github/workflows/ci.yml)), so they run on every push
-and every pull request.
+The typecheck, the behaviour suite, the documentation check and the export are the
+CI job ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)), so they run on
+every push and every pull request.
 
 The suite's limits are stated in its own file: the React screens are not
 rendered in a test, and the storage double stands in for `expo-file-system` and
@@ -823,7 +827,8 @@ In order, and each one is a real piece of work rather than a slogan:
    does not change.
 2. **Scheduled reminders.** Deliberately advertised nowhere until the notification
    code exists. `expo-notifications` plus the store's notification declarations.
-3. **A test suite.** Starting with the pure functions in `careStore.ts`.
+3. **Test coverage beyond the store.** The behaviour suite covers the state engine;
+   the React screens are not rendered in a test, and that is the seam to widen next.
 4. **Store listings.** The runbook is written and the build profiles exist; what is
    missing is the account work and the reviews.
 5. **More than one plan a day.** Weekly and monthly views of what has been done,
