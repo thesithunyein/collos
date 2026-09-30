@@ -1,0 +1,82 @@
+name: Bug report
+description: Something in the app, the sites or the tooling does not do what it says it does.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. Collos has no backend, so most bugs are on the
+        device — the two fields that save the most round trips are the platform and
+        the exact steps, both below.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where did it happen?
+      options:
+        - The browser app (app.collos.sithunyein.com)
+        - A native build on iOS or Android
+        - The project site (collos.sithunyein.com)
+        - The docs page
+        - The capture script or a generator in scripts/ or assets/
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you saw, in your words. Screenshots are welcome — drag them in.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+      description: If a page, a paywall line or the FAQ told you to expect it, quote it — that is a documentation bug as well as a code bug.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Tap ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: device
+    attributes:
+      label: Your device
+      description: |
+        If you can reach the app, open **Settings → This device** and paste what it
+        says — it reports the platform, OS version, device, React Native runtime and
+        app identifier read from the build you are actually running.
+      placeholder: |
+        Platform: ...
+        OS: ...
+        Device: ...
+        React Native: ...
+        Identifier: ...
+    validations:
+      required: false
+  - type: dropdown
+    id: pro-state
+    attributes:
+      label: Pro state
+      options:
+        - Free plan
+        - Pro active (purchased)
+        - Pro active (simulated, preview mode)
+        - Not sure, and that is fine
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?
+      description: For a payment problem, the app user ID from **Settings** is the fastest way to find the record.
+    validations:
+      required: false

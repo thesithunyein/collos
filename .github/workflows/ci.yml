@@ -1,0 +1,69 @@
+name: CI
+
+# What this guarantees, and what it does not.
+#
+# The two commands below are the only automated gate this project has: they catch
+# a type error, a module that no longer resolves, and a bundle that will not
+# build. They are the same two commands run by hand before every commit, which is
+# why they are the ones in CI — a gate nobody runs locally is a gate that fails
+# in CI only.
+#
+# There are no unit tests, and no coverage badge, because there are no unit
+# tests. See the "Testing and quality" section of the README for what is verified
+# instead of a test suite: the typecheck, the export, and the capture script that
+# drives the running app and fails if a screen does not reach the state it is
+# supposed to photograph.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Typecheck and export
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      # `npm ci`, not `npm install`: the lockfile is the thing under test.
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # The browser build is the target that has no native code behind it, so it
+      # is the one that breaks first when a dependency drifts. Building it here
+      # also proves the app still exports without any RevenueCat keys set, which
+      # is the state a new contributor starts in.
+      - name: Build the browser bundle
+        run: npm run build:web
+
+      - name: Assert the export wrote a bundle
+        run: |
+          if [ ! -d dist ]; then
+            echo "::error::expo export reported success but wrote no dist/ directory"
+            exit 1
+          fi
+          echo "Bundle files:"
+          find dist -type f -name '*.js' -print | head -5

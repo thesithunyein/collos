@@ -1,0 +1,61 @@
+name: Feature request
+description: Propose something Collos should do. Ideas are welcome; scope is taken seriously.
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before you write: this project has one rule that rejects more ideas than any
+        other — **nothing may be described that the code cannot do**. A proposal is
+        welcome even if it is large, but it has to be honest about what it costs and
+        what it replaces. The contributing guide lists the rules in full:
+        https://github.com/thesithunyein/collos/blob/HEAD/CONTRIBUTING.md
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the person and the moment, not the feature. "The person doing the evening call does not know whether the morning call happened" beats "add a status badge".
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you have it do?
+    validations:
+      required: true
+  - type: textarea
+    id: replaces
+    attributes:
+      label: What does it cost, and what does it replace?
+      description: |
+        This app is deliberately small and its screens are deliberately quiet. What
+        would come off a screen to make room, or what would have to grow? If the
+        answer is "nothing", say why it deserves to be added rather than swapped in.
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the product is this?
+      options:
+        - Today's plan
+        - The care circle
+        - Notes
+        - Onboarding and setup
+        - Subscriptions and Pro
+        - Accessibility
+        - The landing site, docs or store listing
+        - Storage, platform or tooling
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundaries
+      description: Two things this project will not ship, so it is worth checking before we discuss the rest.
+      options:
+        - label: This is not a medical feature — it does not diagnose, dose, or remind anyone to take medication.
+          required: true
+        - label: I have not assumed a backend exists; a shared circle between phones is still to be built and would be its own project.
+          required: false
