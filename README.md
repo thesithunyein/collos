@@ -113,7 +113,7 @@ Six captures of the running app, at 1179×2556, taken by `npm run screenshots:de
 
 | Paywall | Circle (Pro) | Settings |
 | --- | --- | --- |
-| <img src="submission/screenshots/04-paywall.png" alt="The Collos paywall, with the live RevenueCat packages and the RevenueCat Billing note." width="200" /> | <img src="submission/screenshots/05-circle-pro.png" alt="The care circle with Pro active, and the shared-notes limit lifted." width="200" /> | <img src="submission/screenshots/06-settings.png" alt="Collos Settings: store connection, entitlement, app user ID, project ID, and the device rows." width="200" /> |
+| <img src="submission/screenshots/04-paywall.png" alt="The Collos paywall, with the live RevenueCat packages and the billing note." width="200" /> | <img src="submission/screenshots/05-circle-pro.png" alt="The care circle with Pro active, and the shared-notes limit lifted." width="200" /> | <img src="submission/screenshots/06-settings.png" alt="Collos Settings: store connection, entitlement, app user ID, project ID, and the device rows." width="200" /> |
 
 ## What it deliberately does not do
 
@@ -484,7 +484,7 @@ Settings → **Store connection** prints the state a reviewer needs:
 | Row | What a configured build shows |
 | --- | --- |
 | Status | `Connected` |
-| Billing | `RevenueCat Billing` (web) or the store (native) |
+| Billing | `Test Store` when the build carries a test key, else `RevenueCat Billing` (web) or the store (native) |
 | Entitlement | `collos_pro` |
 | App user ID | `$RCAnonymousID:…`, assigned by the server |
 | RevenueCat project | `projaa1359ce` |
@@ -649,7 +649,7 @@ import the repository with **Root Directory** `.` and the **Other** framework
 preset, add `app.collos.sithunyein.com` under **Project Settings → Domains**, and
 create the DNS record Vercel gives you. Web purchases bill through RevenueCat
 Billing, so a configured `EXPO_PUBLIC_REVENUECAT_WEB_KEY` makes the browser build
-take real subscriptions; without it the build stays in preview mode.
+transact through RevenueCat; without it the build stays in preview mode.
 
 ### The project site
 
@@ -695,7 +695,7 @@ Useful flags:
 | --- | --- |
 | `--base-url http://localhost:8081` | Capture against a local build instead of production. A local build has no keys, so its Settings screen shows preview mode — useful for UI work, useless as evidence. |
 | `--only 04-paywall` | Run the tour only as far as the screens named, and write only those. This is how the paywall shot is taken against production without completing a live checkout. |
-| `--skip-pro` | Drops the paywall and the Pro steps, because *Continue with Pro* hands off to a real RevenueCat Billing checkout that a headless browser cannot finish. |
+| `--skip-pro` | Drops the paywall and the Pro steps, because *Continue with Pro* opens RevenueCat's checkout and this script does not drive it — the run would abort on the open modal. |
 | `--set landing` | The four frames the site uses, one per screen. |
 
 **The six frames do not all come from the same build, and the split is deliberate:**

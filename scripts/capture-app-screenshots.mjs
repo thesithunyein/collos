@@ -193,8 +193,8 @@ const APP_TOUR = [
  *
  * Against a preview-mode build "Continue with Pro" is simulated and unlocks
  * instantly, so the tour runs end to end. Against app.collos.sithunyein.com it
- * hands off to the real RevenueCat Billing / Stripe checkout, which a headless
- * browser cannot finish — so the run would abort at step 5 and silently leave
+ * opens RevenueCat's checkout, which this script does not drive — so the run
+ * would abort at step 5 and silently leave
  * the Settings screenshot at whatever the previous build captured.
  *
  * Skipping that step lets the other five be captured from production, which is

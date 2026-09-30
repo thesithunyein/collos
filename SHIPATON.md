@@ -98,7 +98,7 @@ browser invites exactly the wrong conclusion, and a judge will not go digging th
 `app.json` to correct it. Hence the rule for §6: the **phone is the primary evidence**
 (Expo Go, `npm start`, scan the QR code), and the browser appears only as one labelled
 cutaway for the live sandbox purchase — the beat the browser genuinely does better,
-because that is where the real RevenueCat Billing key is configured.
+because that is where the RevenueCat web key is configured.
 
 > **Verified 30 Sep 2026.** The sandbox purchase beat was driven end-to-end on the
 > production web build: paywall → "Continue with Pro · $39.99" → RevenueCat's
@@ -220,7 +220,7 @@ summaries. Where the marketing page and the rules differ, the rules govern (thei
 | --- | --- |
 | "Is the app idea clear, useful, interesting, or original? Does it solve a real problem?" | Care coordination for the family organiser; the description (§7) names the person and the problem in one paragraph. |
 | "Does the project demonstrate meaningful progress toward a working app? Is the core functionality clear from the video and code repository?" | Two mock screens became three working tabs with a real purchase path and device-local persistence, all inside the window — the commit history is the progress log, and judges can build and run it from the README. |
-| "Does the project thoughtfully use RevenueCat?" | `react-native-purchases` wired per platform with offerings, purchase, restore, entitlement gating real UI, and a labelled preview mode when no key is present. Project created 29 Sep (§4 status): the web build takes a live sandbox purchase through RevenueCat Billing. |
+| "Does the project thoughtfully use RevenueCat?" | `react-native-purchases` wired per platform with offerings, purchase, restore, entitlement gating real UI, and a labelled preview mode when no key is present. Project created 29 Sep (§4 status): the web build takes a live Test Store purchase through RevenueCat. |
 | "Thoughtful technical choices, product thinking, and care in how the app was built and presented?" | The pinned-dependency discipline that fixed a production blank page, the never-failing wrapper pattern, screenshots that assert the UI reacted, and docs that state what is *not* built. |
 
 ### Submission requirements (rules §4), and where each stands
@@ -401,7 +401,7 @@ judging closes on 13 October, and the video may show only what a reviewer can re
 | 0:15–0:35 | Tap *Set up my care circle*, type a name, pick a relationship, *Start my plan* | "You set up who you're caring for — one screen. The plan starts empty, because it's yours; nothing here is somebody else's day." |
 | 0:35–1:00 | On the empty plan, tap *Start from a template*, then *Confirm* on the morning check-in | "When you'd rather edit than stare at a blank page, the four everyday moments are one tap away — a check-in, a water break, a walk, an evening note. They arrive open, and every confirmation is saved the moment you tap it: close the app, come back, and the plan still remembers." |
 | 1:00–1:20 | Circle tab (free) → *Add someone*, then Today → *Shared notes* and write one | "The Circle tab shows who is in the plan and who has checked in today, and it's where a second person joins — each one keeps their own plan and you switch in a tap. Shared notes are the one thing the free plan caps — one a day for each person — and they are kept on this device, still there after a restart." |
-| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro lifts the shared-notes limit — one a day per person on the free plan, as many as your circle needs on Pro. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
+| 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro lifts the shared-notes limit — one a day per person on the free plan, as many as your circle needs on Pro. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live Test Store purchase through RevenueCat — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
 | 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.86.3, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
 
 #### Three beats the app gained after this script was written
@@ -449,7 +449,7 @@ they are mapped to is noted so nothing is cut by accident.
 | 0:16–0:22 | **progress** | *Start from a template* → **0 of 4** | "Four everyday moments, one tap away — and they arrive open, so you only tick what actually happened." |
 | 0:22–0:30 | **progress** | *Confirm* the water break → progress ring moves | "Every tap is saved the moment you make it. Close the app, come back — the plan still remembers." |
 | 0:30–0:44 | **idea** *(tie-breaker)* | *Skip* → **Move to tomorrow** → header: *"1 moment moved to tomorrow."* → **cut** → clock rolled forward, reopen → the moment is back wearing **Moved here** | "And skipping isn't losing. Move it to tomorrow in one tap, and the plan says where it went. Tomorrow it comes back, marked with where it came from. Not now is not never." |
-| 0:44–0:54 | **RevenueCat** | Cut to browser, labelled on screen *web export — same app*: paywall → Test Store → *Collos Pro is active* | "Pro lifts the one limit the free plan has. These are live RevenueCat packages — real prices — and this is a purchase completing through RevenueCat Billing." |
+| 0:44–0:54 | **RevenueCat** | Cut to browser, labelled on screen *web export — same app*: paywall → Test Store → *Collos Pro is active* | "Pro lifts the one limit the free plan has. These are live RevenueCat packages — real prices — and this is a purchase completing through RevenueCat's Test Store." |
 | 0:54–1:00 | **craft** + **category** | Settings → *This device* (native iOS, React Native 0.86.3, `com.collos.app`), then the repo: MIT in About, CI green | "Submitted for the Next Gen Award — a student-built app, judged on this video and the public repository. Same codebase on iOS, Android and web; the repo, the tests and the licence are all public." |
 
 Three production notes, because this cut has no slack in it:
@@ -510,7 +510,7 @@ about a second and a half. Cut between lines on the tap that causes them.
 | 0:16–0:22 | *Four everyday moments, one tap away.* → *They arrive open — tick only what happened.* |
 | 0:22–0:30 | *Every tap saves instantly.* |
 | 0:30–0:44 | *Skipping isn't losing.* → *Move it to tomorrow.* → *"1 moment moved to tomorrow."* → *NEXT DAY* → *It comes back marked with where it came from.* |
-| 0:44–0:54 | *Pro lifts the one limit.* → *Live RevenueCat prices.* → *A real purchase, through RevenueCat Billing.* |
+| 0:44–0:54 | *Pro lifts the one limit.* → *Live RevenueCat prices.* → *A real RevenueCat purchase — Test Store.* |
 | 0:54–1:00 | *Submitted for the Next Gen Award.* → *iOS, Android and web — one codebase.* → *Repository, tests and licence are public.* |
 
 The captions should name the same facts the voice-over version says. If you later
@@ -616,7 +616,7 @@ the paywall renders live packages from the default offering with their localised
 prices. `purchasePackage`, `getCustomerInfo` and `restorePurchases` are all
 implemented, entitlement checks run on launch and after every purchase, and cancelled
 or failed purchases are handled separately from success. Web purchases route through
-RevenueCat Billing so the same entitlement works in the browser and on device. The app
+RevenueCat's web billing so the same entitlement works in the browser and on device (the Test Store while the build carries a `test_` key). The app
 degrades to a clearly-labelled preview mode when no SDK key is present, so the public
 demo never breaks.
 

@@ -186,7 +186,7 @@ export function PaywallModal({
 
             {pro.mode === "preview" ? (
               <Text style={styles.storeNote}>
-                Preview mode · no payment is taken here. Prices are the live Collos plans.
+                Preview mode · no payment is taken here.
               </Text>
             ) : (
               <Text style={styles.storeNote}>{storeNote()}</Text>

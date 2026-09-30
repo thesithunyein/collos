@@ -177,7 +177,8 @@ export function SettingsScreen({
         <View style={styles.detailCard}>
           <DetailRow label="Status" value={configured ? "Connected" : "Preview mode"} />
           {/* Who bills the card if Pro is bought here: App Store and Google Play
-              on a device, RevenueCat Billing in the browser export. */}
+              on a device, RevenueCat Billing in the browser export — or the Test
+              Store, when the build carries a `test_` key. */}
           <DetailRow label="Billing" value={storeDisplayName()} />
           <Pressable
             accessibilityRole="button"

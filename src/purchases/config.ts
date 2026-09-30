@@ -69,8 +69,23 @@ export function isPaymentsConfigured(): boolean {
   return activeApiKey() !== undefined;
 }
 
+/**
+ * True when the active key belongs to RevenueCat's Test Store.
+ *
+ * A Test Store key answers on every platform and completes a real RevenueCat
+ * transaction, but it never bills anyone: it stands in for a store rather than
+ * being one. Naming it honestly matters, because this name is what Settings and
+ * the paywall footer show a reviewer.
+ */
+export function isTestStoreKey(): boolean {
+  return activeApiKey()?.startsWith("test_") ?? false;
+}
+
 /** Store name shown next to prices so the user knows who bills them. */
 export function storeDisplayName(): string {
+  // A Test Store key answers on every platform, so the honest name is the test
+  // store itself rather than the store it is standing in for.
+  if (isTestStoreKey()) return "Test Store";
   switch (Platform.OS) {
     case "ios":
       return "App Store";
