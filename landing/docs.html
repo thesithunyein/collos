@@ -208,14 +208,20 @@ src/storage/fileStore.web.ts   browser: localStorage</code></pre>
             </table>
             <p>
               Pro is billed by the store you bought it in: the App Store, Google Play, or RevenueCat
-              Billing when you subscribe in a browser. Your store shows the price in your own
+              Billing when you subscribe in a browser. The public web build carries a
+              <code>test_</code> key, which routes purchases through RevenueCat's <strong>Test
+              Store</strong>: a real RevenueCat transaction that appears in the dashboard, with no
+              money moving, and the app names it honestly on its Settings screen instead of
+              pretending to bill a store it is not using. Your store shows the price in your own
               currency, and cancelling happens in that store account — not in Collos.
             </p>
             <h3>Restoring a purchase</h3>
             <p>
-              Open <strong>Settings</strong> and tap <strong>Restore purchases</strong>. The same
-              screen shows the app user ID, the entitlement identifier and the RevenueCat project ID,
-              so support can find the record if a restore ever fails.
+              Open <strong>Settings</strong> and tap <strong>Restore purchases</strong>. Restore is
+              available on iOS and Android; it is not part of the web build, where a purchase is
+              tied to the browser profile that made it. The same screen shows the app user ID, the
+              entitlement identifier and the RevenueCat project ID, so support can find the record
+              if a restore ever fails.
             </p>
             <h3>In a development build</h3>
             <p>
