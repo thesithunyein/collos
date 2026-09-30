@@ -53,9 +53,12 @@ npm run screenshots:appstore   # store/screenshots/appstore/ — 1320x2868
 npm run screenshots:playstore  # store/screenshots/playstore/ — 1080x1920
 ```
 
-There are no unit tests to run. If your change adds behaviour worth testing and
-you want to bring a test runner in, open an issue first and propose the runner and
-the first three tests — an empty framework is worse than none.
+`npm test` runs the behaviour suite in `tests/` — Node's built-in runner, no new
+dependencies. If your change adds behaviour to `src/storage/careStore.ts`, extend
+the suite in the same commit: name the behaviour in the test title, and run the
+real source through `tests/support/load-ts.mjs` rather than a copy of it. A test
+that needs the React screens is a different project; this suite tests state, not
+pixels.
 
 ## Rules this project holds itself to
 
@@ -94,8 +97,8 @@ otherwise good.
   describes it. If you change `src/theme.ts`, check `landing/styles.css` and
   `brand.md` in the same change.
 - **Keep the dependencies small.** This project runs on ten runtime dependencies
-  and has no test framework, no state library and no UI kit. Adding one needs a
-  reason in the pull request.
+  and has no state library and no UI kit — the test suite uses Node's built-in
+  runner and adds none. Adding one needs a reason in the pull request.
 
 ## Commits and pull requests
 

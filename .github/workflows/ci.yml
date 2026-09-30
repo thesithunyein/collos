@@ -9,11 +9,10 @@ name: CI
 # why they are the ones in CI — a gate nobody runs locally is a gate that fails in
 # CI only.
 #
-# There are no unit tests, and no coverage badge, because there are no unit
-# tests. See the "Testing and quality" section of the README for what is verified
-# instead of a test suite: the typecheck, the export, and the capture script that
-# drives the running app and fails if a screen does not reach the state it is
-# supposed to photograph.
+# The behaviour suite (`npm test`) runs the store's real TypeScript source in
+# Node's built-in runner — no framework install, no build step. It covers the
+# state engine, not the React screens; the README's "Testing and quality"
+# section says exactly where that line sits.
 
 on:
   push:
@@ -52,6 +51,13 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      # Behaviour tests over the store's real source. Zero new dependencies
+      # (Node's built-in runner, types stripped by the app's own typescript
+      # devDependency), so it runs before the slow build on purpose: a broken
+      # behaviour should not wait three minutes behind an Expo export.
+      - name: Run the behaviour tests
+        run: npm test
 
       # The README makes claims about this repository — that every tracked file
       # appears in its structure tree, that every relative link resolves, that

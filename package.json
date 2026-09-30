@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "build:web": "expo export --platform web",
     "typecheck": "tsc --noEmit",
+    "test": "node --test tests/careStore.test.mjs tests/smoke.test.mjs",
     "docs:check": "node scripts/check-readme.mjs",
     "screenshots": "node scripts/capture-app-screenshots.mjs",
     "screenshots:devpost": "node scripts/capture-app-screenshots.mjs --set devpost",

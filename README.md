@@ -336,6 +336,11 @@ collos/
 │   ├── capture-app-screenshots.mjs   drives the running app and writes every PNG
 │   └── check-readme.mjs         lints this file: links, anchors, diagrams, JSON
 │
+├── tests/
+│   ├── careStore.test.mjs       27 behaviour tests over the store's real source
+│   ├── smoke.test.mjs           the loader runs src TypeScript in Node
+│   └── support/                 load-ts.mjs · hook-cjs.mjs · fileStore-double.mjs
+│
 ├── assets/
 │   ├── logo-source.png          the mark, transparent — the source of truth
 │   ├── logo-mark.png            the mark on its periwinkle square
@@ -406,12 +411,14 @@ rather than a preview shim: it is the same React Native code through
 ```bash
 npm run typecheck   # tsc --noEmit, strict
 npm run build:web   # the export that CI runs
+npm test            # behaviour tests over the store's real source
 ```
 
-There is no `npm test`, because there are no unit tests. Read
-[Testing and quality](#testing-and-quality) for what is verified instead of a test
-suite — it is more than nothing, and less than a suite, and the difference is
-stated rather than implied.
+`npm test` runs the behaviour suite over `src/storage/careStore.ts` — the real
+TypeScript source, loaded into Node by `tests/support/`, with the storage layer
+swapped for an in-memory double that honours the same contract. Read
+[Testing and quality](#testing-and-quality) for what is verified, and what the
+suite deliberately does not cover.
 
 ## Configuration
 
@@ -576,26 +583,41 @@ better than two.
 
 ## Testing and quality
 
-There is no test framework in this repository. That is worth stating plainly
-rather than hiding behind a coverage badge, and it is the largest known gap in the
-project. What *is* verified, and how:
+A behaviour suite now exists, and it is deliberately small and deliberately
+honest about what it does not cover: the React screens are not rendered in a
+test, and nothing here is a UI test. What `src/storage/careStore.ts` *does* —
+the part of the app that decides what a moment is, when it appears, and what
+skipping it means — is tested against its real source:
+
+```bash
+npm test    # 29 tests, Node's built-in runner, zero new dependencies
+```
+
+The suite runs the shipping TypeScript directly — a module loader strips types
+with the app's own `typescript` devDependency, so there is no build step and no
+copy of the code that could drift — and pins the behaviours the app's promises
+depend on: a move resets a status, a skipped moment reappears when its day
+arrives, an edit keeps its id so a rename cannot untick, a corrupt payload reads
+as no state, a failed write never throws. What *is* verified beyond it, and how:
 
 | Check | Command | What it proves |
 | --- | --- | --- |
+| Behaviour | `npm test` | The store's real TypeScript in Node, storage swapped for a contract-identical in-memory double: recurrence, the deferred map, edit/remove/defer transitions, the never-throws storage guarantees, the one-note-a-day limit. |
 | Types | `npm run typecheck` | Strict TypeScript across the app: imports resolve, props line up, the stored-state shape has not drifted. |
 | Browser bundle | `npm run build:web` | The app exports for the target with no native code behind it — the one that breaks first when a dependency drifts. This is also what catches the `expo-font` trap. |
 | Screens | `npm run screenshots` | The capture script drives the real app the way a person does — setup, the starter plan, confirm, and the moment editor — and fails if a screen never reaches the state it is supposed to photograph. That makes it a smoke test with a useful side effect. |
 | Server state | Settings → Store connection | A production build prints `Connected`, `collos_pro`, `projaa1359ce` and a server-assigned `$RCAnonymousID`, none of which can be produced by a mock. |
 | Persistence | Manual | Confirm a moment, close the tab, reopen it: the confirm is still there, because the payload is written on change. |
 
-The two commands in the first two rows are the CI job
+The typecheck, the behaviour suite and the export are the CI job
 ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)), so they run on every push
 and every pull request.
 
-If you want to add a test runner, the honest way is in
-[CONTRIBUTING.md](CONTRIBUTING.md): propose the runner and the first three tests
-together. The pure functions in `src/storage/careStore.ts` are the obvious first
-target, since they take state and return state with no React involved.
+The suite's limits are stated in its own file: the React screens are not
+rendered in a test, and the storage double stands in for `expo-file-system` and
+`localStorage` behind the same three-function contract. Extending it follows
+[CONTRIBUTING.md](CONTRIBUTING.md) — name the behaviour in the test title, and
+run the real source through `tests/support/load-ts.mjs` rather than a copy.
 
 ## Deploy
 
