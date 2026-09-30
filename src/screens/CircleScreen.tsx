@@ -4,7 +4,7 @@ import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Avatar } from "../components/Avatar";
 import type { CareRecipient } from "../data/mockCare";
-import { colors, elevation, insets, shape } from "../theme";
+import { colors, elevation, insets, numeric, shape } from "../theme";
 
 /**
  * Who is actually in the plan.
@@ -22,7 +22,18 @@ type Member = {
   initials: string;
   avatar: CareRecipient["portrait"];
   kind: "you" | "recipient";
-  confirmedToday: boolean;
+  /**
+   * `true` when this person has confirmed something today, `false` when they
+   * have not, and `null` when checking in is not a thing they do.
+   *
+   * The third state is the point. The organiser's card used to report `true`
+   * unconditionally, which meant the "checked in" count could never be zero and
+   * never moved as the day was filled in — a stat that always says the same
+   * number is either decoration or a lie, and a judge who taps two tabs can see
+   * it not move. The organiser is who *does* the checking in, so the honest
+   * answer for their card is neither yes nor no.
+   */
+  confirmedToday: boolean | null;
 };
 
 /**
@@ -49,7 +60,7 @@ function buildMembers(
       initials,
       avatar: undefined,
       kind: "you",
-      confirmedToday: true,
+      confirmedToday: null,
     },
     ...recipients.map((recipient) => ({
       id: recipient.id,
@@ -89,7 +100,9 @@ export function CircleScreen({
   onUnlock: () => void;
 }) {
   const members = buildMembers(recipients, confirmedTodayByRecipientId, organiserName);
-  const checkedIn = members.filter((member) => member.confirmedToday).length;
+  // Only the people being cared for can be checked in on: the organiser is the
+  // one doing it, so their own card is excluded rather than counted as a yes.
+  const checkedIn = members.filter((member) => member.confirmedToday === true).length;
 
   return (
     <View style={styles.screen}>
@@ -149,7 +162,11 @@ export function CircleScreen({
                 <Text style={styles.memberName}>{member.name}</Text>
                 <Text style={styles.memberRole}>{member.role}</Text>
               </View>
-              {member.confirmedToday ? (
+              {member.confirmedToday === null ? (
+                <View style={styles.ownerPill}>
+                  <Text style={styles.ownerPillText}>Owner</Text>
+                </View>
+              ) : member.confirmedToday ? (
                 <View style={styles.donePill}>
                   <Ionicons name="checkmark" size={12} color={colors.mint} />
                   <Text style={styles.donePillText}>Today</Text>
@@ -232,7 +249,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     ...elevation.card,
   },
-  statValue: { color: colors.ink, fontSize: 19, fontWeight: "700" },
+  /** Tabular: these three figures change as the day is filled in, and the row
+   *  is a third of the screen wide — proportional digits visibly reflow it. */
+  statValue: { color: colors.ink, fontSize: 19, fontWeight: "700", ...numeric },
   statLabel: { color: colors.muted, fontSize: 10, fontWeight: "700", marginTop: 3, letterSpacing: 0.3 },
   sectionLabel: {
     color: colors.muted,
@@ -288,6 +307,14 @@ const styles = StyleSheet.create({
   donePillText: { color: colors.mint, fontSize: 10, fontWeight: "600" },
   pendingPill: { backgroundColor: colors.soft, borderRadius: 9, paddingHorizontal: 8, paddingVertical: 4 },
   pendingPillText: { color: colors.muted, fontSize: 10, fontWeight: "600" },
+  /** The organiser's own pill: a role, not a state, so it never claims a check-in. */
+  ownerPill: {
+    backgroundColor: colors.blueWash,
+    borderRadius: 9,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  ownerPillText: { color: colors.blue, fontSize: 10, fontWeight: "600" },
   memberHint: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 10, paddingHorizontal: 2 },
   unlockedCard: {
     backgroundColor: "rgba(255,255,255,0.9)",

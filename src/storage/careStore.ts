@@ -2,9 +2,11 @@ import {
   CareRecipient,
   CareTask,
   PORTRAITS,
+  RepeatRule,
   STARTER_MOMENTS,
   TaskStatus,
   TaskTemplate,
+  repeatMatchesOn,
 } from "../data/mockCare";
 import * as fileStore from "./fileStore";
 
@@ -88,6 +90,19 @@ export type StoredState = {
    * apart meant two code paths that could disagree about status.
    */
   moments: Record<string, TaskTemplate[]>;
+  /**
+   * Moments pushed to a future day, per recipient: `momentId -> YYYY-MM-DD`.
+   *
+   * Added after v2 shipped, so a v2 payload without it reads as `{}` — the
+   * version guard is for *incompatible* payloads, and a new optional field is
+   * not one. Nothing that already persisted needs re-entering for this.
+   *
+   * This is what makes a skip recoverable. Skipping used to be a dead end: the
+   * moment went quiet for the day and the only way to see it again was to reset
+   * the whole day. Moving it forward says the thing a carer means — *not now,
+   * later* — and nothing gets lost.
+   */
+  deferred: Record<string, Record<string, string>>;
   /** Notes left for whoever picks up the plan next. Newest first. */
   notes: StoredNote[];
   /** The person last viewed, so a restart reopens the same plan. */
@@ -109,6 +124,7 @@ export function emptyStoredState(): StoredState {
     organiserName: "",
     statuses: {},
     moments: {},
+    deferred: {},
     notes: [],
     activeRecipientId: null,
     seenOnboarding: false,
@@ -137,6 +153,7 @@ function parse(raw: string | null): StoredState | null {
       // which the UI renders as a neutral greeting rather than a wrong one.
       organiserName: typeof parsed.organiserName === "string" ? parsed.organiserName : "",
       moments: parsed.moments ?? {},
+      deferred: parsed.deferred ?? {},
       activeRecipientId: parsed.activeRecipientId ?? null,
       seenOnboarding: Boolean(parsed.seenOnboarding),
     };
@@ -243,19 +260,72 @@ export function withOrganiserName(state: StoredState, name: string): StoredState
 }
 
 /**
- * A recipient's moments, each carrying its persisted status (default: open).
+ * A recipient's moments for a day, each carrying its persisted status.
  *
  * `null` is a real input, not a guard: before setup is finished the plan
  * belongs to nobody, and "the moments of nobody" is an empty list rather than
  * an error. Every derivation in `App` runs during setup, so each one has to
  * survive being asked about a plan that does not exist yet.
+ *
+ * A moment is on the day's plan when either it has been moved *to* that day, or
+ * it has not been moved at all and its repeat rule covers the day's weekday.
+ * Dates are compared as `YYYY-MM-DD` strings, which sorts chronologically — no
+ * parsing, no timezone to get wrong.
  */
+export function tasksForRecipientOn(
+  state: StoredState,
+  recipientId: string | null,
+  date: Date,
+): CareTask[] {
+  if (!recipientId) return [];
+  const key = dayKey(date);
+  const deferred = state.deferred[recipientId] ?? {};
+  return (state.moments[recipientId] ?? [])
+    .filter((moment) => {
+      const moved = deferred[moment.id];
+      if (moved) {
+        if (moved === key) return true;
+        // Still in the future: today is not its day yet.
+        if (moved > key) return false;
+        // The day it was moved to has passed, so it is an ordinary moment
+        // again rather than one that has vanished for good.
+      }
+      return repeatMatchesOn(moment.repeat, date);
+    })
+    .map((moment) => ({
+      ...moment,
+      status: state.statuses[recipientId]?.[moment.id] ?? ("not-confirmed" as TaskStatus),
+    }));
+}
+
+/** Today's version of the above — the call every screen makes. */
 export function tasksForRecipient(state: StoredState, recipientId: string | null): CareTask[] {
+  return tasksForRecipientOn(state, recipientId, new Date());
+}
+
+/**
+ * Every moment a person has, ignoring the day and the repeat rule.
+ *
+ * Used for the plan's *size* rather than its today-shape: "3 moments" in
+ * Settings is a fact about the plan, and a weekdays-only moment is still on it
+ * on a Saturday.
+ */
+export function allMomentsForRecipient(state: StoredState, recipientId: string | null): CareTask[] {
   if (!recipientId) return [];
   return (state.moments[recipientId] ?? []).map((moment) => ({
     ...moment,
     status: state.statuses[recipientId]?.[moment.id] ?? ("not-confirmed" as TaskStatus),
   }));
+}
+
+/** The day a moment has been moved to, or `null` when it is not moved. */
+export function deferredDayFor(
+  state: StoredState,
+  recipientId: string | null,
+  momentId: string,
+): string | null {
+  if (!recipientId) return null;
+  return state.deferred[recipientId]?.[momentId] ?? null;
 }
 
 /* --- moments --------------------------------------------------------------- */
@@ -302,6 +372,104 @@ export function withStarterMoments(state: StoredState, recipientId: string): Sto
   };
 }
 
+/* --- editing a moment ------------------------------------------------------ */
+
+/**
+ * Changes a moment in place, keeping its id.
+ *
+ * Keeping the id is the whole point: the moment's status is keyed by id, so an
+ * edit that minted a new one would silently untick the thing you just renamed —
+ * and with a repeat rule attached, would lose that too. Editing is a rename, not
+ * a replacement.
+ *
+ * Any pending move is cleared, because a person who has just edited a moment is
+ * looking at it and expects it on the plan in front of them.
+ */
+export function withEditedMoment(
+  state: StoredState,
+  recipientId: string,
+  momentId: string,
+  patch: Partial<Omit<TaskTemplate, "id">>,
+): StoredState {
+  const existing = state.moments[recipientId] ?? [];
+  const deferred = { ...(state.deferred[recipientId] ?? {}) };
+  delete deferred[momentId];
+  return {
+    ...state,
+    seenOnboarding: true,
+    activeRecipientId: recipientId,
+    moments: {
+      ...state.moments,
+      [recipientId]: existing.map((moment) =>
+        moment.id === momentId ? { ...moment, ...patch, id: momentId } : moment,
+      ),
+    },
+    deferred: { ...state.deferred, [recipientId]: deferred },
+  };
+}
+
+/**
+ * Removes a moment, its status and any pending move.
+ *
+ * All three go together. Leaving the status behind would resurrect it on a
+ * future moment that happened to reuse the id, and leaving the move behind
+ * would keep a deleted moment's day reserved.
+ */
+export function withRemovedMoment(
+  state: StoredState,
+  recipientId: string,
+  momentId: string,
+): StoredState {
+  const statuses = { ...(state.statuses[recipientId] ?? {}) };
+  const deferred = { ...(state.deferred[recipientId] ?? {}) };
+  delete statuses[momentId];
+  delete deferred[momentId];
+  return {
+    ...state,
+    seenOnboarding: true,
+    activeRecipientId: recipientId,
+    moments: {
+      ...state.moments,
+      [recipientId]: (state.moments[recipientId] ?? []).filter(
+        (moment) => moment.id !== momentId,
+      ),
+    },
+    statuses: { ...state.statuses, [recipientId]: statuses },
+    deferred: { ...state.deferred, [recipientId]: deferred },
+  };
+}
+
+/**
+ * Moves a moment to another day.
+ *
+ * Its status goes back to open as part of the move, which is the honest
+ * reading: a moment that has been moved has not been done, and carrying a
+ * "confirmed" across a move would let someone tick a future task by skipping a
+ * present one. Passing `null` clears the move entirely — the "bring it back to
+ * today" case.
+ */
+export function withDeferredMoment(
+  state: StoredState,
+  recipientId: string,
+  momentId: string,
+  dayKeyOrNull: string | null,
+): StoredState {
+  const deferred = { ...(state.deferred[recipientId] ?? {}) };
+  if (dayKeyOrNull === null) delete deferred[momentId];
+  else deferred[momentId] = dayKeyOrNull;
+
+  const statuses = { ...(state.statuses[recipientId] ?? {}) };
+  statuses[momentId] = "not-confirmed";
+
+  return {
+    ...state,
+    seenOnboarding: true,
+    activeRecipientId: recipientId,
+    deferred: { ...state.deferred, [recipientId]: deferred },
+    statuses: { ...state.statuses, [recipientId]: statuses },
+  };
+}
+
 /** Puts every moment for one recipient back to "not confirmed". Keeps moments. */
 export function withResetDay(state: StoredState, recipientId: string): StoredState {
   const forRecipient = { ...(state.statuses[recipientId] ?? {}) };
@@ -340,10 +508,37 @@ export function withActiveRecipient(state: StoredState, recipientId: string): St
 /* --- notes ----------------------------------------------------------------- */
 
 /** Local date key. `toISOString` would shift the day for anyone east of UTC. */
-export function todayKey(now: Date = new Date()): string {
+export function dayKey(now: Date = new Date()): string {
   const month = `${now.getMonth() + 1}`.padStart(2, "0");
   const day = `${now.getDate()}`.padStart(2, "0");
   return `${now.getFullYear()}-${month}-${day}`;
+}
+
+/** The same key, `count` days from now. Negative counts go backwards. */
+export function dayKeyFromNow(count: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() + count);
+  return dayKey(date);
+}
+
+/**
+ * A human phrase for a moved moment: "tomorrow", "today", or a real date.
+ *
+ * Read from the key rather than from a stored label, so the wording is always
+ * relative to *now* — a moment moved on Monday and looked at on Monday night
+ * still says "tomorrow", and the same card says "today" the next morning
+ * without anything having been rewritten.
+ */
+export function describeDay(key: string): string {
+  if (key === dayKeyFromNow(0)) return "today";
+  if (key === dayKeyFromNow(1)) return "tomorrow";
+  if (key === dayKeyFromNow(-1)) return "yesterday";
+  const [year, month, day] = key.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+  });
 }
 
 export function withAddedNote(
@@ -355,7 +550,7 @@ export function withAddedNote(
     id: `note-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`,
     recipientId,
     text,
-    day: todayKey(),
+    day: dayKey(),
     createdAt: new Date().toISOString(),
   };
   return {
@@ -373,7 +568,7 @@ export function notesForRecipient(state: StoredState, recipientId: string | null
 }
 
 export function notesLeftToday(state: StoredState, recipientId: string): number {
-  const today = todayKey();
+  const today = dayKey();
   const used = state.notes.filter(
     (note) => note.recipientId === recipientId && note.day === today,
   ).length;

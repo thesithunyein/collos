@@ -3,6 +3,42 @@ import type { ImageSourcePropType } from "react-native";
 export type TaskStatus = "confirmed" | "not-confirmed" | "skipped";
 
 /**
+ * How often a moment comes back.
+ *
+ * `daily` is the default and the pre-existing behaviour — a moment used to
+ * reappear every day with no way to say otherwise, and the add sheet said so in
+ * those words. Real care is only *mostly* daily: the bins go out on Tuesdays,
+ * the district nurse comes on weekdays, the family call is at the weekend. So
+ * the rule is stored rather than assumed, and a moment that does not apply
+ * today simply is not on today's plan.
+ */
+export type RepeatRule = "daily" | "weekdays" | "weekends";
+
+/** The rules a person can pick, in the order they are offered. */
+export const REPEAT_RULES: RepeatRule[] = ["daily", "weekdays", "weekends"];
+
+/** What a rule is called in the UI, and what it means in one line. */
+export const REPEAT_LABELS: Record<RepeatRule, { label: string; short: string }> = {
+  daily: { label: "Every day", short: "Daily" },
+  weekdays: { label: "Weekdays", short: "Mon–Fri" },
+  weekends: { label: "Weekends", short: "Sat–Sun" },
+};
+
+/**
+ * Days are read from a *local* calendar date, not from UTC.
+ *
+ * `Date.getDay()` is already local, which is the whole reason this takes a
+ * `Date` rather than an ISO string: `toISOString` would move the day for anyone
+ * east of UTC, so a weekday rule would drop out a day early for half the world.
+ */
+export function repeatMatchesOn(rule: RepeatRule | undefined, date: Date): boolean {
+  if (!rule || rule === "daily") return true;
+  const day = date.getDay();
+  const isWeekend = day === 0 || day === 6;
+  return rule === "weekends" ? isWeekend : !isWeekend;
+}
+
+/**
  * A moment as the app describes it, with no status attached.
  *
  * Status used to live on the template, which is how a new install could open on
@@ -18,6 +54,12 @@ export type TaskTemplate = {
   time: string;
   icon: "sunny-outline" | "water-outline" | "walk-outline" | "chatbubble-ellipses-outline";
   tone: "blue" | "orange" | "green" | "purple";
+  /**
+   * Absent means `daily`. Optional on purpose: every moment stored before this
+   * field existed keeps working, and a payload written by an older build still
+   * reads as the daily plan it was.
+   */
+  repeat?: RepeatRule;
 };
 
 /** A moment as a screen renders it: the stored moment plus its status today. */

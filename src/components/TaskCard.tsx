@@ -2,7 +2,9 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import type { CareTask, TaskStatus } from "../data/mockCare";
-import { colors, elevation, nativeAnimDriver, shape } from "../theme";
+import { REPEAT_LABELS } from "../data/mockCare";
+import { useReduceMotion } from "../platform/motion";
+import { colors, elevation, motion, nativeAnimDriver, numeric, shape, space, type } from "../theme";
 
 // Tone keys are stored with each saved moment, so they keep their old names even
 // though the colours behind them now come from the logo's palette.
@@ -37,17 +39,28 @@ const TOUCH_SLOP_ICON = { top: 6, bottom: 6, left: 6, right: 6 };
  * glance without reading — confirmed gets the filled button and a quieted title,
  * skipped gets an outlined pill with a strike through the word, and everything
  * else stays inviting.
+ *
+ * A skip is not a dead end: the moment keeps its place and grows a one-tap way
+ * to move it to tomorrow, because "not now, later" is what a carer actually
+ * means and the two used to be indistinguishable.
  */
 export function TaskCard({
   task,
   onUpdate,
+  onOpenEditor,
+  onMoveToTomorrow,
 }: {
   task: CareTask;
   onUpdate: (id: string, status: TaskStatus) => void;
+  /** Opens the sheet that renames, reschedules or deletes this moment. */
+  onOpenEditor: (task: CareTask) => void;
+  /** Pushes the moment onto tomorrow's plan. */
+  onMoveToTomorrow: (id: string) => void;
 }) {
   const isConfirmed = task.status === "confirmed";
   const isSkipped = task.status === "skipped";
   const tone = TONES[task.tone];
+  const reduceMotion = useReduceMotion();
 
   const press = useRef(new Animated.Value(1)).current;
   const [pressed, setPressed] = useState(false);
@@ -55,15 +68,23 @@ export function TaskCard({
   // The spring fires only when the press actually ends, so a user who slides
   // off the button cancels cleanly instead of getting a ghost bounce.
   useEffect(() => {
-    if (!pressed) {
-      Animated.spring(press, {
-        toValue: 1,
-        friction: 5,
-        tension: 220,
-        useNativeDriver: nativeAnimDriver,
-      }).start();
+    if (pressed) return;
+    // With reduce motion on, the row returns instantly rather than springing.
+    // The press still registers — it just stops moving.
+    if (reduceMotion) {
+      press.setValue(1);
+      return;
     }
-  }, [pressed, press]);
+    Animated.spring(press, {
+      toValue: 1,
+      ...motion.spring.press,
+      useNativeDriver: nativeAnimDriver,
+    }).start();
+  }, [pressed, press, reduceMotion]);
+
+  const repeatLabel =
+    task.repeat && task.repeat !== "daily" ? REPEAT_LABELS[task.repeat].short : null;
+  const hasMeta = Boolean(repeatLabel) || isSkipped;
 
   return (
     <Animated.View
@@ -92,10 +113,7 @@ export function TaskCard({
       <View style={styles.taskCopy}>
         <View style={styles.taskTitleRow}>
           <Text
-            style={[
-              styles.taskTitle,
-              (isConfirmed || isSkipped) && styles.taskTitleDone,
-            ]}
+            style={[styles.taskTitle, (isConfirmed || isSkipped) && styles.taskTitleDone]}
           >
             {task.title}
           </Text>
@@ -103,8 +121,52 @@ export function TaskCard({
             <Ionicons name="time-outline" size={12} color={colors.muted} />
             <Text style={styles.taskTime}>{task.time}</Text>
           </View>
+          {/* The way in to changing a moment. It sits with the title rather than
+              in the action row because it is not a state — Confirm and Skip
+              answer "did this happen", and this answers "is this right". */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Edit ${task.title}`}
+            hitSlop={TOUCH_SLOP_ICON}
+            onPress={() => onOpenEditor(task)}
+            style={({ pressed: isPressed }) => [
+              styles.menuButton,
+              isPressed && styles.pressed,
+            ]}
+          >
+            <Ionicons name="ellipsis-horizontal" size={16} color={colors.muted} />
+          </Pressable>
         </View>
         <Text style={styles.taskDetail}>{task.detail}</Text>
+
+        {hasMeta ? (
+          <View style={styles.metaRow}>
+            {repeatLabel ? (
+              <View style={styles.metaChip}>
+                <Ionicons name="repeat-outline" size={11} color={colors.blue} />
+                <Text style={styles.metaChipText}>{repeatLabel}</Text>
+              </View>
+            ) : null}
+            {/* Reschedule on skip. A skipped moment used to just go quiet, so
+                "I couldn't do it" and "that is not happening" looked the same.
+                One tap moves it, and the moment survives the day. */}
+            {isSkipped ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Move ${task.title} to tomorrow`}
+                onPress={() => onMoveToTomorrow(task.id)}
+                style={({ pressed: isPressed }) => [
+                  styles.moveButton,
+                  isPressed && styles.pressed,
+                ]}
+              >
+                <Ionicons name="arrow-forward" size={11} color={colors.blue} />
+                <Text style={styles.moveButtonText}>Move to tomorrow</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        ) : null}
+
         <View style={styles.taskActions}>
           <Pressable
             accessibilityRole="button"
@@ -113,7 +175,7 @@ export function TaskCard({
             hitSlop={TOUCH_SLOP_ROW}
             onPressIn={() => {
               setPressed(true);
-              press.setValue(0.975);
+              if (!reduceMotion) press.setValue(0.975);
             }}
             onPressOut={() => setPressed(false)}
             onPress={() => onUpdate(task.id, isConfirmed ? "not-confirmed" : "confirmed")}
@@ -190,7 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: 23,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginRight: space.lg,
   },
   /** A small mark on the tile: confirmed reads blue, skipped reads blush. */
   statusBadge: {
@@ -214,17 +276,56 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 8,
+    gap: space.sm,
   },
-  taskTitle: { color: colors.ink, fontSize: 15, fontWeight: "600", flex: 1, letterSpacing: -0.2 },
+  taskTitle: { ...type.subhead, color: colors.ink, flex: 1 },
   taskTitleDone: { color: colors.muted, textDecorationLine: "line-through" },
   taskTimeRow: { flexDirection: "row", alignItems: "center", gap: 3 },
-  taskTime: { color: colors.muted, fontSize: 11, fontWeight: "700" },
-  taskDetail: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 4 },
-  taskActions: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: 12 },
+  /** Tabular: the time sits above a row whose state changes, and proportional
+   *  digits would let the label shuffle as the plan updates around it. */
+  taskTime: { ...type.micro, color: colors.muted, fontWeight: "700", ...numeric },
+  menuButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: space.xxs,
+  },
+  taskDetail: { ...type.caption, color: colors.muted, marginTop: space.xxs },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: space.sm,
+    marginTop: space.sm,
+  },
+  metaChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.xxs,
+    backgroundColor: colors.blueWash,
+    borderRadius: 9,
+    paddingHorizontal: space.sm,
+    paddingVertical: 3,
+  },
+  metaChipText: { ...type.tag, color: colors.blue, letterSpacing: 0.2 },
+  moveButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.xxs,
+    minHeight: 28,
+    paddingHorizontal: space.sm,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.white,
+  },
+  moveButtonText: { ...type.tag, color: colors.blue, letterSpacing: 0 },
+  taskActions: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: space.lg },
   confirmButton: {
     minHeight: 36,
-    paddingHorizontal: 12,
+    paddingHorizontal: space.lg,
     borderRadius: 11,
     borderWidth: 1,
     borderColor: colors.borderSoft,
@@ -234,7 +335,7 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   confirmedButton: { backgroundColor: colors.blue, borderColor: colors.blue },
-  confirmButtonText: { color: colors.blue, fontSize: 12, fontWeight: "600" },
+  confirmButtonText: { ...type.caption, color: colors.blue },
   confirmedButtonText: { color: colors.white },
   skipButton: {
     width: 36,

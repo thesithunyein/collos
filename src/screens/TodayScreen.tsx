@@ -15,7 +15,7 @@ import { Avatar } from "../components/Avatar";
 import { TaskCard } from "../components/TaskCard";
 import type { CareRecipient, CareTask, TaskStatus } from "../data/mockCare";
 
-import { colors, elevation, insets, shape } from "../theme";
+import { colors, elevation, insets, numeric, shape } from "../theme";
 
 /**
  * The hero's progress number eases from its previous value to each new one, so
@@ -175,6 +175,10 @@ export type TodayScreenProps = {
   organiserName: string;
   onSelectRecipient: (recipient: CareRecipient) => void;
   onUpdateTask: (taskId: string, status: TaskStatus) => void;
+  /** Opens the sheet that renames, reschedules or deletes a moment. */
+  onOpenTaskEditor: (task: CareTask) => void;
+  /** Pushes a moment onto tomorrow's plan — the other half of skipping it. */
+  onMoveTaskToTomorrow: (taskId: string) => void;
   onAddMoment: () => void;
   /** Puts the four everyday moments on this person's plan, all open. */
   onUseStarterPlan: () => void;
@@ -196,6 +200,8 @@ export function TodayScreen({
   organiserName,
   onSelectRecipient,
   onUpdateTask,
+  onOpenTaskEditor,
+  onMoveTaskToTomorrow,
   onAddMoment,
   onUseStarterPlan,
   onOpenPaywall,
@@ -352,13 +358,20 @@ export function TodayScreen({
                 </Pressable>
                 <Text style={styles.emptyHint}>
                   Adds four everyday moments — a morning check-in, a water break, fresh air and an
-                  evening note. All open, so you only tick what you actually did.
+                  evening note. All open, so you only tick what you actually did, and each one can
+                  be set to weekdays or weekends once it is on the plan.
                 </Text>
               </View>
             ) : (
               <View style={styles.taskList}>
                 {tasks.map((task) => (
-                  <TaskCard key={task.id} task={task} onUpdate={onUpdateTask} />
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onUpdate={onUpdateTask}
+                    onOpenEditor={onOpenTaskEditor}
+                    onMoveToTomorrow={onMoveTaskToTomorrow}
+                  />
                 ))}
               </View>
             )}
@@ -616,7 +629,9 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     borderColor: "transparent",
   },
-  progressValue: { color: colors.white, fontSize: 15, fontWeight: "700" },
+  /** Tabular, because this is the one number in the app that animates: the
+   *  count-up would otherwise make every digit to its left shift as it runs. */
+  progressValue: { color: colors.white, fontSize: 15, fontWeight: "700", ...numeric },
   progressLabel: { color: colors.blueTint, fontSize: 10, marginTop: 1 },
   sectionHeader: {
     flexDirection: "row",

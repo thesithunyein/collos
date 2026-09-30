@@ -7,7 +7,7 @@ import { PaywallModal } from "./src/components/PaywallModal";
 import { AddMomentSheet } from "./src/components/AddMomentSheet";
 import { AddPersonSheet } from "./src/components/AddPersonSheet";
 import { NotesSheet } from "./src/components/NotesSheet";
-import type { CareRecipient, TaskTemplate } from "./src/data/mockCare";
+import type { CareRecipient, CareTask, TaskTemplate } from "./src/data/mockCare";
 import type { TaskStatus } from "./src/data/mockCare";
 import { CircleScreen } from "./src/screens/CircleScreen";
 import { NewPerson, OnboardingScreen } from "./src/screens/OnboardingScreen";
@@ -19,6 +19,10 @@ import {
   StoredState,
   careRecipients,
   clearStoredState,
+  dayKey,
+  dayKeyFromNow,
+  deferredDayFor,
+  describeDay,
   emptyStoredState,
   loadStoredState,
   newMomentId,
@@ -26,11 +30,13 @@ import {
   notesLeftToday,
   saveStoredState,
   tasksForRecipient,
-  todayKey,
   withActiveRecipient,
   withAddedNote,
   withAddedRecipient,
+  withDeferredMoment,
+  withEditedMoment,
   withMoment,
+  withRemovedMoment,
   withResetDay,
   withOrganiserName,
   withStarterMoments,
@@ -52,6 +58,14 @@ export default function App() {
   const [isLoading, setLoading] = useState(false);
   const [notice, setNotice] = useState("");
   const [isAddingMoment, setAddingMoment] = useState(false);
+  /**
+   * The moment the editor sheet is open on, or `null` for add mode.
+   *
+   * The task is held rather than its id, because the sheet seeds itself from
+   * the whole moment — and it is the *derived* task, so it carries the status
+   * the row is currently showing.
+   */
+  const [editingTask, setEditingTask] = useState<CareTask | null>(null);
   const [isAddingPerson, setAddingPerson] = useState(false);
   const [isNotesOpen, setNotesOpen] = useState(false);
 
@@ -142,7 +156,7 @@ export default function App() {
     [stored, recipientId],
   );
   const notesToday = useMemo(() => {
-    const today = todayKey();
+    const today = dayKey();
     return stored.notes.filter((note) => note.day === today).length;
   }, [stored.notes]);
   const confirmedTodayByRecipientId = useMemo(() => {
@@ -222,6 +236,48 @@ export default function App() {
   };
 
   /**
+   * Editing keeps the moment and its id, so a status already set and the repeat
+   * rule both survive the change. Renaming a moment must not untick it.
+   */
+  const saveEditedMoment = (momentId: string, patch: Omit<TaskTemplate, "id">) => {
+    mutate(withEditedMoment(storedRef.current, recipient.id, momentId, patch));
+    setEditingTask(null);
+    showNotice(`“${patch.title}” updated.`);
+  };
+
+  const deleteMoment = (momentId: string) => {
+    const gone = tasks.find((task) => task.id === momentId);
+    mutate(withRemovedMoment(storedRef.current, recipient.id, momentId));
+    setEditingTask(null);
+    showNotice(`“${gone?.title ?? "That moment"}” removed from the plan.`);
+  };
+
+  /**
+   * Moves a moment onto another day, and is the reason a skip is no longer a
+   * dead end: "not now, later" is the thing a carer actually means.
+   *
+   * A `null` day brings it back, which is how the undo works — the move is
+   * reversible without a confirmation dialog, because it is not destructive.
+   */
+  const moveMoment = (momentId: string, day: string | null) => {
+    const moved = tasks.find((task) => task.id === momentId);
+    mutate(withDeferredMoment(storedRef.current, recipient.id, momentId, day));
+    setEditingTask(null);
+    showNotice(
+      day
+        ? `“${moved?.title ?? "That moment"}” moved to ${describeDay(day)}.`
+        : `“${moved?.title ?? "That moment"}” is back on today’s plan.`,
+    );
+  };
+
+  /** The one-tap version, offered on a skipped row. */
+  const moveMomentToTomorrow = (momentId: string) => {
+    const moved = tasks.find((task) => task.id === momentId);
+    mutate(withDeferredMoment(storedRef.current, recipient.id, momentId, dayKeyFromNow(1)));
+    showNotice(`“${moved?.title ?? "That moment"}” moved to tomorrow.`);
+  };
+
+  /**
    * Adding someone later is the same operation setup performs, including the
    * switch to their (empty) plan — the reason to add a person is to start
    * planning for them, and the empty screen is where that happens.
@@ -262,6 +318,22 @@ export default function App() {
     setTab("today");
   };
 
+  /**
+   * Where the moment being edited has been moved to, when that day is still
+   * ahead of us.
+   *
+   * A deferral whose day has already passed is not a move any more — the moment
+   * is an ordinary one again — so it reports `null` rather than a stale
+   * "yesterday", and the sheet offers to move it forward rather than back.
+   */
+  const editingMovedTo = useMemo(() => {
+    if (!editingTask) return null;
+    const day = deferredDayFor(stored, recipient.id, editingTask.id);
+    return day && day > dayKeyFromNow(0) ? describeDay(day) : null;
+    // `recipient` is unused while the sheet is closed, which is the only time
+    // this can run during setup — the guard above returns first.
+  }, [editingTask, stored, recipient]);
+
   if (!hydrated) {
     return (
       <View style={[styles.viewport, isWide && styles.viewportWide]}>
@@ -299,6 +371,8 @@ export default function App() {
             organiserName={stored.organiserName}
             onSelectRecipient={selectRecipient}
             onUpdateTask={updateTask}
+            onOpenTaskEditor={(task) => setEditingTask(task)}
+            onMoveTaskToTomorrow={moveMomentToTomorrow}
             onAddMoment={() => setAddingMoment(true)}
             onUseStarterPlan={useStarterPlan}
             onOpenPaywall={() => setPaywallOpen(true)}
@@ -368,10 +442,21 @@ export default function App() {
           </Animated.View>
         ) : null}
 
+        {/* One sheet, two jobs: add a moment, or revise the one you tapped.
+            They are the same form, so they are the same surface — the only
+            difference is whether a moment already exists to write back to. */}
         <AddMomentSheet
-          visible={isAddingMoment}
-          onClose={() => setAddingMoment(false)}
+          visible={isAddingMoment || Boolean(editingTask)}
+          onClose={() => {
+            setAddingMoment(false);
+            setEditingTask(null);
+          }}
           onSubmit={addMoment}
+          editing={editingTask}
+          onSave={saveEditedMoment}
+          onDelete={deleteMoment}
+          onDefer={moveMoment}
+          movedTo={editingMovedTo}
         />
 
         <AddPersonSheet

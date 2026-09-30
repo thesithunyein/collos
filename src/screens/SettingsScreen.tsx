@@ -219,7 +219,14 @@ export function SettingsScreen({
         <Text style={styles.sectionLabel}>Your data</Text>
         <View style={styles.detailCard}>
           <DetailRow label="People" value={countLabel(data.people, "person", "people")} />
-          <DetailRow label="This plan" value={countLabel(data.moments, "moment", "moments")} />
+          {/* "On today's plan", not "This plan": a moment set to weekdays or
+              weekends is on the plan every day but only *appears* on some, and
+              these two rows have to agree with each other and with the Today
+              screen. */}
+          <DetailRow
+            label="On today’s plan"
+            value={countLabel(data.moments, "moment", "moments")}
+          />
           <DetailRow
             label="Confirmed today"
             value={data.moments === 0 ? "Nothing planned" : `${data.confirmed} of ${data.moments}`}

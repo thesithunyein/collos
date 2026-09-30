@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, nativeAnimDriver } from "../theme";
+import { useReduceMotion } from "../platform/motion";
+import { colors, motion, nativeAnimDriver } from "../theme";
 
 /**
  * A bottom-tab item with a springy active state. The icon springs up a few
@@ -28,25 +29,42 @@ export function NavItem({
   // 0 = resting, 1 = active. Starts at the right value so a tab that mounts
   // already active doesn't play a spurious pop.
   const lift = useRef(new Animated.Value(active ? 1 : 0)).current;
+  const reduceMotion = useReduceMotion();
   // The icon grows slightly when active; it never shrinks below full size, so
   // every tab stays visible at rest.
   const iconScale = lift.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] });
 
   useEffect(() => {
+    // With reduce motion on, the capsule and the icon still change — they just
+    // arrive at once instead of springing, and the tab is never left mid-tween.
+    if (reduceMotion) {
+      lift.setValue(active ? 1 : 0);
+      return;
+    }
     Animated.spring(lift, {
       toValue: active ? 1 : 0,
       // A touch of overshoot reads as "alive" without bouncing enough to
       // smear on a screen recording.
-      friction: 6,
-      tension: 190,
+      ...motion.spring.lift,
       useNativeDriver: nativeAnimDriver,
     }).start();
-  }, [active, lift]);
+  }, [active, lift, reduceMotion]);
 
   return (
     <Pressable
       accessibilityRole="tab"
       accessibilityState={{ selected: active }}
+      /*
+       * `aria-selected` is set as well as `accessibilityState`.
+       *
+       * On web, react-native-web does not translate `accessibilityState` into
+       * `aria-selected` on a `tab` role, so the active tab was reachable and
+       * labelled but never announced as the current one — a screen reader heard
+       * three tabs and no answer to "where am I". Setting both is not belt and
+       * braces: `accessibilityState` is what native reads and `aria-selected` is
+       * what the browser reads.
+       */
+      aria-selected={active}
       accessibilityLabel={label}
       onPress={onPress}
       style={({ pressed }) => [styles.navItem, pressed && styles.navItemPressed]}
@@ -65,7 +83,15 @@ export function NavItem({
           <Ionicons name={icon} size={22} color={active ? colors.blue : colors.muted} />
         </Animated.View>
       </View>
-      <Text style={[styles.navLabel, active && styles.navLabelActive]}>{label}</Text>
+      {/* Capped, not free: the bar is a fixed 68pt capsule, so letting a
+          maxed-out text setting scale the label would push it out of the
+          control it belongs to. Body copy is left to scale however it likes. */}
+      <Text
+        maxFontSizeMultiplier={1.3}
+        style={[styles.navLabel, active && styles.navLabelActive]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -92,7 +118,9 @@ const styles = StyleSheet.create({
   },
   // Luma's tab bar separates its states by weight as well as tint: an inactive
   // label sits back, the active one is genuinely bold. Weight alone would be too
-  // subtle at 11pt, so tint and weight move together.
+  // subtle at 11pt, so tint and weight move together — and both of them do.
+  // They were documented here as moving together but were both set to 600, so
+  // the active tab was carried by colour alone.
   navLabel: { color: colors.muted, fontSize: 11, fontWeight: "600" },
-  navLabelActive: { color: colors.blue, fontWeight: "600" },
+  navLabelActive: { color: colors.blue, fontWeight: "700" },
 });
