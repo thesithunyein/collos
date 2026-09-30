@@ -302,10 +302,10 @@ violating it risks the whole entry.
 | 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro lifts the shared-notes limit — one a day per person on the free plan, as many as your circle needs on Pro. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
 | 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.74.5, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
 
-#### Two beats the app gained after this script was written
+#### Three beats the app gained after this script was written
 
-The 0:35–1:00 block is where they fit, and the first one is the better film. Both are
-covered by commits in the repository, so the video and the code agree.
+The 0:35–1:00 block is where they fit, and the first is still the better film. All
+three are covered by commits in the repository, so the video and the code agree.
 
 - **Skipping moves a moment instead of losing it.** On a moment, tap *Skip*, then the
   **Move to tomorrow** that appears on the row. The moment leaves today and the plan

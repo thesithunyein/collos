@@ -338,7 +338,7 @@ collos/
 │
 ├── tests/
 │   ├── careStore.test.mjs       27 behaviour tests over the store's real source
-│   ├── smoke.test.mjs           the loader runs src TypeScript in Node
+│   ├── smoke.test.mjs           the loader runs src TypeScript in Node (2 tests)
 │   └── support/                 load-ts.mjs · hook-cjs.mjs · fileStore-double.mjs
 │
 ├── assets/
