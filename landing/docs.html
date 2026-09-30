@@ -288,15 +288,16 @@ src/purchases/              the only place the RevenueCat SDK is imported
 src/theme.ts                colour, radius scale, safe-area insets</code></pre>
             <ul>
               <li>
-                <strong>Expo SDK 51, React Native 0.74.5.</strong> Identifiers are
+                <strong>Expo SDK 54, React Native 0.81.5.</strong> Identifiers are
                 <code>com.collos.app</code> on both iOS and Android, and EAS builds both from
                 <code>eas.json</code>.
               </li>
               <li>
                 <strong>Dependencies are pinned, deliberately.</strong> <code>expo-font</code> is held
-                at <code>~12.0.10</code> with an <code>overrides</code> entry, because a floating
+                at <code>~14.0.12</code> with a matching <code>overrides</code> entry, because a floating
                 version resolves to a release that calls <code>registerWebModule</code> and blanks the
-                web build at runtime.
+                web build at runtime. The override has to move whenever the SDK does — npm refuses to
+                install while the two disagree.
               </li>
               <li>
                 <strong>The entitlement gates one thing.</strong> Notes are capped in

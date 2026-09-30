@@ -253,7 +253,7 @@ should see as new.
 
 **Never let an Expo package float.** The web build once shipped a blank white page in
 production: `@expo/vector-icons` drifted to a version whose wildcard `expo-font: "*"`
-peer resolution pulled a modern `expo-font` into this SDK 51 tree, where
+peer resolution pulled a `expo-font` from outside the pinned tree, where
 `expo-modules-core` has no `registerWebModule`, so the app died before its first render.
 The bundle built successfully and failed only at runtime. `expo-font` is pinned exactly
 and additionally guarded by an `overrides` entry in `package.json` for that reason, and

@@ -11,9 +11,9 @@ A short shared daily plan for the person in a family who has quietly become the 
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/thesithunyein/collos?style=flat-square&color=2f63d6" /></a>
   <a href="https://github.com/thesithunyein/collos/actions/workflows/ci.yml"><img alt="CI: typecheck and export" src="https://github.com/thesithunyein/collos/actions/workflows/ci.yml/badge.svg" /></a>
   <img alt="Platforms: iOS, Android and web from one codebase" src="https://img.shields.io/badge/platforms-iOS%20%C2%B7%20Android%20%C2%B7%20web-183468?style=flat-square" />
-  <img alt="Expo SDK 51" src="https://img.shields.io/badge/Expo%20SDK-51-000020?style=flat-square&logo=expo&logoColor=white" />
-  <img alt="React Native 0.74" src="https://img.shields.io/badge/React%20Native-0.74-61dafb?style=flat-square&logo=react&logoColor=white" />
-  <img alt="TypeScript 5.3" src="https://img.shields.io/badge/TypeScript-5.3-3178c6?style=flat-square&logo=typescript&logoColor=white" />
+  <img alt="Expo SDK 54" src="https://img.shields.io/badge/Expo%20SDK-54-000020?style=flat-square&logo=expo&logoColor=white" />
+  <img alt="React Native 0.81" src="https://img.shields.io/badge/React%20Native-0.81-61dafb?style=flat-square&logo=react&logoColor=white" />
+  <img alt="TypeScript 5.9" src="https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square&logo=typescript&logoColor=white" />
   <img alt="Payments: RevenueCat" src="https://img.shields.io/badge/payments-RevenueCat-f2542d?style=flat-square" />
   <img alt="Data: device-local, no backend" src="https://img.shields.io/badge/data-device--local%2C%20no%20backend-4fa98a?style=flat-square" />
   <img alt="Store listing: not yet published" src="https://img.shields.io/badge/store%20listing-not%20yet%20published-d97706?style=flat-square" />
@@ -305,7 +305,7 @@ collos/
 ├── App.tsx                      the whole shell: stage, tabs, nav, persistence wiring
 ├── app.json                     Expo config: name, scheme, icons, bundle id com.collos.app
 ├── eas.json                     build profiles: preview (internal) and production (stores)
-├── package.json                 scripts, ten runtime dependencies, two dev dependencies
+├── package.json                 scripts, eleven runtime dependencies, three dev dependencies
 ├── tsconfig.json                TypeScript config, strict, no emit
 ├── babel.config.js              the Expo preset, unchanged
 ├── vercel.json                  builds the browser bundle into dist/ for the app domain
@@ -398,7 +398,7 @@ collos/
 
 ### Prerequisites
 
-- **Node.js 18 or newer** (CI runs 20).
+- **Node.js 20.19.4 or newer** — the floor Expo SDK 54 sets (CI runs 20).
 - For a native run: the iOS Simulator (macOS), an Android emulator, or the Expo Go
   app on a physical phone.
 - Nothing else. No store account, no Apple or Google developer account, and **no
@@ -774,11 +774,14 @@ worth more than one that restates the line beneath it.
 
 1. **A floated `expo-font` blanks the web build.** `@expo/vector-icons` declares
    `expo-font` as a wildcard peer dependency, so a floating range resolves to the
-   newest release, and a newer `expo-font` calls `registerWebModule`, which does not
-   exist in SDK 51's `expo-modules-core`. The bundle then builds successfully and
-   throws at runtime, leaving a blank white page. `expo-font` is pinned to
-   `~12.0.10` and additionally held by an `overrides` entry. Move `expo`,
-   `expo-font` and `@expo/vector-icons` together, or not at all.
+   newest release, and an `expo-font` from a different SDK calls `registerWebModule`,
+   which does not exist in the pinned `expo-modules-core`. The bundle then builds
+   successfully and throws at runtime, leaving a blank white page. It first bit on
+   SDK 51; `expo-font` is pinned to `~14.0.12` for SDK 54 and additionally held by an
+   `overrides` entry. **The override is part of the SDK upgrade, not a constant:** npm
+   refuses to install while it names a version the SDK no longer expects (`EOVERRIDE`),
+   so it has to move with the pin. Move `expo`, `expo-font` and `@expo/vector-icons`
+   together, or not at all.
 2. **Centring with `transform` breaks a `rotate` animation on the same element.**
    The individual transform properties compose with `transform` rather than
    replacing it, and `transform` is applied innermost — so a

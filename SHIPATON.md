@@ -80,7 +80,7 @@ submission field, not necessarily the Devpost account's own login email.
 This is the single most dangerous misreading of the entry, because the rules say plainly
 that **"web apps are not eligible."** The facts are unambiguous:
 
-- The dependency that defines the product is **`react-native` 0.74.5** on **Expo SDK 51**.
+- The dependency that defines the product is **`react-native` 0.81.5** on **Expo SDK 54**.
   The web build only exists because `react-native-web` renders the same components to the
   DOM as an additional target.
 - **Native targets are configured, not aspirational:** `ios.bundleIdentifier` =
@@ -272,12 +272,12 @@ Two rules-side facts that are easy to miss:
    satisfies "SDK integrated"; a Test Store purchase satisfies "SDK powers a purchase"
    beyond doubt — and the Ship Kit milestones (perks) track exactly this. Have the
    project ID ready for the Devpost form.
-4. **Record the video on a real device** — an **Android** phone running the SDK 51 build
-   of Expo Go, an Android emulator, or the iOS Simulator. **Not an iPhone** — read
-   "Getting the app onto a phone" in §6 before anything else tonight; at SDK 51, Expo
-   Go cannot be made to run this project on a physical iPhone at all. Show only what
-   the app does; no copyrighted music, no third-party trademarks or logos (rules §4
-   makes this a submission requirement, not a style tip).
+4. **Record the video on a real device** — an **iPhone** running Expo Go from the App
+   Store, which is SDK 54 and therefore matches this project. Read "Getting the app onto
+   a phone" in §6 first: the project was upgraded from SDK 51 to SDK 54 on submission day
+   precisely *because* an iPhone cannot run SDK 51 at all. Show only what the app does;
+   no copyrighted music, no third-party trademarks or logos (rules §4 makes this a
+   submission requirement, not a style tip).
 5. **Fill in the Devpost form** using §7, list Next Gen, submit, then keep editing
    until the deadline if needed — but never after it.
 
@@ -301,35 +301,39 @@ violating it risks the whole entry.
 
 #### Getting the app onto a phone
 
-`npm start` starts the dev server; the phone runs the app inside Expo Go. Two hard
-constraints decide whether that works tonight:
+`npm start` starts the dev server; the phone runs the app inside Expo Go.
 
-- **This project is SDK 51 (`expo ~51.0.28`), and each Expo Go build carries exactly one
-  SDK version.** Expo Go from the App Store stops at SDK 54, so a store install refuses
-  this project with *"Project is incompatible with this version of Expo Go."*
-- **On an iPhone there is no way around it.** Expo documents it plainly: for *"projects
-  using SDK 53 or earlier, you cannot install an older version of Expo Go on a physical
-  iOS device."* The iOS Simulator needs macOS, and this project is built on Windows.
+**The project is SDK 54 (`expo ^54.0.0`), and SDK 54 is the last SDK Expo Go carries on
+the App Store.** Those two matching is the entire requirement — each Expo Go build
+contains exactly one SDK version and refuses a project built on any other.
 
-So the workable path is **Android** — a phone, or the Android emulator:
+1. Install or update **Expo Go** from the App Store. It is SDK 54.
+2. Put the phone and the machine on the **same Wi-Fi**.
+3. From the repository root: `npm start`.
+4. In Expo Go, choose **Enter URL manually** and type the dev server's address;
+   `ipconfig` prints it under the Wi-Fi adapter:
 
-1. On the Android device, open <https://expo.dev/go>, choose **SDK 51** and **Android**,
-   and install that build. If a newer Expo Go is already on the device, **uninstall it
-   first** — the builds are signed differently and will not install over one another.
-2. From the repository root on the machine: `npm start`.
-3. Put the phone and the machine on the **same Wi-Fi**, then scan the QR code **from
-   inside Expo Go**. Android's system camera does not know what to do with that code.
-4. If the QR will not connect — a closed port, or a Windows firewall rule — restart with
+   ```
+   exp://192.168.x.x:8081
+   ```
+
+   Scanning the QR code the terminal draws does the same thing.
+5. If it will not connect — a closed port, or a Windows firewall rule — restart with
    `npx expo start --tunnel`, which routes around both.
 
-**If the only device to hand is an iPhone**, fastest options first: borrow an Android
-phone for twenty minutes; run the **Android emulator** and film that; or make a
-development build. The last needs an EAS build and, for an iPhone, an Apple Developer
-Program membership plus TestFlight — not a tonight-sized job.
+Dismiss Expo Go's floating dev-menu button before recording, and keep its name and mark
+out of frame: third-party trademarks are a submission restriction.
 
-**Do not upgrade the project to a newer SDK before the deadline.** It is the single
-riskiest edit available: it would put a working, tested app at risk to solve a tooling
-problem, hours before submission.
+**Why the project was upgraded from SDK 51 to SDK 54 on submission day.** At SDK 51 an
+iPhone could not run it at all: Expo documents that for *"projects using SDK 53 or
+earlier, you cannot install an older version of Expo Go on a physical iOS device"*, and
+every fallback was closed — the iOS Simulator needs macOS, the Android emulator wanted
+about 4 GB of disk that was not free, and a development build wants an Apple Developer
+Program membership. SDK 54 was the one version that both accepted this code and matched
+the store build of Expo Go, so upgrading was the only route to footage on a real phone.
+It cost three SDK majors in one step, and the breakages were all in the same two places:
+`expo-file-system` stopped being a transitive dependency of `expo` **and** moved its old
+functions behind `/legacy`, and the `expo-font` override had to move with the SDK.
 
 #### What the screeners and the judges are each required to do
 
@@ -366,7 +370,7 @@ judging closes on 13 October, and the video may show only what a reviewer can re
 | 0:35–1:00 | On the empty plan, tap *Start from a template*, then *Confirm* on the morning check-in | "When you'd rather edit than stare at a blank page, the four everyday moments are one tap away — a check-in, a water break, a walk, an evening note. They arrive open, and every confirmation is saved the moment you tap it: close the app, come back, and the plan still remembers." |
 | 1:00–1:20 | Circle tab (free) → *Add someone*, then Today → *Shared notes* and write one | "The Circle tab shows who is in the plan and who has checked in today, and it's where a second person joins — each one keeps their own plan and you switch in a tap. Shared notes are the one thing the free plan caps — one a day for each person — and they are kept on this device, still there after a restart." |
 | 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro lifts the shared-notes limit — one a day per person on the free plan, as many as your circle needs on Pro. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
-| 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.74.5, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
+| 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.81.5, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
 
 #### Three beats the app gained after this script was written
 
@@ -414,7 +418,7 @@ they are mapped to is noted so nothing is cut by accident.
 | 0:22–0:30 | **progress** | *Confirm* the water break → progress ring moves | "Every tap is saved the moment you make it. Close the app, come back — the plan still remembers." |
 | 0:30–0:44 | **idea** *(tie-breaker)* | *Skip* → **Move to tomorrow** → header: *"1 moment moved to tomorrow."* → **cut** → clock rolled forward, reopen → the moment is back wearing **Moved here** | "And skipping isn't losing. Move it to tomorrow in one tap, and the plan says where it went. Tomorrow it comes back, marked with where it came from. Not now is not never." |
 | 0:44–0:54 | **RevenueCat** | Cut to browser, labelled on screen *web export — same app*: paywall → Test Store → *Collos Pro is active* | "Pro lifts the one limit the free plan has. These are live RevenueCat packages — real prices — and this is a purchase completing through RevenueCat Billing." |
-| 0:54–1:00 | **craft** + **category** | Settings → *This device* (native iOS, React Native 0.74.5, `com.collos.app`), then the repo: MIT in About, CI green | "Submitted for the Next Gen Award — a student-built app, judged on this video and the public repository. Same codebase on iOS, Android and web; the repo, the tests and the licence are all public." |
+| 0:54–1:00 | **craft** + **category** | Settings → *This device* (native iOS, React Native 0.81.5, `com.collos.app`), then the repo: MIT in About, CI green | "Submitted for the Next Gen Award — a student-built app, judged on this video and the public repository. Same codebase on iOS, Android and web; the repo, the tests and the licence are all public." |
 
 Three production notes, because this cut has no slack in it:
 
@@ -495,12 +499,12 @@ make a judge see it, roughly in order of how much they persuade:
    bar with its clock, Wi-Fi and battery, the notch or Dynamic Island, and the home indicator.
 3. **Show a native-only dialog.** Settings → *Reset all data* opens a **real system alert** on
    iOS/Android; the web build deliberately falls back to a two-tap inline confirm because React
-   Native 0.74's `Alert` does not exist on web. Tap it, show the OS dialog, tap *Cancel*. That is a
+   Native 0.81's `Alert` does not exist on web. Tap it, show the OS dialog, tap *Cancel*. That is a
    visible platform divergence in four seconds, and it is already implemented.
 4. **Show the phone's own keyboard and the safe-area layout.** Use *add a moment* and type with the
    native keyboard; the layout clears the notch and the home indicator.
 5. **Land on Settings → *This device*.** The card reads platform, OS version, device, the React
-   Native runtime (`0.74.5`), `com.collos.app` and app version out of the running app, and on a
+   Native runtime (`0.81.5`), `com.collos.app` and app version out of the running app, and on a
    phone it says *Native iOS app*. Then say the sentence that settles it: *"this is the iOS app;
    the browser version is the same React Native codebase exported to web."*
 6. **Only then cut to the browser**, label it on screen (*web export — same app*), and use it for
@@ -586,8 +590,8 @@ demo never breaks.
 
 **What was hard.** The scariest bug was a blank white page in production. The cause was
 a floating transitive dependency: `@expo/vector-icons` drifted to a version whose
-wildcard `expo-font: "*"` peer pulled a modern `expo-font` into an Expo SDK 51 tree,
-where `expo-modules-core` has no `registerWebModule`, so the app died before its first
+wildcard `expo-font: "*"` peer pulled a `expo-font` from outside the pinned tree, where
+`expo-modules-core` has no `registerWebModule`, so the app died before its first
 render. The fix was pinning exact versions and adding an `overrides` entry — and the
 lesson was that `*` peer ranges are load-bearing in a pinned SDK tree. Adding
 `react-native-purchases` afterwards carried exactly that risk, so the dependency tree

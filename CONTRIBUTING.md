@@ -96,7 +96,7 @@ otherwise good.
   type family on purpose, so a capture of the app can sit inside the page that
   describes it. If you change `src/theme.ts`, check `landing/styles.css` and
   `brand.md` in the same change.
-- **Keep the dependencies small.** This project runs on ten runtime dependencies
+- **Keep the dependencies small.** This project runs on eleven runtime dependencies
   and has no state library and no UI kit — the test suite uses Node's built-in
   runner and adds none. Adding one needs a reason in the pull request.
 
