@@ -21,7 +21,18 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const readmePath = join(root, "README.md");
-const readme = readFileSync(readmePath, "utf8");
+/**
+ * Normalised to LF before anything is matched against it.
+ *
+ * `core.autocrlf=true` — the default Git for Windows install, and what this
+ * repository's own checkout has — rewrites tracked text files to CRLF on
+ * checkout. Every pattern below anchors on `\n`, so without this the JSON sample
+ * looks missing and headings carry a stray `\r` into the anchor comparison: the
+ * check then fails on the platform the project is developed on while passing in
+ * CI, which runs on Linux. Line endings are not one of the four things this file
+ * exists to verify, so it stops being able to see them.
+ */
+const readme = readFileSync(readmePath, "utf8").replace(/\r\n/g, "\n");
 
 const problems = [];
 const note = (message) => problems.push(message);
