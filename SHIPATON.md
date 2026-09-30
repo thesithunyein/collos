@@ -328,6 +328,44 @@ safety control, not a story.
 
 Do not use copyrighted music or any third party's trademarks.
 
+### The one-minute cut
+
+A minute is enough, and it is safer than two: the rule is a ceiling (*"should be
+less than two minutes"*), and a dense minute reads as confidence. The cost is real
+though — this cut drops the Circle-tab and notes beats, which are the only footage
+the *"meaningful progress toward a working app"* criterion has for the second
+person on a plan. **1:30 is the better film if your pacing holds**; use 1:00 only
+if you would otherwise rush the centerpiece.
+
+Every block below exists to score one of the four Next Gen criteria. The project
+they are mapped to is noted so nothing is cut by accident.
+
+| Time | Scores | On screen | Say |
+| --- | --- | --- | --- |
+| 0:00–0:06 | **idea** | Phone in hand, today's plan | "When you help look after someone, the small things are what slip — did she drink water, did anyone actually check in." |
+| 0:06–0:16 | **progress** | Cold launch → *Set up my care circle* → name + relationship → *Start my plan* | "One screen sets up who you're caring for. No account, no password. The plan starts empty, because it's yours." |
+| 0:16–0:22 | **progress** | *Start from a template* → **0 of 4** | "Four everyday moments, one tap away — and they arrive open, so you only tick what actually happened." |
+| 0:22–0:30 | **progress** | *Confirm* the water break → progress ring moves | "Every tap is saved the moment you make it. Close the app, come back — the plan still remembers." |
+| 0:30–0:44 | **idea** *(tie-breaker)* | *Skip* → **Move to tomorrow** → header: *"1 moment moved to tomorrow."* → **cut** → clock rolled forward, reopen → the moment is back wearing **Moved here** | "And skipping isn't losing. Move it to tomorrow in one tap, and the plan says where it went. Tomorrow it comes back, marked with where it came from. Not now is not never." |
+| 0:44–0:54 | **RevenueCat** | Cut to browser, labelled on screen *web export — same app*: paywall → Test Store → *Collos Pro is active* | "Pro lifts the one limit the free plan has. These are live RevenueCat packages — real prices — and this is a purchase completing through RevenueCat Billing." |
+| 0:54–1:00 | **craft** | Settings → *This device* (native iOS, React Native 0.74.5, `com.collos.app`), then the repo: MIT in About, CI green | "Same codebase on iOS, Android and web. The repository, the tests and the licence are all public." |
+
+Three production notes, because this cut has no slack in it:
+
+- **It is two takes, not one.** Rolling the phone's clock forward is ~20 seconds of
+  Settings you must not film. Shoot the skip in take one, change the clock, shoot the
+  arrival in take two, and join them with a caption like *next day*. The state is
+  genuinely the app's own; nothing is mocked.
+- **The browser may appear once, and never first.** Label it on screen. Everything
+  before and after is the phone, because the rules ask for footage "on the device for
+  which it was built" — and because a judge who sees a browser window first has
+  already decided what your app is.
+- **The purchase beat has to be the browser, and has to be today.** On a phone in Expo
+  Go `react-native-purchases` has no native module, so the paywall runs in labelled
+  preview mode and charges nothing; the browser build is where the live `rcb_` key
+  completes a real sandbox purchase. The sandbox entitlement expires the same day it
+  is bought, so if you film tomorrow that beat shows **FREE** and is not filmable.
+
 ### Proving it's a native app, on camera
 
 The rules ask for footage of the project "functioning on the device for which it was built" and
