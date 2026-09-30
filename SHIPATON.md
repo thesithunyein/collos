@@ -368,9 +368,16 @@ Three production notes, because this cut has no slack in it:
 
 #### Captions instead of a voice-over
 
-**Nothing in the rules requires narration**, so on-screen sentences are a perfectly
-legitimate style — and often the better one, since a clear caption beats a mumbled
-line into a phone mic. What the rules *do* constrain is the audio bed:
+**Text-led is the right choice for a one-minute cut**, and not only because a clear
+caption beats a mumbled line into a phone mic. Reading runs at roughly 240 words a
+minute against speech at about 150, so captions carry materially more meaning per
+second — which is precisely the currency when the budget is sixty seconds. They also
+survive muted playback, 2x scrubbing and a viewer whose first language is not
+English, none of which are hypothetical when a judge is working through a stack of
+demos in one sitting. A voice-over is not forbidden and is welcome as a quiet second
+reading of the same lines; what it must never be is the *only* carrier of meaning.
+
+The rules constrain the audio bed rather than the narration:
 
 > *"must not include third party trademarks, or copyrighted music or other material
 > unless the Entrant has permission to use such material"*
