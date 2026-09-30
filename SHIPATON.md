@@ -272,9 +272,12 @@ Two rules-side facts that are easy to miss:
    satisfies "SDK integrated"; a Test Store purchase satisfies "SDK powers a purchase"
    beyond doubt — and the Ship Kit milestones (perks) track exactly this. Have the
    project ID ready for the Devpost form.
-4. **Record the video on a real device** — Expo Go on a phone, or the iOS Simulator.
-   Show only what the app does; no copyrighted music, no third-party trademarks or
-   logos (rules §4 makes this a submission requirement, not a style tip).
+4. **Record the video on a real device** — an **Android** phone running the SDK 51 build
+   of Expo Go, an Android emulator, or the iOS Simulator. **Not an iPhone** — read
+   "Getting the app onto a phone" in §6 before anything else tonight; at SDK 51, Expo
+   Go cannot be made to run this project on a physical iPhone at all. Show only what
+   the app does; no copyrighted music, no third-party trademarks or logos (rules §4
+   makes this a submission requirement, not a style tip).
 5. **Fill in the Devpost form** using §7, list Next Gen, submit, then keep editing
    until the deadline if needed — but never after it.
 
@@ -282,7 +285,10 @@ Two rules-side facts that are easy to miss:
 
 Judges are not required to watch beyond two minutes, and screeners score from the
 video plus the description. **Film on the device the app is built for** — a real phone
-running the app in Expo Go (`npm start`, scan the QR code), or the iOS Simulator. The
+running the app in Expo Go (`npm start`, scan the QR code), or the Android emulator /
+iOS Simulator. Read "Getting the app onto a phone" immediately below before you rely on
+that sentence: on an iPhone it is not possible at this SDK, and finding that out at
+midnight costs the whole submission. The
 browser build (app.collos.sithunyein.com) is one labelled cutaway for the live sandbox
 purchase, not the main evidence: the rules ask for "footage that shows the Project
 functioning on the device for which it was built," and they separately disqualify web
@@ -292,6 +298,38 @@ Never film the Freebuff preview panel — it injects its own badge into the page
 plain browser window. No copyrighted music, no third-party trademarks or logos
 anywhere in the frame — this is a submission requirement in the Official Rules, and
 violating it risks the whole entry.
+
+#### Getting the app onto a phone
+
+`npm start` starts the dev server; the phone runs the app inside Expo Go. Two hard
+constraints decide whether that works tonight:
+
+- **This project is SDK 51 (`expo ~51.0.28`), and each Expo Go build carries exactly one
+  SDK version.** Expo Go from the App Store stops at SDK 54, so a store install refuses
+  this project with *"Project is incompatible with this version of Expo Go."*
+- **On an iPhone there is no way around it.** Expo documents it plainly: for *"projects
+  using SDK 53 or earlier, you cannot install an older version of Expo Go on a physical
+  iOS device."* The iOS Simulator needs macOS, and this project is built on Windows.
+
+So the workable path is **Android** — a phone, or the Android emulator:
+
+1. On the Android device, open <https://expo.dev/go>, choose **SDK 51** and **Android**,
+   and install that build. If a newer Expo Go is already on the device, **uninstall it
+   first** — the builds are signed differently and will not install over one another.
+2. From the repository root on the machine: `npm start`.
+3. Put the phone and the machine on the **same Wi-Fi**, then scan the QR code **from
+   inside Expo Go**. Android's system camera does not know what to do with that code.
+4. If the QR will not connect — a closed port, or a Windows firewall rule — restart with
+   `npx expo start --tunnel`, which routes around both.
+
+**If the only device to hand is an iPhone**, fastest options first: borrow an Android
+phone for twenty minutes; run the **Android emulator** and film that; or make a
+development build. The last needs an EAS build and, for an iPhone, an Apple Developer
+Program membership plus TestFlight — not a tonight-sized job.
+
+**Do not upgrade the project to a newer SDK before the deadline.** It is the single
+riskiest edit available: it would put a working, tested app at risk to solve a tooling
+problem, hours before submission.
 
 #### What the screeners and the judges are each required to do
 
