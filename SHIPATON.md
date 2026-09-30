@@ -293,6 +293,34 @@ plain browser window. No copyrighted music, no third-party trademarks or logos
 anywhere in the frame — this is a submission requirement in the Official Rules, and
 violating it risks the whole entry.
 
+#### What the screeners and the judges are each required to do
+
+RevenueCat publishes the funnel, and it is what should decide the shape of the video.
+
+**Stage 1 — intake filtering (1 October).** A submission is dropped here unless every
+required field is answered and it has: a video, a valid **bundle ID or package name**,
+the app icon and screenshots for the Times Square marketing, and — for every other
+category — a store link. *"Sadly, but unsurprisingly, a lot of project submissions get
+filtered out at this point."* This is also where an entry is tagged for the categories
+it may be judged for, taken from the category questions, so an unanswered question means
+no judging for that prize.
+
+**Stage 2 — prescreening.** Every entry goes to **at least two** RevenueCat screeners,
+who score it 1–5 across the categories it entered. They must watch **the first two
+minutes** of the video and read the submission. What they are told to look for in that
+window is: the elevator pitch, **the app in use**, and **how and why the app targets the
+categories it entered** — which is why the closing caption now names the Next Gen Award.
+
+**Stage 3 — judge scoring.** Each judge must read the **entire** description, watch at
+least two minutes of the video, and **review all of the screenshots**, then score 1–5 per
+category. Close to 100 apps reach this round across all categories.
+
+**Stage 4 — final selection (8–9 October).** The source material is read once more, and
+*"at least one RevenueCat developer advocate downloads the app to confirm it matches what
+the video shows."* Under Next Gen there is no store listing, so the live web build and
+the public repository are all there is to check against — both must stay reachable until
+judging closes on 13 October, and the video may show only what a reviewer can reproduce.
+
 | Time | On screen | Say |
 | --- | --- | --- |
 | 0:00–0:15 | Onboarding screen | "This is Collos. When you help look after someone, the little things are the first to slip — did she drink water, did anyone actually check in, who is visiting on Sunday. Collos is one calm place for a care circle to keep track." |
@@ -348,7 +376,7 @@ they are mapped to is noted so nothing is cut by accident.
 | 0:22–0:30 | **progress** | *Confirm* the water break → progress ring moves | "Every tap is saved the moment you make it. Close the app, come back — the plan still remembers." |
 | 0:30–0:44 | **idea** *(tie-breaker)* | *Skip* → **Move to tomorrow** → header: *"1 moment moved to tomorrow."* → **cut** → clock rolled forward, reopen → the moment is back wearing **Moved here** | "And skipping isn't losing. Move it to tomorrow in one tap, and the plan says where it went. Tomorrow it comes back, marked with where it came from. Not now is not never." |
 | 0:44–0:54 | **RevenueCat** | Cut to browser, labelled on screen *web export — same app*: paywall → Test Store → *Collos Pro is active* | "Pro lifts the one limit the free plan has. These are live RevenueCat packages — real prices — and this is a purchase completing through RevenueCat Billing." |
-| 0:54–1:00 | **craft** | Settings → *This device* (native iOS, React Native 0.74.5, `com.collos.app`), then the repo: MIT in About, CI green | "Same codebase on iOS, Android and web. The repository, the tests and the licence are all public." |
+| 0:54–1:00 | **craft** + **category** | Settings → *This device* (native iOS, React Native 0.74.5, `com.collos.app`), then the repo: MIT in About, CI green | "Submitted for the Next Gen Award — a student-built app, judged on this video and the public repository. Same codebase on iOS, Android and web; the repo, the tests and the licence are all public." |
 
 Three production notes, because this cut has no slack in it:
 
@@ -409,7 +437,7 @@ about a second and a half. Cut between lines on the tap that causes them.
 | 0:22–0:30 | *Every tap saves instantly.* |
 | 0:30–0:44 | *Skipping isn't losing.* → *Move it to tomorrow.* → *"1 moment moved to tomorrow."* → *NEXT DAY* → *It comes back marked with where it came from.* |
 | 0:44–0:54 | *Pro lifts the one limit.* → *Live RevenueCat prices.* → *A real purchase, through RevenueCat Billing.* |
-| 0:54–1:00 | *iOS, Android and web — one codebase.* → *Repository, tests and licence are public.* |
+| 0:54–1:00 | *Submitted for the Next Gen Award.* → *iOS, Android and web — one codebase.* → *Repository, tests and licence are public.* |
 
 The captions should name the same facts the voice-over version says. If you later
 add narration, keep the captions — they are also the accessible version, and several
@@ -551,6 +579,7 @@ one person who ends up carrying the mental load alone.
 | Built with | React Native, Expo, TypeScript, RevenueCat |
 | **Student email** | `sithunyein@my.uopeople.edu` — **confirmed by the organisers 29 Sep**, and the address they explicitly told you to enter in this field |
 | RevenueCat project ID | `projaa1359ce` — the value set as `EXPO_PUBLIC_REVENUECAT_PROJECT_ID` in Vercel; the app's **Settings → Store connection** screen displays the same value, so a reviewer can compare the two |
+| **Bundle ID / package name** | `com.collos.app` — **check this before submitting.** Stage 1 intake filtering verifies "a valid bundle ID or package name, which we can use to check that the app has the RevenueCat SDK integrated correctly". Fill the field if the form offers one; if it does not, put `com.collos.app` in the additional-details box. This is a filter, not a preference |
 | Screenshot | Any file from `submission/screenshots/` (1179×2556, no device frame) |
 | Icon | `assets/icon.png` (1024×1024) |
 | Category | **Next Gen Award** — plus Design Award and Peace Prize only if you can evidence them (§8) |
