@@ -100,6 +100,17 @@ browser invites exactly the wrong conclusion, and a judge will not go digging th
 cutaway for the live sandbox purchase — the beat the browser genuinely does better,
 because that is where the real RevenueCat Billing key is configured.
 
+> **Verified 30 Sep 2026.** The sandbox purchase beat was driven end-to-end on the
+> production web build: paywall → "Continue with Pro · $39.99" → RevenueCat's
+> Test Store dialog ("Product: yearly_3999") → "Test valid purchase" →
+> "Unlimited shared notes are unlocked" → **survived a full page reload** →
+> Settings shows "Collos Pro is active · Current period ends Sep 30, 2026".
+> The earlier "Pro reads FREE in production" risk is resolved: a fresh purchase
+> works today, and the video can film it. One caveat for filming: the sandbox
+> entitlement expires the same day it was bought, so the purchase beat should be
+> filmed on the same day it is recorded — or re-run "Restore purchases" first if
+> filming happens the next day.
+
 ## 2. Eligibility gates
 
 Gates marked **[main]** apply to the main competition only — the Next Gen Award does
