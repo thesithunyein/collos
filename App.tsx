@@ -151,6 +151,28 @@ export default function App() {
 
   // Notes are real, persisted state — the one paid feature, so the whole circle
   // screen and the Today strip read from it rather than from sample numbers.
+  /**
+   * Moments moved off today's plan, with the day they went to.
+   *
+   * The plan itself cannot show them — a moved moment is *not* on today — so
+   * the only way the loop reads as closed is to say where it went. Without
+   * this, skip → move looks identical to delete: the moment vanishes and the
+   * "nothing is lost" promise is prose, not pixels. Keyed by moment id.
+   */
+  const movedMomentsForToday = useMemo(() => {
+    if (!recipient) return {};
+    const map = stored.deferred[recipient.id] ?? {};
+    const today = dayKey();
+    const out: Record<string, string> = {};
+    for (const [momentId, day] of Object.entries(map)) {
+      // Strictly future days only: a move to *today* means the moment is on
+      // the plan again (tasksForRecipientOn renders it), so it is not "moved";
+      // a past day has already re-absorbed the moment into the daily plan.
+      if (day > today) out[momentId] = describeDay(day);
+    }
+    return out;
+  }, [stored.deferred, recipient]);
+
   const recipientNotes = useMemo(
     () => notesForRecipient(stored, recipientId),
     [stored, recipientId],
@@ -369,6 +391,7 @@ export default function App() {
             pro={pro.pro}
             noteCount={recipientNotes.length}
             organiserName={stored.organiserName}
+            movedMoments={movedMomentsForToday}
             onSelectRecipient={selectRecipient}
             onUpdateTask={updateTask}
             onOpenTaskEditor={(task) => setEditingTask(task)}

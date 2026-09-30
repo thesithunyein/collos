@@ -173,6 +173,11 @@ export type TodayScreenProps = {
   noteCount: number;
   /** The person holding the phone, from stored state — empty when unsaid. */
   organiserName: string;
+  /**
+   * Moments moved off today's plan: moment id → the day it went to, already
+   * phrased ("tomorrow"). Read-only display state; the map is derived in App.
+   */
+  movedMoments: Record<string, string>;
   onSelectRecipient: (recipient: CareRecipient) => void;
   onUpdateTask: (taskId: string, status: TaskStatus) => void;
   /** Opens the sheet that renames, reschedules or deletes a moment. */
@@ -198,6 +203,7 @@ export function TodayScreen({
   pro,
   noteCount,
   organiserName,
+  movedMoments,
   onSelectRecipient,
   onUpdateTask,
   onOpenTaskEditor,
@@ -208,6 +214,14 @@ export function TodayScreen({
   onOpenNotes,
   onOpenAccount,
 }: TodayScreenProps) {
+  /**
+   * The moved-moments line. `movedMoments` maps id → phrased day, so the count
+   * is the map's size and the phrase reused is simply its first value.
+   */
+  const movedEntries = Object.values(movedMoments);
+  const movedCount = movedEntries.length;
+  const nextMovedDay = movedEntries[0];
+
   return (
     <View style={styles.app}>
       <StatusBar style="dark" />
@@ -308,6 +322,13 @@ export function TodayScreen({
                     ? "Nothing planned yet"
                     : `${completedCount} of ${tasks.length} confirmed`}
                 </Text>
+                {movedCount > 0 ? (
+                  <Text style={styles.movedNote}>
+                    {movedCount === 1
+                      ? `1 moment moved to ${Object.values(movedMoments)[0]}.`
+                      : `${movedCount} moments moved — the next one to ${nextMovedDay}.`}
+                  </Text>
+                ) : null}
               </View>
               <View style={styles.sectionActions}>
                 <Pressable
@@ -639,6 +660,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { ...type.heading, color: colors.ink },
   sectionMeta: { ...type.caption, color: colors.muted, marginTop: space.xxs },
+  /** The moved-moments line: proof the loop closed, in the plan's own voice. */
+  movedNote: {
+    ...type.caption,
+    color: colors.blue,
+    marginTop: 2,
+  },
   sectionActions: { flexDirection: "row", alignItems: "center", gap: space.sm },
   pillButton: {
     minHeight: 34,
