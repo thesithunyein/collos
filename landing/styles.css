@@ -192,10 +192,57 @@ body.nav-open { overflow: hidden; }
    decorations move and a completely static hero reads as a mockup. Kept faint
    on purpose: these sit behind the headline, and anything heavier eats the
    contrast of the two-tone type in front of it. */
-.glow { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.24; animation: floatGlow 9s ease-in-out infinite; }
+.glow { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.2; animation: floatGlow 11s ease-in-out infinite; }
 .glow-a { top: -180px; left: -140px; width: 560px; height: 560px; background: radial-gradient(circle, var(--glow-a) 0%, transparent 70%); }
-.glow-b { top: -120px; left: 180px; width: 420px; height: 420px; background: radial-gradient(circle, var(--glow-b) 0%, transparent 70%); opacity: 0.16; animation-delay: 0.3s; }
-.glow-c { top: 220px; right: -160px; width: 480px; height: 480px; background: radial-gradient(circle, var(--periwinkle) 0%, transparent 70%); opacity: 0.2; animation-duration: 6.5s; }
+.glow-b { top: -120px; left: 180px; width: 420px; height: 420px; background: radial-gradient(circle, var(--glow-b) 0%, transparent 70%); opacity: 0.13; animation-delay: 0.3s; }
+.glow-c { top: 220px; right: -160px; width: 480px; height: 480px; background: radial-gradient(circle, var(--periwinkle) 0%, transparent 70%); opacity: 0.16; animation-duration: 7.5s; }
+
+/* A dot field, drawn once and masked to the device, so the empty half of the
+   hero has a material instead of a gradient. Two copies of the same field sit
+   on top of each other: the faint one is the room, the bright one is only
+   visible under the pointer (script.js moves the mask), which is the cheapest
+   way to say "this page is listening" without animating anything. */
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(47, 99, 214, 0.55) 1.1px, transparent 1.2px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(600px 500px at 68% 46%, #000 0%, rgba(0, 0, 0, 0.4) 62%, transparent 100%);
+          mask-image: radial-gradient(600px 500px at 68% 46%, #000 0%, rgba(0, 0, 0, 0.4) 62%, transparent 100%);
+  opacity: 0.5;
+}
+.hero-grid-hot {
+  background-image: radial-gradient(rgba(24, 52, 104, 0.6) 1.5px, transparent 1.6px);
+  -webkit-mask-image: radial-gradient(200px 200px at var(--gx, 68%) var(--gy, 46%), #000 0%, rgba(0, 0, 0, 0.4) 46%, transparent 100%);
+          mask-image: radial-gradient(200px 200px at var(--gx, 68%) var(--gy, 46%), #000 0%, rgba(0, 0, 0, 0.4) 46%, transparent 100%);
+  opacity: 0;
+  transition: opacity 500ms ease-out;
+}
+.hero-glow.aiming .hero-grid-hot { opacity: 0.7; }
+/* The light the pointer carries: brand blue, never white. A white pool over a
+   light page is a washed-out patch, and it would sit under the muted standfirst
+   where contrast is already the thing being protected. */
+.hero-spot {
+  position: absolute; left: 0; top: 0; width: 720px; height: 720px;
+  margin: -360px 0 0 -360px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(47, 99, 214, 0.17) 0%, rgba(47, 99, 214, 0.07) 50%, transparent 100%);
+  opacity: 0;
+  will-change: transform;
+  transition: opacity 420ms ease-out;
+}
+.hero-glow.aiming .hero-spot { opacity: 1; }
+/* Grain. Every large gradient on a light background bands on a cheap panel, and
+   banding is the single clearest tell of a gradient that was stepped rather
+   than photographed. One SVG turbulence tile at 6% kills it for nothing, and it
+   gives the flat brand blue the tooth of paper — which is the material the rest
+   of the page is already made of. */
+.hero-grain {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: multiply;
+  opacity: 0.06;
+}
 .hero-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 0.95fr 1.05fr; align-items: center; gap: 56px; }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
@@ -240,38 +287,199 @@ h2 em, h1 em { color: var(--blue); font-style: normal; }
    bullet rule was written as `.mobile-note span`, which also caught the text
    span beside it and turned the whole line red. */
 .mobile-note-text { text-align: left; }
-
-/* The cards sit on the product's own surface, not on an orb.
-
-   A glossy sphere is decoration from anywhere: it is not a shape Collos uses,
-   and the three real cards read as floating in front of scenery. This panel is
-   the card Today opens with ("Today's care plan") at hero scale: brand blue
-   through the darker stop, a corner radius in the same proportion as the card's
-   24pt, and one pass of light from its top-left. So the hero shows the app's own
-   surface behind the app's own rows. It stays off the left column. */
-.hero-stage { position: relative; min-height: 560px; }
-.hero-panel {
-  position: absolute; top: 48%; left: 53%;
-  width: 440px; height: 420px;
-  transform: translate(-50%, -50%) rotate(-6deg);
-  border-radius: 46px;
-  background:
-    radial-gradient(110% 80% at 16% 10%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 58%),
-    linear-gradient(158deg, #4f8ef2 0%, #2f63d6 54%, #1b3f96 100%);
-  box-shadow: 0 34px 80px rgba(47, 99, 214, 0.28);
-  animation: panel-drift 16s ease-in-out infinite alternate;
+/* The copy arrives in the order a reader takes it in: badge, headline,
+   standfirst, buttons, note. 70ms apart and 14px of travel — enough that the
+   column reads as being written rather than switched on, small enough that
+   nobody is ever waiting for it. */
+.hero-copy > * { animation: riseIn 720ms cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.hero-copy > *:nth-child(1) { animation-delay: 40ms; }
+.hero-copy > *:nth-child(2) { animation-delay: 110ms; }
+.hero-copy > *:nth-child(3) { animation-delay: 180ms; }
+.hero-copy > *:nth-child(4) { animation-delay: 250ms; }
+.hero-copy > *:nth-child(5) { animation-delay: 320ms; }
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
 }
-/* One soft pass of light across the top-left, so the panel reads as a lit
-   surface rather than a flat rectangle. */
-.hero-panel-sheen {
+
+/* The cards sit on the product's own surface: the two annotations are the app's
+   own copy at card scale, and everything behind them is light. Nothing in this
+   composition is a shape the app does not have. */
+/* Four layers, front to back: the product, two annotations, the aurora, the
+   ambient light. Depth is what a flat panel cannot give — an abstract blue
+   rounded square says "graphic", and a device standing in front of moving light
+   says "product". Each layer travels at its own rate, both on its own clock and
+   against the pointer, which is what makes the depth readable; see `heroDepth`
+   in script.js. */
+.hero-stage { position: relative; min-height: 700px; }
+
+/* The aurora: the brand's blue, in motion, behind the device.
+
+   This replaces two turned rounded squares. The squares were the third attempt
+   at a shape behind the hero and the honest problem with all three was the
+   same: a hard-edged slab of flat brand blue is a graphic, and a graphic behind
+   a product photo reads as a placeholder. Light does not have that problem. A
+   conic sweep of the brand blues, blurred past the point where any band is
+   visible and faded out by its own mask, has no edge to judge and no rectangle
+   to collide with the device — it reads as the room the device is standing in.
+   It is also the one thing on the page that is unmistakably alive: it turns a
+   full revolution every 84 seconds, which is slow enough that you notice it has
+   moved rather than watch it move.
+
+   The two blooms are the accents from the app itself — periwinkle above,
+   the blush of the evening note below — kept at a whisper, because they are
+   here to keep the blue from going dead, not to be a second idea. */
+.aurora {
+  position: absolute;
+  left: 50%; top: 46%;
+  /* Taller than it is wide, deliberately. A round pool at this size reaches far
+     enough left to sit under the muted half of the headline, which is exactly
+     the text whose contrast cannot afford a tint behind it. Standing the light
+     up as a column keeps the glow where the device is and lets it go as high and
+     as low as it likes. */
+  width: min(760px, 138%); height: min(1040px, 188%);
+  /* `translate`, not `transform: translate(-50%, -50%)`, and this one line is
+     the difference between light and a bug.
+
+     The individual transform properties compose in a fixed order — translate,
+     then rotate, then scale, then `transform` — which puts `transform`
+     innermost: a `translate(-50%, -50%)` written there is rotated along with
+     everything else. The moment a `rotate` animation starts on that same
+     element, the offset swings around the anchor instead of the element turning
+     on the spot. That is precisely what this layer did in its first version —
+     it was not a glow drifting gently, it was a glow orbiting the device once
+     every 84 seconds, which is why its blue kept surfacing in the wrong corner
+     of the hero and never behind the phone where it belonged. `translate` is a
+     separate property and cannot be rotated by a sibling, so the layer stays
+     where it is put. */
+  translate: -50% -50%;
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 40%, rgba(0, 0, 0, 0.66) 74%, transparent 100%);
+          mask-image: radial-gradient(closest-side, #000 40%, rgba(0, 0, 0, 0.66) 74%, transparent 100%);
+  pointer-events: none;
+}
+/* The turn gets an element of its own, for the reason above: this way the sweep
+   and the movement are two properties on two boxes — `rotate` here, `transform`
+   on the parent, which script.js owns for the pointer drift — and nothing has to
+   compose with anything.
+
+   Every stop is a mid or dark brand blue, and there is no pale one anywhere in
+   the turn. A conic places its stops by angle alone, so a pale stop is not a
+   highlight you can put somewhere: it is a pale sector, and the rotation drags
+   it across the whole hero once a cycle. Blue all the way round means the turn
+   varies the light instead of periodically cancelling it. */
+.aurora-turn {
   position: absolute; inset: 0; border-radius: inherit;
-  background: linear-gradient(122deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 44%);
+  background: conic-gradient(from 200deg at 50% 50%, #2f63d6 0deg, #5b95f2 70deg, #2b5ed2 150deg, #7fb0ff 228deg, #3f7fe8 300deg, #2f63d6 360deg);
+  animation: auroraSpin 84s linear infinite;
+  will-change: rotate;
 }
-/* The sphere used to drift on a 14s loop. The panel settles instead: a couple
-   of degrees of tilt, no scale, so the corner radius never looks wobbly. */
-@keyframes panel-drift {
-  from { transform: translate(-52%, -50%) rotate(-7.5deg); }
-  to { transform: translate(-48%, -50.5%) rotate(-4.5deg); }
+/* Each layer also declares the opacity `--fade-to` animates to, because under
+   `prefers-reduced-motion` the animation does not run and the declared value is
+   the one that paints. */
+.aurora-a {
+  /* 38px of blur, not the 52 it started with: past about 40 the sweep's bands
+     average out into one flat field, and a flat field is a colour rather than
+     light — nothing in it moves, so nothing about it reads as alive. Enough
+     blur to lose the stop edges, not enough to lose the variation. */
+  filter: blur(38px) saturate(120%);
+  opacity: 0.66;
+  --fade-to: 0.66;
+  animation: heroFade 1200ms ease-out both;
+}
+.aurora-b {
+  left: 57%; top: 33%;
+  width: min(520px, 96%); height: min(520px, 96%);
+  background: radial-gradient(circle at 50% 50%, rgba(154, 191, 243, 0.95) 0%, rgba(154, 191, 243, 0) 70%);
+  filter: blur(46px);
+  opacity: 0.42;
+  --fade-to: 0.42;
+  animation: heroFade 1400ms ease-out both, auroraDrift 17s ease-in-out 1.2s infinite alternate;
+}
+.aurora-c {
+  left: 43%; top: 67%;
+  width: min(440px, 82%); height: min(440px, 82%);
+  background: radial-gradient(circle at 50% 50%, rgba(221, 107, 107, 0.55) 0%, rgba(221, 107, 107, 0) 70%);
+  filter: blur(52px);
+  opacity: 0.16;
+  --fade-to: 0.16;
+  animation: heroFade 1500ms ease-out both, auroraDrift 23s ease-in-out 0.6s infinite alternate-reverse;
+}
+/* A full turn, not a wobble: anything shorter reads as the page twitching. */
+@keyframes auroraSpin { to { rotate: 360deg; } }
+/* Breathing, not drifting: 4% of scale and a few pixels, so the light looks like
+   it is being lit rather than pushed around. These offsets are relative to the
+   `translate` that already centres each bloom — the animation only nudges it,
+   which also matters during its delay, when the base position is all there is. */
+@keyframes auroraDrift {
+  from { transform: translate(-2%, -2%) scale(0.97); }
+  to { transform: translate(4%, 4%) scale(1.05); }
+}
+/* The entrance every layer shares. It ends at `--fade-to`, not at 1, and that
+   is not a detail: with `fill-mode: both` this animation keeps the element's
+   final value forever, so ending on `opacity: 1` silently overwrote each
+   layer's own opacity — which is how a 40%-opacity bloom was painting at full
+   strength. Each layer now names the value it wants to keep. */
+@keyframes heroFade {
+  from { opacity: 0; }
+  to { opacity: var(--fade-to, 1); }
+}
+
+/* ------------------------------------------------------------- the phone */
+/* The product at hero scale, in the app's own bezel: navy border, the corner
+   proportion the desktop frame uses, and a shadow deep enough that it reads as
+   an object standing in front of the brand shape rather than a picture pasted
+   onto it. What is inside is the running app — see
+   `scripts/capture-app-screenshots.mjs` — so the hero cannot advertise a screen
+   the build does not have, which is how the hand-drawn version drifted.
+
+   The bezel sits on `.hero-phone-body` rather than on `.hero-phone` because the
+   entrance animation moves the whole frame while the pointer tilt rotates only
+   the body: two animations, two elements, no fight over one `transform`. */
+.hero-phone {
+  position: absolute;
+  left: 50%; top: 34px;
+  width: 300px;
+  margin: 0;
+  transform: translateX(-50%);
+  animation: heroRise 800ms cubic-bezier(0.22, 0.61, 0.36, 1) 140ms both;
+}
+/* The device never fully settles: 7px of rise and fall over nine seconds.
+
+   Three movements meet on the phone, and each one owns its own element so none
+   of them can overwrite another: `.hero-phone` carries the entrance (an
+   animation, so it owns `transform`), this wrapper carries the idle float, and
+   `.hero-phone-body` is left for the pointer tilt, which script.js writes
+   inline. Two animations on one property would not compose — the later one
+   simply replaces the earlier — and a phone that only moves while the mouse is
+   on it is a phone that is off. */
+.hero-phone-drift { display: block; animation: idleFloat 9s ease-in-out 1s infinite; }
+@keyframes idleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.hero-phone-body {
+  display: block;
+  position: relative;
+  border: 10px solid var(--ink);
+  border-radius: 46px;
+  background: var(--ink);
+  overflow: hidden;
+  box-shadow:
+    0 40px 90px rgba(24, 52, 104, 0.26),
+    0 8px 20px rgba(24, 52, 104, 0.1),
+    /* Light spilling off the screen: the device is standing in the aurora, so it
+       should be the brightest thing in it rather than a cut-out on top of it. */
+    0 0 110px rgba(47, 99, 214, 0.22);
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.hero-phone-body img { display: block; width: 100%; height: auto; }
+/* Arriving, not fading in: the frame rises the last few pixels into place. */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateX(-50%) translateY(28px) scale(0.985); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 /* The reference's one shared animation: a 10px rise with a 3 degree tilt. */
 @keyframes floatSlow {
@@ -295,41 +503,22 @@ h2 em, h1 em { color: var(--blue); font-style: normal; }
 }
 .card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow-lift); }
 
-/* Floating product cards — every row on them mirrors a real screen in the app. */
-.card-plan { position: absolute; top: 34px; left: 0; width: min(320px, 84%); padding: 16px; z-index: 2; }
-.card-head { display: flex; align-items: center; gap: 11px; }
-/* Real faces, not letters: the lettered square is what made the product look
-   like a wireframe. The initials fallback still exists in the app for a person
-   with no picture; on the site everyone has one. */
-.card-avatar { display: block; width: 38px; height: 38px; flex: 0 0 auto; border-radius: 50%; object-fit: cover; background: var(--periwinkle-wash); box-shadow: 0 0 0 1px var(--hairline); }
-.card-head-copy { flex: 1; }
-.card-head-copy strong { display: block; font-size: 13.5px; font-weight: 600; }
-.card-head-copy small { color: var(--muted); font-size: 10.5px; }
-.card-chip { padding: 5px 9px; border-radius: 99px; color: var(--blue); background: var(--periwinkle-wash); font-size: 10.5px; font-weight: 700; }
-.plan-row { display: flex; align-items: center; gap: 9px; margin-top: 12px; padding: 10px 11px; border: 1px solid var(--hairline); border-radius: 13px; background: #fbfcfe; }
-.plan-row-copy { flex: 1; font-size: 12px; font-weight: 600; }
-.plan-row-copy small { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; font-weight: 500; }
-.plan-dot { width: 8px; height: 8px; border-radius: 50%; }
-.plan-dot-blush { background: var(--blush); }
-.plan-dot-mint { background: var(--mint); }
-.plan-check { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 50%; color: var(--white); background: var(--blue); font-size: 11px; }
-.plan-check-open { color: var(--muted); background: var(--periwinkle-wash); }
-/* The two affordances the app now carries on a row, shown at hero scale so the
-   card cannot promise a screen the product does not have: a repeat rule, and
-   the way in to renaming or moving the moment. */
-.plan-repeat { flex: 0 0 auto; padding: 3px 7px; border-radius: 7px; color: var(--blue); background: var(--periwinkle-wash); font-size: 9px; font-weight: 700; letter-spacing: 0.3px; }
-.plan-menu { flex: 0 0 auto; color: #a3b2cc; font-size: 15px; }
-.plan-bar { height: 7px; margin-top: 13px; border-radius: 99px; background: var(--periwinkle-deep); overflow: hidden; }
-.plan-bar-fill { display: block; width: 50%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--blue), #60b1ff); }
-/* Overlapping circles, the way a real avatar stack reads. */
-.avatar-stack { display: flex; margin-top: 13px; }
-.avatar-stack img { display: block; width: 26px; height: 26px; margin-left: -7px; border: 2px solid var(--white); border-radius: 50%; background: var(--periwinkle-wash); object-fit: cover; }
-.avatar-stack img:first-child { margin-left: 0; }
-.card-note { position: absolute; right: 0; bottom: 148px; display: flex; align-items: center; gap: 11px; width: min(250px, 70%); padding: 14px 16px; z-index: 3; animation: floatSlow 5s ease-in-out 1s infinite; }
+/* The two annotations. They are the part of the composition that is laid out by
+   hand, and they are here because a still cannot show them: what a note is for,
+   and who the circle holds. Everything they say is the app's own copy. */
+/* 27%, not the 41% it was first placed at: at 41% the card landed across the
+   app's own "Add" pill, which is a control, and half-covering a control reads as
+   a collision. Up here it overlaps the empty right-hand side of the recipient
+   row instead — the card still sits on the device, and nothing it covers was
+   something a person would want to read. */
+.card-note { position: absolute; right: -14px; top: 27%; display: flex; align-items: center; gap: 11px; width: clamp(148px, 35%, 210px); padding: 14px 16px; z-index: 3; animation: floatSlow 5s ease-in-out 1s infinite; }
 .note-icon { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border-radius: 50%; color: var(--blush); background: var(--blush-wash); font-size: 18px; }
 .card-note strong { display: block; font-size: 12.5px; font-weight: 600; }
 .card-note small { color: var(--muted); font-size: 10.5px; }
-.card-circle { position: absolute; left: 22px; bottom: 26px; display: flex; align-items: center; gap: 12px; padding: 13px 16px; z-index: 2; animation: floatSlow 4.5s ease-in-out 0.3s infinite; }
+/* Lifted off the bottom edge for the same reason: at 72px it sat over the app's
+   own tab bar. Now it lands on the moment rows, which are content rather than
+   chrome, and the device's nav stays legible underneath. */
+.card-circle { position: absolute; left: -14px; bottom: 118px; display: flex; align-items: center; gap: 12px; width: clamp(148px, 35%, 210px); padding: 13px 16px; z-index: 2; animation: floatSlow 4.5s ease-in-out 0.3s infinite; }
 .circle-logo { width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; object-fit: cover; }
 .card-circle strong { display: block; font-size: 12.5px; font-weight: 600; }
 .card-circle small { color: var(--muted); font-size: 10.5px; }
@@ -400,6 +589,12 @@ h2 { margin-top: 0; font-weight: 600; }
 .cta-card .eyebrow { color: #bcd0ff; }
 .cta-card h2 em { color: var(--periwinkle); }
 .cta-card > div:last-child > p { max-width: 300px; margin-bottom: 22px; color: #dce7ff; font-size: 14px; line-height: 1.6; }
+/* The closing block has two actions now: the product, and the source beside it
+   as a quiet link rather than a second pill. Two equally loud buttons is how a
+   page ends up with no primary action at all. */
+.cta-actions { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.cta-secondary { color: #bcd0ff; font-size: 13px; font-weight: 600; transition: color 180ms ease-out; }
+.cta-secondary:hover { color: var(--white); text-decoration: underline; }
 
 /* ------------------------------------------------------------------ buttons */
 .button {
@@ -457,6 +652,12 @@ h2 { margin-top: 0; font-weight: 600; }
 /* The little UI fragment at the foot of each step is the app's own language:
    recipient chips, a plan row, a progress bar. Nothing invented. */
 .step-ui { display: grid; gap: 8px; margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); }
+/* The tone dot a moment wears in the app, kept here because the step cards use
+   it too. It is the only fragment of the old hand-drawn hero card that still has
+   a job: everything else on that card is now the real capture. */
+.plan-dot { width: 8px; height: 8px; border-radius: 50%; }
+.plan-dot-blush { background: var(--blush); }
+.plan-dot-mint { background: var(--mint); }
 .chip { display: inline-flex; align-items: center; gap: 9px; width: fit-content; padding: 5px 14px 5px 5px; border: 1px solid var(--hairline); border-radius: 99px; background: var(--white); color: var(--ink); font-size: 12px; font-weight: 600; box-shadow: var(--card-shadow); }
 .chip-on { color: var(--white); background: var(--blue); border-color: transparent; box-shadow: 0 4px 15px rgba(47, 99, 214, 0.22); }
 .chip-face { display: block; width: 24px; height: 24px; flex: 0 0 auto; border-radius: 50%; object-fit: cover; background: var(--periwinkle-wash); }
@@ -559,6 +760,24 @@ code { padding: 1px 5px; border-radius: 6px; color: var(--ink); background: var(
 .docs-table td code { white-space: nowrap; }
 .docs-meta { margin: 14px 0 0; color: #9aa7bb; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
+/* ------------------------------------------------------------- arrival */
+/* Every block below the fold arrives once, when it first comes into view, and
+   then forgets it ever had an entrance: script.js drops both classes when the
+   transition has run, so nothing is left holding a transform or a transition
+   that would fight the hover lift on the cards inside it.
+
+   Both classes are added by script.js and never written in the markup, so a
+   reader without JavaScript — or with motion reduced — gets the page fully
+   composed rather than a page with invisible sections in it. An entrance that
+   can hide content when the script fails is not an entrance. */
+.reveal { opacity: 0; transform: translateY(20px); }
+.reveal-in {
+  opacity: 1; transform: none;
+  transition:
+    opacity 720ms cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 720ms cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-delay, 0ms);
+}
+
 /* --------------------------------------------------------- responsive */
 @media (max-width: 1080px) {
   .nav-links { gap: 26px; }
@@ -579,7 +798,16 @@ code { padding: 1px 5px; border-radius: 6px; color: var(--ink); background: var(
   .hero-lede { margin: 0 auto; }
   .hero-actions { justify-content: center; }
   .mobile-note { justify-content: center; }
-  .hero-stage { max-width: 460px; margin: 0 auto; width: 100%; }
+  .hero-stage { max-width: 460px; margin: 0 auto; width: 100%; min-height: 640px; }
+  /* Stacked, the copy sits above the device and the stage is centred, so the
+     field follows it: the 68% that lands under the phone in the two-column
+     layout would otherwise light up the right-hand third of a phone screen. */
+  .hero-grid {
+    -webkit-mask-image: radial-gradient(460px 560px at 50% 72%, #000 0%, rgba(0, 0, 0, 0.4) 62%, transparent 100%);
+            mask-image: radial-gradient(460px 560px at 50% 72%, #000 0%, rgba(0, 0, 0, 0.4) 62%, transparent 100%);
+  }
+  .hero-phone { width: 262px; }
+  .card-note, .card-circle { width: min(192px, 54%); }
 }
 /* Below 768px the row of links cannot hold four labels, so it becomes the
    full-screen overlay and the hamburger takes over. */
@@ -596,10 +824,20 @@ code { padding: 1px 5px; border-radius: 6px; color: var(--ink); background: var(
   .mobile-nav { display: flex; }
   .hero { padding-top: 40px; }
   h1 { font-size: clamp(34px, 9vw, 48px); letter-spacing: -1.6px; }
-  .hero-stage { min-height: 500px; }
-  .hero-panel { width: 330px; height: 330px; }
-  .card-plan { width: min(300px, 92%); }
-  .card-note { bottom: 128px; }
+  .hero-stage { min-height: 580px; }
+  .aurora { width: min(560px, 152%); height: min(560px, 152%); }
+  .aurora-b { width: min(400px, 108%); height: min(400px, 108%); }
+  .aurora-c { width: min(340px, 92%); height: min(340px, 92%); }
+  .hero-grid { background-size: 22px 22px; }
+  .hero-phone { width: 236px; top: 26px; }
+  /* Anchored to opposite corners of the device on a phone, so the overlap reads
+     as annotations stuck to it rather than two cards drifting over its middle. */
+  /* Only 4px proud of the stage on a phone: the shell already eats 14px of the
+     viewport on each side, so the −18px the desktop rules use put the circle
+     card 7px off the left edge of a 390px screen — a card cut in half by the
+     viewport, which reads as a bug rather than as a card. */
+  .card-note { top: 30%; right: -4px; width: min(162px, 52%); }
+  .card-circle { bottom: 52px; left: -4px; width: min(162px, 52%); }
   .stack-strip { flex-direction: column; gap: 14px; padding-bottom: 0; }
   .stack-strip ul { justify-content: center; gap: 20px; }
   .section { padding: 85px 0; }
@@ -625,6 +863,7 @@ code { padding: 1px 5px; border-radius: 6px; color: var(--ink); background: var(
   .cta { padding: 75px 0; }
   .cta-card { display: block; padding: 37px 28px; text-align: center; }
   .cta-card > div:last-child > p { margin: 23px auto 20px; }
+  .cta-actions { flex-direction: column; gap: 16px; }
   .cta-card .button { width: 100%; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 35px 25px; }
   .footer-grid > div:first-child { grid-column: 1 / -1; }
@@ -661,7 +900,18 @@ code { padding: 1px 5px; border-radius: 6px; color: var(--ink); background: var(
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .hero-panel, .glow, .card-note, .card-circle { animation: none; }
+  /* Nothing arrives, nothing drifts, nothing floats, and the pointer listeners
+     in script.js are never attached at this setting — so the light stays put and
+     the page still looks like itself once it has settled, it just does not
+     perform. The aurora keeps its shape and loses its clock: a still pool of
+     brand light behind the device, which is what the hero looks like at rest
+     anyway. `.reveal` is forced visible as a last resort: script.js never adds
+     it here, but a stylesheet that can hide content should have said out loud
+     that it will not hide it for this reader. */
+  .aurora, .aurora-turn, .hero-phone, .hero-phone-drift, .glow, .card-note, .card-circle { animation: none; }
+  .hero-phone-body { transition: none; }
+  .hero-spot, .hero-grid-hot { display: none; }
+  .hero-copy > *, .reveal { animation: none !important; opacity: 1 !important; transform: none !important; }
   .button, .button-glass, .nav-cta, .card, .faq-item, .nav-links a { transition: none; }
   .button-glass:hover, .button:hover, .nav-cta:hover, .card:hover { transform: none; }
 }

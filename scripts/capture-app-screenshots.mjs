@@ -120,6 +120,28 @@ const FLOWS = {
       presses: [...SETUP_PRESSES, "Start from a template", "Confirm"],
       expect: "Today.s moments",
     },
+    // The editor is captured next, while the plan is still on screen: pressing
+    // the "Today" tab to come back from the circle would be ambiguous, because
+    // "Today" is the word on every screen of this app — the moment rows, the
+    // section heading, and the member pills.
+    {
+      file: "app-editor.png",
+      label: "moment editor",
+      press: "Edit Water break",
+      expect: "Move to tomorrow",
+    },
+    // The circle comes last, because the sheet has to be closed first: it covers
+    // the tab bar, so a "Circle" press would land on its scrim.
+    //
+    // The page gives each of the four screens one home — the dashboard is the
+    // hero, the band shows setup and the editor, the showcase shows the circle —
+    // so nothing on it repeats a screenshot.
+    {
+      file: "app-circle.png",
+      label: "care circle",
+      presses: ["Close", "Circle"],
+      expect: "Everyone helping out",
+    },
   ],
 };
 
@@ -328,13 +350,20 @@ class Cdp {
    * `radio`), so query every interactive role and pick the *shortest* matching
    * text: that is the innermost, most specific element rather than a container
    * that happens to include the label.
+   *
+   * Both the visible text and the accessibility label are tested, and they have
+   * to be tested separately rather than as one fallback chain. The chain was the
+   * bug: an icon-only control renders a private-use glyph as its `innerText`, so
+   * `innerText || aria-label` returned the glyph and the label was never read at
+   * all — which made every `⋯`, every close button and every icon-only skip
+   * unreachable by name, the moment rows included.
    */
   _finder(pattern) {
     return `(() => {
       const re = new RegExp(${JSON.stringify(pattern)}, "i");
       const nodes = [...document.querySelectorAll('[role="button"],[role="tab"],[role="radio"],[tabindex]')];
       const hits = nodes
-        .filter((n) => re.test((n.innerText || n.getAttribute('aria-label') || '').trim()))
+        .filter((n) => re.test((n.innerText || '').trim()) || re.test(n.getAttribute('aria-label') || ''))
         .sort((a, b) => (a.innerText || '').trim().length - (b.innerText || '').trim().length);
       return hits[0] || null;
     })()`;

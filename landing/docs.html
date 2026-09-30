@@ -306,16 +306,29 @@ src/theme.ts                colour, radius scale, safe-area insets</code></pre>
             <h2>Screenshots and assets</h2>
             <p>
               Every phone frame on the product page is a capture of the running app, taken by the
-              script below rather than drawn by hand, and it writes them at the exact sizes the
-              stores require:
+              script below rather than drawn by hand &mdash; the hero included. That is deliberate:
+              the hero used to be a hand-built impression of the plan screen, and it drifted, still
+              advertising a percentage the app had stopped showing. A capture cannot drift.
             </p>
             <p>
-              The one composed surface is the hero: its floating rows are laid out by hand, and the
-              values on them &mdash; the person, the 10:30 water break and its
-              <code>Mon&ndash;Fri</code> rule, the edit affordance, the <code>1 of 2</code> &mdash;
-              are read off a real screen. That composition is the reason the hero card is the part
-              most likely to drift, which is why the numbers on it are checked against the app
-              rather than remembered.
+              Four captures are used, one per screen, and no screen appears twice: the dashboard is
+              the hero, the dark band shows setup and the editor for a moment, and the showcase
+              shows the circle. The only hand-laid-out parts of that composition are the two
+              annotation cards beside the phone, and they carry the app&rsquo;s own copy &mdash; the
+              evening note&rsquo;s title and its prompt are strings from the build.
+            </p>
+            <p>
+              What the phone stands in is light rather than a shape: a slow sweep of the brand blues
+              that takes 84 seconds to turn once, two accent blooms, a dot field, a pool of brand
+              light that follows the pointer, and one pass of SVG grain over the whole hero. The
+              grain is doing a job, not a mood &mdash; a gradient this large bands on a cheap panel,
+              and banding is the clearest tell of a gradient that was stepped rather than
+              photographed. It replaced two turned blue rounded squares, which were the third
+              attempt at a shape behind the hero and still read as a graphic, because a hard-edged
+              slab of flat colour behind a photograph of a device always does. All of it is
+              decoration in the strict sense: it is behind <code>aria-hidden</code>, nothing in it
+              is needed to read the page, and under <code>prefers-reduced-motion</code> every clock
+              stops, the light holds still, and the pointer listeners are never attached at all.
             </p>
             <pre><code>npm run screenshots          # the two previews used on the landing page
 npm run screenshots:devpost   # 1179x2556, the submission size
@@ -370,6 +383,18 @@ npm run screenshots:playstore # 1080x1920</code></pre>
                 <tr>
                   <td>Plans never load</td>
                   <td>No <strong>default</strong> offering, or packages missing from it.</td>
+                </tr>
+                <tr>
+                  <td>The hero&rsquo;s glow drifts away from the device instead of sitting behind it</td>
+                  <td>
+                    A <code>transform: translate(-50%, -50%)</code> on an element that also animates
+                    <code>rotate</code> or <code>scale</code>. The individual transform properties
+                    compose with <code>transform</code> rather than replacing it, and
+                    <code>transform</code> is applied innermost, so the centring offset is rotated
+                    along with everything else and the layer orbits its own anchor. Centre with the
+                    <code>translate</code> property and leave <code>transform</code> to carry only
+                    the movement.
+                  </td>
                 </tr>
               </tbody>
             </table>
