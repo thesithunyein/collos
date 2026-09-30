@@ -308,10 +308,16 @@ The 0:35–1:00 block is where they fit, and the first one is the better film. B
 covered by commits in the repository, so the video and the code agree.
 
 - **Skipping moves a moment instead of losing it.** On a moment, tap *Skip*, then the
-  **Move to tomorrow** that appears on the row. The moment leaves today and a toast
-  says where it went. Say the plain version: *"Not now is not never — skipping moves
-  it, so nothing you meant to do falls off the plan."* It is four seconds and it is
+  **Move to tomorrow** that appears on the row. The moment leaves today and the plan
+  header says where it went: *"1 moment moved to tomorrow."* Say the plain version:
+  *"Not now is not never — skipping moves it, so nothing you meant to do falls off the
+  plan."* It is four seconds and it is
   the one interaction here a judge has not seen in three other care apps.
+- **The loop closes on camera.** After the move, jump the device clock forward a
+  day and reopen the app: the morning is back on the plan wearing a **"Moved here"**
+  chip. Skip → moved → arrived, both halves visible, no mock involved — the chip is
+  driven by the same deferred map the store persists. This is the beat that turns a
+  nice mechanic into a finished idea; do not cut it for time.
 - **A moment can repeat on its own days.** Open a moment with the **⋯**, pick
   *Weekdays*, and save. Its row grows a **Mon–Fri** chip. Say: *"The bins go out on
   Tuesdays and the nurse comes on weekdays — a plan that can't say that isn't

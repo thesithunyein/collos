@@ -173,6 +173,26 @@ export default function App() {
     return out;
   }, [stored.deferred, recipient]);
 
+  /**
+   * Moments that *arrived* today: their deferred day is today's key.
+   *
+   * The other half of closing the skip loop. `movedMomentsForToday` shows the
+   * handoff ("moved to tomorrow"); this shows the payoff — when the day a
+   * moment was moved to becomes today, the row carries a small "Moved here"
+   * chip, so the return is visible rather than silent. Exactly the entries
+   * `tasksForRecipientOn` renders as on-plan, keyed for O(1) card lookups.
+   */
+  const arrivedTodayIds = useMemo(() => {
+    if (!recipient) return new Set<string>();
+    const map = stored.deferred[recipient.id] ?? {};
+    const today = dayKey();
+    const out = new Set<string>();
+    for (const [momentId, day] of Object.entries(map)) {
+      if (day === today) out.add(momentId);
+    }
+    return out;
+  }, [stored.deferred, recipient]);
+
   const recipientNotes = useMemo(
     () => notesForRecipient(stored, recipientId),
     [stored, recipientId],
@@ -392,6 +412,7 @@ export default function App() {
             noteCount={recipientNotes.length}
             organiserName={stored.organiserName}
             movedMoments={movedMomentsForToday}
+            arrivedMoments={arrivedTodayIds}
             onSelectRecipient={selectRecipient}
             onUpdateTask={updateTask}
             onOpenTaskEditor={(task) => setEditingTask(task)}

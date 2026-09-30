@@ -46,11 +46,18 @@ const TOUCH_SLOP_ICON = { top: 6, bottom: 6, left: 6, right: 6 };
  */
 export function TaskCard({
   task,
+  arrived = false,
   onUpdate,
   onOpenEditor,
   onMoveToTomorrow,
 }: {
   task: CareTask;
+  /**
+   * The moment was moved to today and today is now the day it was moved to:
+   * the arrival half of the skip loop. Display-only; the source of truth is
+   * the deferred map in the store.
+   */
+  arrived?: boolean;
   onUpdate: (id: string, status: TaskStatus) => void;
   /** Opens the sheet that renames, reschedules or deletes this moment. */
   onOpenEditor: (task: CareTask) => void;
@@ -84,7 +91,7 @@ export function TaskCard({
 
   const repeatLabel =
     task.repeat && task.repeat !== "daily" ? REPEAT_LABELS[task.repeat].short : null;
-  const hasMeta = Boolean(repeatLabel) || isSkipped;
+  const hasMeta = Boolean(repeatLabel) || isSkipped || arrived;
 
   return (
     <Animated.View
@@ -141,6 +148,15 @@ export function TaskCard({
 
         {hasMeta ? (
           <View style={styles.metaRow}>
+            {/* Arrival: the visible payoff of a move. A moment moved to today
+                wears proof of where it came from, so the loop the app promises
+                — skip, not lose — finishes where it started: on the plan. */}
+            {arrived ? (
+              <View style={styles.arrivedChip}>
+                <Ionicons name="arrow-undo" size={11} color={colors.blue} />
+                <Text style={styles.metaChipText}>Moved here</Text>
+              </View>
+            ) : null}
             {repeatLabel ? (
               <View style={styles.metaChip}>
                 <Ionicons name="repeat-outline" size={11} color={colors.blue} />
@@ -301,6 +317,16 @@ const styles = StyleSheet.create({
     marginTop: space.sm,
   },
   metaChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.xxs,
+    backgroundColor: colors.blueWash,
+    borderRadius: 9,
+    paddingHorizontal: space.sm,
+    paddingVertical: 3,
+  },
+  /** The arrival chip: the same family as the repeat chip, one icon changed. */
+  arrivedChip: {
     flexDirection: "row",
     alignItems: "center",
     gap: space.xxs,

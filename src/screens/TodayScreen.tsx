@@ -178,6 +178,8 @@ export type TodayScreenProps = {
    * phrased ("tomorrow"). Read-only display state; the map is derived in App.
    */
   movedMoments: Record<string, string>;
+  /** Moment ids whose moved-to day is today — the arrival half of the loop. */
+  arrivedMoments: Set<string>;
   onSelectRecipient: (recipient: CareRecipient) => void;
   onUpdateTask: (taskId: string, status: TaskStatus) => void;
   /** Opens the sheet that renames, reschedules or deletes a moment. */
@@ -204,6 +206,7 @@ export function TodayScreen({
   noteCount,
   organiserName,
   movedMoments,
+  arrivedMoments,
   onSelectRecipient,
   onUpdateTask,
   onOpenTaskEditor,
@@ -390,6 +393,7 @@ export function TodayScreen({
                   <TaskCard
                     key={task.id}
                     task={task}
+                    arrived={arrivedMoments.has(task.id)}
                     onUpdate={onUpdateTask}
                     onOpenEditor={onOpenTaskEditor}
                     onMoveToTomorrow={onMoveTaskToTomorrow}
