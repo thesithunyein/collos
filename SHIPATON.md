@@ -125,7 +125,7 @@ not require them. Verified against the category page and the walkthrough video.
 | 3 | New app; first public release inside 1 Aug – 30 Sep 2026 | ✅ Nothing released anywhere; all commits dated 27–28 Sep, inside the window |
 | 4 **[main]** | Fully published on a supported store | ➖ Not required for Next Gen. The build path exists anyway — see `RELEASE.md` |
 | 5 **[main]** | Available to download in the US | ➖ Follows from #4 |
-| 6 | RevenueCat project ID (Devpost form field) | ⚠️ Free, ~10 min in the dashboard; also upgrades the demo to a real sandbox purchase |
+| 6 | RevenueCat project ID (Devpost form field) | ✅ `projaa1359ce` — live in Settings → Support details and inlined in the production web bundle; sandbox purchase verified 30 Sep |
 | 7 | Public YouTube/Vimeo demo video, essential footage <2 min | ❌ Not recorded (script in §6) — the main open item |
 | 8 | 1024×1024 app icon | ✅ `assets/icon.png` committed |
 | 9 | ≥1 screenshot at **1179×2556**, no device frame | ✅ `submission/screenshots/`, plus store-sized sets in `store/screenshots/` |
