@@ -80,7 +80,7 @@ submission field, not necessarily the Devpost account's own login email.
 This is the single most dangerous misreading of the entry, because the rules say plainly
 that **"web apps are not eligible."** The facts are unambiguous:
 
-- The dependency that defines the product is **`react-native` 0.81.5** on **Expo SDK 54**.
+- The dependency that defines the product is **`react-native` 0.86.3** on **Expo SDK 57**.
   The web build only exists because `react-native-web` renders the same components to the
   DOM as an additional target.
 - **Native targets are configured, not aspirational:** `ios.bundleIdentifier` =
@@ -90,7 +90,7 @@ that **"web apps are not eligible."** The facts are unambiguous:
 - **The scripts are device scripts:** `expo start --ios`, `expo start --android`, and
   `eas.json` defines native build profiles (iOS simulator, Android APK, AAB).
 - **Platform-split native code ships:** `src/storage/fileStore.ts` writes through
-  `expo-file-system` (17.0.1) on native while `fileStore.web.ts` uses `localStorage`.
+  `expo-file-system` (57.0.7) on native while `fileStore.web.ts` uses `localStorage`.
   That split exists *because* it is a native app.
 
 So the risk is not eligibility — it is **presentation**. A video shot entirely in a
@@ -273,9 +273,9 @@ Two rules-side facts that are easy to miss:
    beyond doubt — and the Ship Kit milestones (perks) track exactly this. Have the
    project ID ready for the Devpost form.
 4. **Record the video on a real device** — an **iPhone** running Expo Go from the App
-   Store, which is SDK 54 and therefore matches this project. Read "Getting the app onto
-   a phone" in §6 first: the project was upgraded from SDK 51 to SDK 54 on submission day
-   precisely *because* an iPhone cannot run SDK 51 at all. Show only what the app does;
+   Store, which is SDK 57 and therefore matches this project. Read "Getting the app onto
+   a phone" in §6 first: an iPhone runs only the newest Expo Go, so this is a hard
+   constraint rather than a preference. Show only what the app does;
    no copyrighted music, no third-party trademarks or logos (rules §4 makes this a
    submission requirement, not a style tip).
 5. **Fill in the Devpost form** using §7, list Next Gen, submit, then keep editing
@@ -287,8 +287,9 @@ Judges are not required to watch beyond two minutes, and screeners score from th
 video plus the description. **Film on the device the app is built for** — a real phone
 running the app in Expo Go (`npm start`, scan the QR code), or the Android emulator /
 iOS Simulator. Read "Getting the app onto a phone" immediately below before you rely on
-that sentence: on an iPhone it is not possible at this SDK, and finding that out at
-midnight costs the whole submission. The
+that sentence: an iPhone runs only the newest Expo Go, and the account on the phone must
+match the account on the machine — finding either out at midnight costs the whole
+submission. The
 browser build (app.collos.sithunyein.com) is one labelled cutaway for the live sandbox
 purchase, not the main evidence: the rules ask for "footage that shows the Project
 functioning on the device for which it was built," and they separately disqualify web
@@ -303,11 +304,37 @@ violating it risks the whole entry.
 
 `npm start` starts the dev server; the phone runs the app inside Expo Go.
 
-**The project is SDK 54 (`expo ^54.0.0`), and SDK 54 is the last SDK Expo Go carries on
-the App Store.** Those two matching is the entire requirement — each Expo Go build
-contains exactly one SDK version and refuses a project built on any other.
+**Two things have to match, and neither is optional on an iPhone.**
 
-1. Install or update **Expo Go** from the App Store. It is SDK 54.
+**1. The SDK.** Expo Go contains exactly one SDK version and refuses a project built on
+any other, and the App Store build is always the newest — currently **SDK 57**, which is
+what this project is (`expo ^57.0.26`). Expo documents that for *"projects using SDK 53
+or earlier, you cannot install an older version of Expo Go on a physical iOS device"*, so
+there is no downgrade to fall back on.
+
+**2. The account.** On a physical iOS device — and only there — Expo Go checks that it
+and the Expo CLI are signed in to the *same* account before it will open a dev-server
+project, and the CLI reports nothing while this is wrong: the error appears only on the
+phone. Signing *out* of Expo Go does not fix it; Expo documents the same block when
+neither side is signed in. Put both on one account:
+
+```bash
+npx expo whoami            # must print the same username Expo Go shows
+npx expo login --browser   # only if it prints "Not logged in"
+```
+
+If `--browser` cannot launch a browser it looks like a dead end — it shells out to
+`cmd /c start`, which fails in a non-interactive session and takes its own callback server
+down with it. It is not a dead end: the CLI skips that call entirely when `BROWSER=none`,
+leaving the callback server alive so you can open the printed link yourself.
+
+```bash
+BROWSER=none npx expo login --browser   # copy the https://expo.dev/login?... link it prints
+```
+
+Then, once and only once:
+
+1. Install or update **Expo Go** from the App Store. It is SDK 57.
 2. Put the phone and the machine on the **same Wi-Fi**.
 3. From the repository root: `npm start`.
 4. In Expo Go, choose **Enter URL manually** and type the dev server's address;
@@ -317,23 +344,28 @@ contains exactly one SDK version and refuses a project built on any other.
    exp://192.168.x.x:8081
    ```
 
-   Scanning the QR code the terminal draws does the same thing.
+   Scanning the QR code the terminal draws does the same thing, but it depends on mDNS
+   discovery, which a Windows firewall or an AP-isolated network can silently swallow.
+   Typing the address works either way.
 5. If it will not connect — a closed port, or a Windows firewall rule — restart with
    `npx expo start --tunnel`, which routes around both.
 
 Dismiss Expo Go's floating dev-menu button before recording, and keep its name and mark
 out of frame: third-party trademarks are a submission restriction.
 
-**Why the project was upgraded from SDK 51 to SDK 54 on submission day.** At SDK 51 an
-iPhone could not run it at all: Expo documents that for *"projects using SDK 53 or
-earlier, you cannot install an older version of Expo Go on a physical iOS device"*, and
-every fallback was closed — the iOS Simulator needs macOS, the Android emulator wanted
-about 4 GB of disk that was not free, and a development build wants an Apple Developer
-Program membership. SDK 54 was the one version that both accepted this code and matched
-the store build of Expo Go, so upgrading was the only route to footage on a real phone.
-It cost three SDK majors in one step, and the breakages were all in the same two places:
+**Why the project was upgraded twice on submission day (SDK 51 → 54 → 57).** At SDK 51
+an iPhone could not run it at all, and every fallback was closed — the iOS Simulator needs
+macOS, the Android emulator wanted about 4 GB of disk that was not free, and a development
+build wants an Apple Developer Program membership. So the project went to SDK 54, the
+version Expo Go *then* carried. The store build had already moved to 57, and Expo ships
+only the newest, so 54 was stale on arrival; 57 was the version that finally matched. Six
+SDK majors in one evening, and every breakage landed in the same three places:
 `expo-file-system` stopped being a transitive dependency of `expo` **and** moved its old
-functions behind `/legacy`, and the `expo-font` override had to move with the SDK.
+functions behind `/legacy`; `StyleSheet.absoluteFillObject` was removed in React Native
+0.86 in favour of `absoluteFill`, which is now the object rather than a registered id; and
+the `expo-font` override had to move with the SDK each time. **No state-engine code was
+touched to make any of it pass** — the store, the storage contract and the skip loop are
+the same code that shipped before the upgrade, and `npm test` still reports 29/29.
 
 #### What the screeners and the judges are each required to do
 
@@ -370,7 +402,7 @@ judging closes on 13 October, and the video may show only what a reviewer can re
 | 0:35–1:00 | On the empty plan, tap *Start from a template*, then *Confirm* on the morning check-in | "When you'd rather edit than stare at a blank page, the four everyday moments are one tap away — a check-in, a water break, a walk, an evening note. They arrive open, and every confirmation is saved the moment you tap it: close the app, come back, and the plan still remembers." |
 | 1:00–1:20 | Circle tab (free) → *Add someone*, then Today → *Shared notes* and write one | "The Circle tab shows who is in the plan and who has checked in today, and it's where a second person joins — each one keeps their own plan and you switch in a tap. Shared notes are the one thing the free plan caps — one a day for each person — and they are kept on this device, still there after a restart." |
 | 1:20–1:45 | Tap *Unlock with Pro* → paywall → purchase | "Collos Pro lifts the shared-notes limit — one a day per person on the free plan, as many as your circle needs on Pro. The paywall loads live plans from RevenueCat — real prices, a per-month breakdown, and the entitlement is checked on every launch and after every purchase." *(The key is set: in the browser this is a live sandbox purchase through RevenueCat Billing — film the purchase beat there. On the phone in Expo Go the paywall is labelled preview mode and takes no payment, which the Next Gen walkthrough confirms is acceptable.)* |
-| 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.81.5, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
+| 1:45–2:00 | Circle screen now unlocked, then Settings → *This device* | "The entitlement isn't decorative: the same screen unlocks instantly. Settings exposes the RevenueCat app user ID, entitlement and project ID so this can be verified, and Restore purchases works for anyone reinstalling. This card is read from the phone itself — native iOS, React Native 0.86.3, `com.collos.app`. The browser build is the same codebase exported to web, which is where that purchase just went through." |
 
 #### Three beats the app gained after this script was written
 
@@ -418,7 +450,7 @@ they are mapped to is noted so nothing is cut by accident.
 | 0:22–0:30 | **progress** | *Confirm* the water break → progress ring moves | "Every tap is saved the moment you make it. Close the app, come back — the plan still remembers." |
 | 0:30–0:44 | **idea** *(tie-breaker)* | *Skip* → **Move to tomorrow** → header: *"1 moment moved to tomorrow."* → **cut** → clock rolled forward, reopen → the moment is back wearing **Moved here** | "And skipping isn't losing. Move it to tomorrow in one tap, and the plan says where it went. Tomorrow it comes back, marked with where it came from. Not now is not never." |
 | 0:44–0:54 | **RevenueCat** | Cut to browser, labelled on screen *web export — same app*: paywall → Test Store → *Collos Pro is active* | "Pro lifts the one limit the free plan has. These are live RevenueCat packages — real prices — and this is a purchase completing through RevenueCat Billing." |
-| 0:54–1:00 | **craft** + **category** | Settings → *This device* (native iOS, React Native 0.81.5, `com.collos.app`), then the repo: MIT in About, CI green | "Submitted for the Next Gen Award — a student-built app, judged on this video and the public repository. Same codebase on iOS, Android and web; the repo, the tests and the licence are all public." |
+| 0:54–1:00 | **craft** + **category** | Settings → *This device* (native iOS, React Native 0.86.3, `com.collos.app`), then the repo: MIT in About, CI green | "Submitted for the Next Gen Award — a student-built app, judged on this video and the public repository. Same codebase on iOS, Android and web; the repo, the tests and the licence are all public." |
 
 Three production notes, because this cut has no slack in it:
 
@@ -499,12 +531,12 @@ make a judge see it, roughly in order of how much they persuade:
    bar with its clock, Wi-Fi and battery, the notch or Dynamic Island, and the home indicator.
 3. **Show a native-only dialog.** Settings → *Reset all data* opens a **real system alert** on
    iOS/Android; the web build deliberately falls back to a two-tap inline confirm because React
-   Native 0.81's `Alert` does not exist on web. Tap it, show the OS dialog, tap *Cancel*. That is a
+   Native 0.86's `Alert` does not exist on web. Tap it, show the OS dialog, tap *Cancel*. That is a
    visible platform divergence in four seconds, and it is already implemented.
 4. **Show the phone's own keyboard and the safe-area layout.** Use *add a moment* and type with the
    native keyboard; the layout clears the notch and the home indicator.
 5. **Land on Settings → *This device*.** The card reads platform, OS version, device, the React
-   Native runtime (`0.81.5`), `com.collos.app` and app version out of the running app, and on a
+   Native runtime (`0.86.3`), `com.collos.app` and app version out of the running app, and on a
    phone it says *Native iOS app*. Then say the sentence that settles it: *"this is the iOS app;
    the browser version is the same React Native codebase exported to web."*
 6. **Only then cut to the browser**, label it on screen (*web export — same app*), and use it for

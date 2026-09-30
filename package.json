@@ -24,24 +24,24 @@
     "submit:android": "npx --yes eas-cli@24.8.0 submit --platform android --profile production"
   },
   "dependencies": {
-    "@expo/metro-runtime": "~6.1.2",
+    "@expo/metro-runtime": "~57.0.16",
     "@expo/vector-icons": "^15.0.3",
-    "expo": "^54.0.0",
-    "expo-file-system": "~19.0.24",
-    "expo-font": "~14.0.12",
-    "expo-status-bar": "~3.0.9",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.5",
+    "expo": "^57.0.26",
+    "expo-file-system": "~57.0.7",
+    "expo-font": "~57.0.4",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
     "react-native-purchases": "10.10.2",
     "react-native-web": "^0.21.0"
   },
   "devDependencies": {
-    "@types/react": "~19.1.10",
-    "babel-preset-expo": "~54.0.10",
-    "typescript": "~5.9.2"
+    "@types/react": "~19.2.4",
+    "babel-preset-expo": "~57.0.13",
+    "typescript": "~6.0.3"
   },
   "overrides": {
-    "expo-font": "~14.0.12"
+    "expo-font": "~57.0.4"
   }
 }

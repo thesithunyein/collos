@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
   /** The luma-style wash capsule that fades in under the active tab's icon. */
   iconWellFill: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 18,
     backgroundColor: colors.blueWash,
   },

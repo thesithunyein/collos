@@ -11,9 +11,9 @@ A short shared daily plan for the person in a family who has quietly become the 
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/thesithunyein/collos?style=flat-square&color=2f63d6" /></a>
   <a href="https://github.com/thesithunyein/collos/actions/workflows/ci.yml"><img alt="CI: typecheck and export" src="https://github.com/thesithunyein/collos/actions/workflows/ci.yml/badge.svg" /></a>
   <img alt="Platforms: iOS, Android and web from one codebase" src="https://img.shields.io/badge/platforms-iOS%20%C2%B7%20Android%20%C2%B7%20web-183468?style=flat-square" />
-  <img alt="Expo SDK 54" src="https://img.shields.io/badge/Expo%20SDK-54-000020?style=flat-square&logo=expo&logoColor=white" />
-  <img alt="React Native 0.81" src="https://img.shields.io/badge/React%20Native-0.81-61dafb?style=flat-square&logo=react&logoColor=white" />
-  <img alt="TypeScript 5.9" src="https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square&logo=typescript&logoColor=white" />
+  <img alt="Expo SDK 57" src="https://img.shields.io/badge/Expo%20SDK-57-000020?style=flat-square&logo=expo&logoColor=white" />
+  <img alt="React Native 0.86" src="https://img.shields.io/badge/React%20Native-0.86-61dafb?style=flat-square&logo=react&logoColor=white" />
+  <img alt="TypeScript 6.0" src="https://img.shields.io/badge/TypeScript-6.0-3178c6?style=flat-square&logo=typescript&logoColor=white" />
   <img alt="Payments: RevenueCat" src="https://img.shields.io/badge/payments-RevenueCat-f2542d?style=flat-square" />
   <img alt="Data: device-local, no backend" src="https://img.shields.io/badge/data-device--local%2C%20no%20backend-4fa98a?style=flat-square" />
   <img alt="Store listing: not yet published" src="https://img.shields.io/badge/store%20listing-not%20yet%20published-d97706?style=flat-square" />
@@ -398,7 +398,8 @@ collos/
 
 ### Prerequisites
 
-- **Node.js 20.19.4 or newer** — the floor Expo SDK 54 sets (CI runs 20).
+- **Node.js 20.19.4+, 22.13+, or 24.3+** — the range React Native 0.86 declares
+  (`^20.19.4 || ^22.13.0 || ^24.3.0 || >= 25.0.0`); CI runs 20.
 - For a native run: the iOS Simulator (macOS), an Android emulator, or the Expo Go
   app on a physical phone.
 - Nothing else. No store account, no Apple or Google developer account, and **no
@@ -777,7 +778,7 @@ worth more than one that restates the line beneath it.
    newest release, and an `expo-font` from a different SDK calls `registerWebModule`,
    which does not exist in the pinned `expo-modules-core`. The bundle then builds
    successfully and throws at runtime, leaving a blank white page. It first bit on
-   SDK 51; `expo-font` is pinned to `~14.0.12` for SDK 54 and additionally held by an
+   SDK 51; `expo-font` is pinned to `~57.0.4` for SDK 57 and additionally held by an
    `overrides` entry. **The override is part of the SDK upgrade, not a constant:** npm
    refuses to install while it names a version the SDK no longer expects (`EOVERRIDE`),
    so it has to move with the pin. Move `expo`, `expo-font` and `@expo/vector-icons`

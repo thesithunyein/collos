@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
    * off. Four of these, rotated 0/90/180/270, tile the ring exactly.
    */
   progressSegment: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderWidth: 5,
     borderRadius: 36,
     borderColor: "transparent",
