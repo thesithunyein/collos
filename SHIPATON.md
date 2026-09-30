@@ -366,6 +366,48 @@ Three production notes, because this cut has no slack in it:
   completes a real sandbox purchase. The sandbox entitlement expires the same day it
   is bought, so if you film tomorrow that beat shows **FREE** and is not filmable.
 
+#### Captions instead of a voice-over
+
+**Nothing in the rules requires narration**, so on-screen sentences are a perfectly
+legitimate style — and often the better one, since a clear caption beats a mumbled
+line into a phone mic. What the rules *do* constrain is the audio bed:
+
+> *"must not include third party trademarks, or copyrighted music or other material
+> unless the Entrant has permission to use such material"*
+
+So a commercial track is out unless you hold a licence for it. This is not a
+technicality worth risking: a YouTube Content ID claim can mute, restrict or block
+the upload, and the video has to be **publicly visible** on YouTube or Vimeo for the
+submission to count at all. Three safe options, in order:
+
+1. **No music at all.** Captions over the app's own taps and interface. Zero risk.
+2. **A royalty-free bed you can point to a licence for** — the YouTube Audio Library
+   is the obvious source, and it is instrumental, which is what you want: lyrics
+   compete with reading.
+3. **Something you made yourself.** Also zero risk, and it is yours.
+
+Keep any music well under the captions, and **do not put third-party logos in
+frame** — that includes the tooling. Crop or avoid Expo Go's chrome, and if you show
+GitHub, show the file rather than the header.
+
+Here is the caption text, block by block. Each line is short enough to read in the
+time it is on screen — aim for **four to seven words**, and hold each for at least
+about a second and a half. Cut between lines on the tap that causes them.
+
+| Time | Captions, in order |
+| --- | --- |
+| 0:00–0:06 | *Care work is invisible.* → *Did she drink water?* → *Did anyone actually check in?* |
+| 0:06–0:16 | *One screen to set up.* → *No account. No password.* |
+| 0:16–0:22 | *Four everyday moments, one tap away.* → *They arrive open — tick only what happened.* |
+| 0:22–0:30 | *Every tap saves instantly.* |
+| 0:30–0:44 | *Skipping isn't losing.* → *Move it to tomorrow.* → *"1 moment moved to tomorrow."* → *NEXT DAY* → *It comes back marked with where it came from.* |
+| 0:44–0:54 | *Pro lifts the one limit.* → *Live RevenueCat prices.* → *A real purchase, through RevenueCat Billing.* |
+| 0:54–1:00 | *iOS, Android and web — one codebase.* → *Repository, tests and licence are public.* |
+
+The captions should name the same facts the voice-over version says. If you later
+add narration, keep the captions — they are also the accessible version, and several
+judges will watch with sound off.
+
 ### Proving it's a native app, on camera
 
 The rules ask for footage of the project "functioning on the device for which it was built" and
