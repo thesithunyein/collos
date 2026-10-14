@@ -21,9 +21,9 @@ A short shared daily plan for the person in a family who has quietly become the 
 </p>
 
 <p align="center">
-  <a href="https://app.collos.sithunyein.com"><strong>Open the live app</strong></a> ·
-  <a href="https://collos.sithunyein.com">Project site</a> ·
-  <a href="https://collos.sithunyein.com/docs">Docs</a> ·
+  <a href="https://collos-app.vercel.app"><strong>Open the live app</strong></a> ·
+  <a href="https://collos.vercel.app">Project site</a> ·
+  <a href="https://collos.vercel.app/docs">Docs</a> ·
   <a href="RELEASE.md">Release runbook</a>
 </p>
 
@@ -419,7 +419,7 @@ npm run web        # straight to the browser build
 The browser build is the fastest way to see the app, and it is a real target
 rather than a preview shim: it is the same React Native code through
 `react-native-web`, and it is what runs at
-[app.collos.sithunyein.com](https://app.collos.sithunyein.com).
+[collos-app.vercel.app](https://collos-app.vercel.app).
 
 ### Checks
 

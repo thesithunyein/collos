@@ -76,7 +76,7 @@ const PRESETS = {
 };
 
 const VIEWPORT = PRESETS[SET];
-const BASE_URL = arg("base-url", "https://app.collos.sithunyein.com/");
+const BASE_URL = arg("base-url", "https://collos-app.vercel.app/");
 const OUT_DIRS = {
   landing: "landing",
   devpost: "submission/screenshots",
