@@ -286,7 +286,7 @@ absent is an App Store **2.3.1** rejection.
 - [ ] A purchase, a cancellation, and a restore each behave correctly on a real build
 - [ ] The Circle screen visibly unlocks when Pro activates
 - [ ] Screenshots re-captured from the submitted build at each store's required size
-- [ ] `https://collos.sithunyein.com/privacy` and `/terms` resolve
+- [ ] `https://collos.vercel.app/privacy` and `/terms` resolve
 - [ ] `store/listing.md` §1 and §7 re-read against what the build actually does
 - [ ] `ios.buildNumber` / `android.versionCode` committed after the last production build
 - [ ] Privacy, data-safety, age-rating and content-rating forms completed from `store/listing.md` §6

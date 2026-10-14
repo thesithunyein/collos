@@ -201,7 +201,7 @@ Steps 1–5 were the environment work (four `EXPO_PUBLIC_*` variables in Vercel:
 done — see the entry above. What is left is the part only you can do: **step 8
 (record the video), step 9 (fill the form), and optionally step 10**.
 
-**Status, 29 Sep.** Verified live: the paywall at app.collos.sithunyein.com loads
+**Status, 29 Sep.** Verified live: the paywall at collos-app.vercel.app loads
 the real offering ($4.99 / $39.99 / $3.33 per month) with no preview notice. On a
 phone in Expo Go purchases stay in labelled preview mode — iOS/Android store
 products are what native keys would buy, and Next Gen explicitly does not require
@@ -290,7 +290,7 @@ iOS Simulator. Read "Getting the app onto a phone" immediately below before you 
 that sentence: an iPhone runs only the newest Expo Go, and the account on the phone must
 match the account on the machine — finding either out at midnight costs the whole
 submission. The
-browser build (app.collos.sithunyein.com) is one labelled cutaway for the live sandbox
+browser build (collos-app.vercel.app) is one labelled cutaway for the live sandbox
 purchase, not the main evidence: the rules ask for "footage that shows the Project
 functioning on the device for which it was built," and they separately disqualify web
 apps outright (see "But is it a web app?" in §2). Shooting the whole thing in a browser
@@ -588,10 +588,10 @@ sibling does the morning call, another does the shopping, and nobody knows what 
 actually been done. Collos turns that into a short, shared daily plan.
 
 **Try it.** The video shows the app running on a phone. You can also open the same
-codebase in a browser — <https://app.collos.sithunyein.com> is a live, interactive
+codebase in a browser — <https://collos-app.vercel.app> is a live, interactive
 preview of the mobile UI (web is an Expo export of this React Native app, not a
 separate build). Without a store key configured it runs in a clearly-labelled
-preview mode and takes no payment; project site: <https://collos.sithunyein.com>.
+preview mode and takes no payment; project site: <https://collos.vercel.app>.
 
 **Who it's for.** The person in a family who has quietly become the organiser — usually
 the one who lives closest, or the only one who remembers.

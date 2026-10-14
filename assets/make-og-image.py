@@ -3,7 +3,7 @@
 
 Why this exists
 ---------------
-The link preview for collos.sithunyein.com used to be `app-dashboard.png`: a
+The link preview for collos.vercel.app used to be `app-dashboard.png`: a
 780x1688 portrait phone screenshot served to a `summary_large_image` card, which
 crops to roughly 2:1. Every judge who pastes the URL into a chat or a submission
 form saw the middle 40% of a phone screen with no name on it — the first thing

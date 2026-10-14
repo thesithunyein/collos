@@ -192,7 +192,7 @@ const APP_TOUR = [
  * `--skip-pro` drops the one step that cannot complete against the live app.
  *
  * Against a preview-mode build "Continue with Pro" is simulated and unlocks
- * instantly, so the tour runs end to end. Against app.collos.sithunyein.com it
+ * instantly, so the tour runs end to end. Against collos-app.vercel.app it
  * opens RevenueCat's checkout, which this script does not drive — so the run
  * would abort at step 5 and silently leave
  * the Settings screenshot at whatever the previous build captured.

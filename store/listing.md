@@ -18,7 +18,7 @@ make the difference between a live listing and a rejected one.
 | 2 | `EXPO_PUBLIC_REVENUECAT_*` keys are set for the platform being submitted, and the dashboard has a **default** offering with a monthly and an annual package | Without them the app ships in *preview* mode and takes no payment, so the listing would describe a subscription that does not exist |
 | 3 | A **free trial or promo code** is attached to that offering | Apple and Google both expect a way to evaluate the subscription; §4 also uses it for the review notes |
 | 4 | `store/screenshots/{appstore,playstore}/` are re-captured from that exact build | Screenshots showing a different build is a rejection reason |
-| 5 | `https://collos.sithunyein.com/privacy` resolves | Both stores require a reachable privacy policy URL |
+| 5 | `https://collos.vercel.app/privacy` resolves | Both stores require a reachable privacy policy URL |
 | 6 | The Data safety and Privacy Nutrition answers in §6 still match `package.json` | Adding any analytics or crash SDK changes them |
 
 Gates 1–3 need a store developer account and a RevenueCat project; they cannot be
@@ -38,9 +38,9 @@ produced by a code change.
 | Secondary category (iOS) | Productivity |
 | Play category | Lifestyle |
 | Price | Free with in-app subscriptions |
-| Marketing URL | `https://collos.sithunyein.com` |
-| Support URL | `https://collos.sithunyein.com` |
-| Privacy policy URL | `https://collos.sithunyein.com/privacy` |
+| Marketing URL | `https://collos.vercel.app` |
+| Support URL | `https://collos.vercel.app` |
+| Privacy policy URL | `https://collos.vercel.app/privacy` |
 | Support email | `sithunyein.mailto@gmail.com` |
 | Copyright | `2026 Sithu Nyein` |
 
@@ -107,7 +107,7 @@ A NOTE ON SAFETY
 Collos is for care coordination only. It is not medical advice and does not replace a qualified care professional. In an emergency, contact your local emergency number.
 
 Terms of use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
-Privacy policy: https://collos.sithunyein.com/privacy
+Privacy policy: https://collos.vercel.app/privacy
 ```
 
 **What's new in this version**
@@ -160,7 +160,7 @@ Keep a family's daily care plan in one shared place.
 
 Use the App Store description from §3 verbatim, with two changes: replace the
 "Terms of use (EULA)" line with
-`Terms: https://collos.sithunyein.com/terms`, and keep the safety note. Play
+`Terms: https://collos.vercel.app/terms`, and keep the safety note. Play
 rejects listings that reference another platform's store terms.
 
 **Store settings**
@@ -170,7 +170,7 @@ rejects listings that reference another platform's store terms.
 | App category | Lifestyle |
 | Tags | Caregiving, Family, Task management |
 | Contact email | `sithunyein.mailto@gmail.com` |
-| Website | `https://collos.sithunyein.com` |
+| Website | `https://collos.vercel.app` |
 | Ads | **No**, contains no ads |
 | In-app purchases | **Yes**, $2.99–$39.99 per item |
 | Government app | No |

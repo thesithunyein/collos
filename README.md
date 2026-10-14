@@ -644,12 +644,17 @@ Both deployments are Vercel, and neither needs a secret in the repository.
 npm run build:web          # expo export --platform web, into dist/
 ```
 
-The repository-root `vercel.json` runs that command and serves `dist/`. In Vercel,
-import the repository with **Root Directory** `.` and the **Other** framework
-preset, add `app.collos.sithunyein.com` under **Project Settings → Domains**, and
-create the DNS record Vercel gives you. Web purchases bill through RevenueCat
+The repository-root `vercel.json` runs that command and serves `dist/`. In Vercel the
+`collos-app` project imports this repository with **Root Directory** `.`, the **Other**
+framework preset and `npm run build:web` as its build command — which is what makes
+<https://collos-app.vercel.app> the app. It needs no custom domain: the
+`*.vercel.app` URL is the public address.
+Web purchases bill through RevenueCat
 Billing, so a configured `EXPO_PUBLIC_REVENUECAT_WEB_KEY` makes the browser build
-transact through RevenueCat; without it the build stays in preview mode.
+transact through RevenueCat; without it the build stays in preview mode. All three
+`EXPO_PUBLIC_REVENUECAT_*` values must be set on this project for the Production
+environment — with none of them present it still builds a finished-looking app that
+quietly takes no money.
 
 ### The project site
 
@@ -660,11 +665,12 @@ and deploys on its own.
 cd landing && vercel --prod
 ```
 
-In Vercel: **Root Directory** `landing`, **Other** preset, no build command, `.` as
-the output directory, then add `collos.sithunyein.com`. `landing/vercel.json` sets
+In Vercel the `collos` project uses **Root Directory** `landing`, the **Other**
+preset, no build command and `.` as the output directory, which is what makes
+<https://collos.vercel.app> the site rather than the app. `landing/vercel.json` sets
 `cleanUrls`, so the docs page resolves at `/docs` and the legal pages without
-`.html`. A domain is not claimed as live here until Vercel reports the deployment
-ready and the domain resolves.
+`.html`. Nothing here depends on a custom domain — the `*.vercel.app` URLs are
+the public addresses, so a DNS lapse at the registrar cannot take the site down.
 
 To preview the site locally, serve the directory (`python -m http.server 8123
 --directory landing`) — opening `index.html` from the filesystem works for the
@@ -706,7 +712,7 @@ node scripts/capture-app-screenshots.mjs --set devpost --only 04-paywall        
 node scripts/capture-app-screenshots.mjs --set devpost --base-url http://localhost:8081 --only 05-circle-pro
 ```
 
-Five of the six come from `app.collos.sithunyein.com`, because that is the only
+Five of the six come from `collos-app.vercel.app`, because that is the only
 place the Settings screen can show a real store row: a local build renders
 `Preview mode`, `collos_pro` and `RevenueCat project: Not set in this build`, which
 is no evidence of anything. The Pro-state frame is the exception — unlocking Pro

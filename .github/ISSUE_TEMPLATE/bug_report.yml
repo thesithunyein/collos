@@ -14,9 +14,9 @@ body:
     attributes:
       label: Where did it happen?
       options:
-        - The browser app (app.collos.sithunyein.com)
+        - The browser app (collos-app.vercel.app)
         - A native build on iOS or Android
-        - The project site (collos.sithunyein.com)
+        - The project site (collos.vercel.app)
         - The docs page
         - The capture script or a generator in scripts/ or assets/
         - Not sure
